@@ -20,7 +20,7 @@ class UserCrudController extends AbstractCrudController
     {
         $this->passwordHasher = $passwordHasher;
     }
-    
+
     public static function getEntityFqcn(): string
     {
         return User::class;
