@@ -1,0 +1,29 @@
+# translations/EasyAdminBundle.fr.yaml
+EasyAdminBundle:
+  page_title.dashboard: Tableau de bord
+  page_title.detail: "%entity_as_string%"
+  page_title.edit: Modifier %entity_label_singular%
+  page_title.index: "%entity_label_plural%"
+  page_title.new: Créer %entity_label_singular%
+  page_title.exception: Erreur|Erreurs
+
+  action.new: Créer %entity_label_singular%
+  action.search: Rechercher
+  action.detail: Détails
+  action.edit: Modifier
+  action.delete: Supprimer
+  action.save: Enregistrer
+  action.continue: Continuer
+  action.cancel: Annuler
+  action.list: Retour à la liste
+  action.deselect: Désélectionner
+  action.add_new_item: Ajouter un élément
+  action.remove_item: Supprimer l’élément
+
+  label.true: Oui
+  label.false: Non
+  label.empty: Vide
+  label.form.empty_value: Aucun(e)
+
+  message.form.tab.error: Il y a une erreur dans le formulaire
+  message.form.is_invalid: Le formulaire contient des erreurs.

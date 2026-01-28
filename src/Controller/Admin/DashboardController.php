@@ -3,6 +3,12 @@
 namespace App\Controller\Admin;
 
 use App\Entity\User;
+use App\Entity\Comment;
+use App\Entity\Resource;
+use Symfony\Component\HttpFoundation\Response;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Assets;
+use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminDashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractDashboardController;
 
@@ -14,15 +20,25 @@ class DashboardController extends AbstractDashboardController
         return $this->render('admin/index.html.twig');
     }
 
+    public function configureAssets(): Assets
+    {
+        return Assets::new()
+            ->addCssFile('styles/easyadmin.css');
+    }
+
     public function configureDashboard(): Dashboard
     {
         return Dashboard::new()
-            ->setTitle('Projet Collaboratif');
+            ->setTitle('Ressources Relationnelles')
+            ->renderContentMaximized()
+            ->disableDarkMode();
     }
 
     public function configureMenuItems(): iterable
     {
         yield MenuItem::linkToDashboard('Dashboard', 'fa fa-home');
         yield MenuItem::linkToCrud('Utilisateur', 'fas fa-user', User::class);
+        yield MenuItem::linkToCrud('Commentaire', 'fas fa-comment', Comment::class);
+        yield MenuItem::linkToCrud('Ressource', 'fas fa-image', Resource::class);
     }
 }

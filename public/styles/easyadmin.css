@@ -1,0 +1,25 @@
+/* personnalisation du menu gauche de easyadmin */
+.sidebar{
+    background-color: #2B3B82;
+}
+.logo-custom{
+    color: white;
+}
+.menu-item-label{
+    color: white;
+}
+#main-menu .menu .menu-icon{
+    color: white;
+}
+#main-menu .menu .menu-item.active:not(.expanded) .menu-icon, #main-menu .menu .menu-item.active:not(.expanded) a {
+    color: white;
+}
+#main-menu .menu .menu-item.active{
+    background-color: rgb(176, 176, 176);
+}
+
+/* personalisation des élements dans easyadmin */
+
+.btn-primary, .btn-primary:not(:disabled):not(.disabled):not(.btn-link):not(.btn-danger):active, .btn-primary:not(:disabled):not(.disabled):not(.btn-link):not(.btn-danger):active:focus, .btn-primary:not(:disabled):not(.disabled):not(.btn-link):not(.btn-danger):focus, .btn-primary:not(:disabled):not(.disabled):not(.btn-link):not(.btn-danger):hover {
+    background-color: #2B3B82;
+}

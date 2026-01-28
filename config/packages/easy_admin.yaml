@@ -1,0 +1,5 @@
+easy_admin:
+  design:
+    use_pretty_urls: true
+    assets:
+      locale: fr
