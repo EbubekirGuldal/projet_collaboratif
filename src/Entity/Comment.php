@@ -21,14 +21,15 @@ class Comment
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $status = null;
+    #[ORM\Column(length: 255, options: ["default" => "En attente"])]
+    private ?string $status = "En attente";
 
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $updatedAt = null;
 
-    #[ORM\Column]
-    private ?int $parentId = null;
+    #[ORM\ManyToOne(inversedBy: 'comments')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Resource $resource = null;
 
     public function __construct()
     {
@@ -88,14 +89,14 @@ class Comment
         return $this;
     }
 
-    public function getParentId(): ?int
+    public function getResource(): ?Resource
     {
-        return $this->parentId;
+        return $this->resource;
     }
 
-    public function setParentId(int $parentId): static
+    public function setResource(?Resource $resource): static
     {
-        $this->parentId = $parentId;
+        $this->resource = $resource;
 
         return $this;
     }

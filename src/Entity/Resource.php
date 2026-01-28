@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\ResourceRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -47,9 +49,21 @@ class Resource
     #[ORM\Column]
     private ?int $sharesCount = null;
 
+    /**
+     * @var Collection<int, Comment>
+     */
+    #[ORM\OneToMany(targetEntity: Comment::class, mappedBy: 'resource', orphanRemoval: true)]
+    private Collection $comments;
+
+    public function __toString()
+    {
+        return $this->id." | ".$this->title;
+    }
+
     public function __construct()
     {
         $this->createdAt = new \DateTimeImmutable();
+        $this->comments = new ArrayCollection();
     }
     
 
@@ -186,6 +200,36 @@ class Resource
     public function setSharesCount(int $sharesCount): static
     {
         $this->sharesCount = $sharesCount;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Comment>
+     */
+    public function getComments(): Collection
+    {
+        return $this->comments;
+    }
+
+    public function addComment(Comment $comment): static
+    {
+        if (!$this->comments->contains($comment)) {
+            $this->comments->add($comment);
+            $comment->setResource($this);
+        }
+
+        return $this;
+    }
+
+    public function removeComment(Comment $comment): static
+    {
+        if ($this->comments->removeElement($comment)) {
+            // set the owning side to null (unless already changed)
+            if ($comment->getResource() === $this) {
+                $comment->setResource(null);
+            }
+        }
 
         return $this;
     }
