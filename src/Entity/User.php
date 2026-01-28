@@ -34,17 +34,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255)]
     private ?string $username = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $lastName = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $firstName = null;
 
     #[ORM\Column]
     private ?bool $isVerified = null;
 
-    #[ORM\Column(nullable: true)]
-    private ?bool $isActive = null;
+    #[ORM\Column(options: ["default" => true])]
+    private ?bool $isActive = true;
 
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
