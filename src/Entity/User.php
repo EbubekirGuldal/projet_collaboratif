@@ -34,11 +34,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255)]
     private ?string $username = null;
 
-<<<<<<< HEAD
     #[ORM\Column(length: 255, nullable: true)]
-=======
-    #[ORM\Column(length: 255, nullable:true)]
->>>>>>> baptiste
     private ?string $lastName = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -47,11 +43,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?bool $isVerified = null;
 
-<<<<<<< HEAD
     #[ORM\Column(options: ["default" => true])]
-=======
-    #[ORM\Column(options: ["default"=>true])]
->>>>>>> baptiste
     private ?bool $isActive = true;
 
     #[ORM\Column]

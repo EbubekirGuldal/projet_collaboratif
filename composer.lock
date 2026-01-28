@@ -5510,92 +5510,6 @@
         {
             "name": "symfony/polyfill-uuid",
             "version": "v1.33.0",
-<<<<<<< HEAD
-=======
-            "source": {
-                "type": "git",
-                "url": "https://github.com/symfony/polyfill-uuid.git",
-                "reference": "21533be36c24be3f4b1669c4725c7d1d2bab4ae2"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/symfony/polyfill-uuid/zipball/21533be36c24be3f4b1669c4725c7d1d2bab4ae2",
-                "reference": "21533be36c24be3f4b1669c4725c7d1d2bab4ae2",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=7.2"
-            },
-            "provide": {
-                "ext-uuid": "*"
-            },
-            "suggest": {
-                "ext-uuid": "For best performance"
-            },
-            "type": "library",
-            "extra": {
-                "thanks": {
-                    "url": "https://github.com/symfony/polyfill",
-                    "name": "symfony/polyfill"
-                }
-            },
-            "autoload": {
-                "files": [
-                    "bootstrap.php"
-                ],
-                "psr-4": {
-                    "Symfony\\Polyfill\\Uuid\\": ""
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Grégoire Pineau",
-                    "email": "lyrixx@lyrixx.info"
-                },
-                {
-                    "name": "Symfony Community",
-                    "homepage": "https://symfony.com/contributors"
-                }
-            ],
-            "description": "Symfony polyfill for uuid functions",
-            "homepage": "https://symfony.com",
-            "keywords": [
-                "compatibility",
-                "polyfill",
-                "portable",
-                "uuid"
-            ],
-            "support": {
-                "source": "https://github.com/symfony/polyfill-uuid/tree/v1.33.0"
-            },
-            "funding": [
-                {
-                    "url": "https://symfony.com/sponsor",
-                    "type": "custom"
-                },
-                {
-                    "url": "https://github.com/fabpot",
-                    "type": "github"
-                },
-                {
-                    "url": "https://github.com/nicolas-grekas",
-                    "type": "github"
-                },
-                {
-                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
-                    "type": "tidelift"
-                }
-            ],
-            "time": "2024-09-09T11:45:10+00:00"
-        },
-        {
-            "name": "symfony/process",
-            "version": "v7.3.4",
->>>>>>> baptiste
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-uuid.git",
@@ -7332,8 +7246,6 @@
         {
             "name": "symfony/uid",
             "version": "v7.3.10",
-<<<<<<< HEAD
-=======
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/uid.git",
@@ -7410,9 +7322,8 @@
             "time": "2026-01-03T23:21:50+00:00"
         },
         {
-            "name": "symfony/ux-turbo",
-            "version": "v2.31.0",
->>>>>>> baptiste
+            "name": "symfony/uid",
+            "version": "v7.3.10",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/uid.git",
@@ -7672,8 +7583,6 @@
         {
             "name": "symfony/ux-twig-component",
             "version": "v2.32.0",
-<<<<<<< HEAD
-=======
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/ux-twig-component.git",
@@ -7759,9 +7668,8 @@
             "time": "2025-12-25T09:25:01+00:00"
         },
         {
-            "name": "symfony/validator",
-            "version": "v7.3.5",
->>>>>>> baptiste
+            "name": "symfony/ux-twig-component",
+            "version": "v2.32.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/ux-twig-component.git",
@@ -8268,83 +8176,7 @@
                 "push"
             ],
             "support": {
-<<<<<<< HEAD
                 "source": "https://github.com/symfony/web-link/tree/v7.3.10"
-=======
-                "source": "https://github.com/symfony/web-link/tree/v7.3.0"
-            },
-            "funding": [
-                {
-                    "url": "https://symfony.com/sponsor",
-                    "type": "custom"
-                },
-                {
-                    "url": "https://github.com/fabpot",
-                    "type": "github"
-                },
-                {
-                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
-                    "type": "tidelift"
-                }
-            ],
-            "time": "2025-05-19T13:28:18+00:00"
-        },
-        {
-            "name": "symfony/webpack-encore-bundle",
-            "version": "v2.4.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/symfony/webpack-encore-bundle.git",
-                "reference": "5b932e0feddd81aaf0ecd7d5fcd2e450e5a7817e"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/symfony/webpack-encore-bundle/zipball/5b932e0feddd81aaf0ecd7d5fcd2e450e5a7817e",
-                "reference": "5b932e0feddd81aaf0ecd7d5fcd2e450e5a7817e",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=8.1.0",
-                "symfony/asset": "^5.4 || ^6.2 || ^7.0 || ^8.0",
-                "symfony/config": "^5.4 || ^6.2 || ^7.0 || ^8.0",
-                "symfony/dependency-injection": "^5.4 || ^6.2 || ^7.0 || ^8.0",
-                "symfony/http-kernel": "^5.4 || ^6.2 || ^7.0 || ^8.0",
-                "symfony/service-contracts": "^1.1.9 || ^2.1.3 || ^3.0"
-            },
-            "require-dev": {
-                "symfony/framework-bundle": "^5.4 || ^6.2 || ^7.0 || ^8.0",
-                "symfony/http-client": "^5.4 || ^6.2 || ^7.0 || ^8.0",
-                "symfony/phpunit-bridge": "^5.4 || ^6.2 || ^7.0 || ^8.0",
-                "symfony/twig-bundle": "^5.4 || ^6.2 || ^7.0 || ^8.0",
-                "symfony/web-link": "^5.4 || ^6.2 || ^7.0 || ^8.0"
-            },
-            "type": "symfony-bundle",
-            "extra": {
-                "thanks": {
-                    "url": "https://github.com/symfony/webpack-encore",
-                    "name": "symfony/webpack-encore"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Symfony\\WebpackEncoreBundle\\": "src"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Symfony Community",
-                    "homepage": "https://symfony.com/contributors"
-                }
-            ],
-            "description": "Integration of your Symfony app with Webpack Encore",
-            "support": {
-                "issues": "https://github.com/symfony/webpack-encore-bundle/issues",
-                "source": "https://github.com/symfony/webpack-encore-bundle/tree/v2.4.0"
->>>>>>> baptiste
             },
             "funding": [
                 {
@@ -8364,11 +8196,7 @@
                     "type": "tidelift"
                 }
             ],
-<<<<<<< HEAD
             "time": "2026-01-01T22:03:12+00:00"
-=======
-            "time": "2025-11-27T13:41:46+00:00"
->>>>>>> baptiste
         },
         {
             "name": "symfony/webpack-encore-bundle",
@@ -8523,26 +8351,6 @@
             "time": "2025-12-04T18:07:52+00:00"
         },
         {
-<<<<<<< HEAD
-            "name": "theseer/tokenizer",
-            "version": "1.2.3",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/theseer/tokenizer.git",
-                "reference": "737eda637ed5e28c3413cb1ebe8bb52cbf1ca7a2"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/theseer/tokenizer/zipball/737eda637ed5e28c3413cb1ebe8bb52cbf1ca7a2",
-                "reference": "737eda637ed5e28c3413cb1ebe8bb52cbf1ca7a2",
-                "shasum": ""
-            },
-            "require": {
-                "ext-dom": "*",
-                "ext-tokenizer": "*",
-                "ext-xmlwriter": "*",
-                "php": "^7.2 || ^8.0"
-=======
             "name": "twig/extra-bundle",
             "version": "v3.22.0",
             "source": {
@@ -8572,7 +8380,6 @@
                 "twig/intl-extra": "^3.0",
                 "twig/markdown-extra": "^3.0",
                 "twig/string-extra": "^3.0"
->>>>>>> baptiste
             },
             "type": "symfony-bundle",
             "autoload": {
@@ -8603,8 +8410,7 @@
                 "twig"
             ],
             "support": {
-                "issues": "https://github.com/theseer/tokenizer/issues",
-                "source": "https://github.com/theseer/tokenizer/tree/1.2.3"
+                "source": "https://github.com/twigphp/twig-extra-bundle/tree/v3.22.0"
             },
             "funding": [
                 {
@@ -8616,82 +8422,11 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2024-03-03T12:36:25+00:00"
+            "time": "2025-09-15T05:57:37+00:00"
         },
         {
             "name": "twig/html-extra",
             "version": "v3.23.0",
-<<<<<<< HEAD
-=======
-            "source": {
-                "type": "git",
-                "url": "https://github.com/twigphp/html-extra.git",
-                "reference": "2ef1d0ccaa06d4f4405b330fe6c4b6f7b50fbbc3"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/twigphp/html-extra/zipball/2ef1d0ccaa06d4f4405b330fe6c4b6f7b50fbbc3",
-                "reference": "2ef1d0ccaa06d4f4405b330fe6c4b6f7b50fbbc3",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=8.1.0",
-                "symfony/deprecation-contracts": "^2.5|^3",
-                "symfony/mime": "^5.4|^6.4|^7.0|^8.0",
-                "twig/twig": "^3.13|^4.0"
-            },
-            "require-dev": {
-                "symfony/phpunit-bridge": "^6.4|^7.0"
-            },
-            "type": "library",
-            "autoload": {
-                "files": [
-                    "Resources/functions.php"
-                ],
-                "psr-4": {
-                    "Twig\\Extra\\Html\\": ""
-                },
-                "exclude-from-classmap": [
-                    "/Tests/"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Fabien Potencier",
-                    "email": "fabien@symfony.com",
-                    "homepage": "http://fabien.potencier.org",
-                    "role": "Lead Developer"
-                }
-            ],
-            "description": "A Twig extension for HTML",
-            "homepage": "https://twig.symfony.com",
-            "keywords": [
-                "html",
-                "twig"
-            ],
-            "support": {
-                "source": "https://github.com/twigphp/html-extra/tree/v3.23.0"
-            },
-            "funding": [
-                {
-                    "url": "https://github.com/fabpot",
-                    "type": "github"
-                },
-                {
-                    "url": "https://tidelift.com/funding/github/packagist/twig/twig",
-                    "type": "tidelift"
-                }
-            ],
-            "time": "2025-12-02T14:45:16+00:00"
-        },
-        {
-            "name": "twig/twig",
-            "version": "v3.22.0",
->>>>>>> baptiste
             "source": {
                 "type": "git",
                 "url": "https://github.com/twigphp/html-extra.git",

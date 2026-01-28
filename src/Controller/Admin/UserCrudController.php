@@ -9,10 +9,6 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\EmailField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
-<<<<<<< HEAD
-=======
-use EasyCorp\Bundle\EasyAdminBundle\Field\TextEditorField;
->>>>>>> baptiste
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
@@ -24,30 +20,19 @@ class UserCrudController extends AbstractCrudController
     {
         $this->passwordHasher = $passwordHasher;
     }
-<<<<<<< HEAD
 
-=======
->>>>>>> baptiste
     public static function getEntityFqcn(): string
     {
         return User::class;
     }
 
-<<<<<<< HEAD
-=======
-    
->>>>>>> baptiste
     public function configureFields(string $pageName): iterable
     {
         return [
             IdField::new('id')->hideOnForm(),
             EmailField::new('email'),
             TextField::new('password'),
-<<<<<<< HEAD
             TextField::new('username'),
-=======
-            TextField::new('userName'),
->>>>>>> baptiste
             TextField::new('lastName'),
             TextField::new('firstName'),
             BooleanField::new('isVerified'),
@@ -84,10 +69,4 @@ class UserCrudController extends AbstractCrudController
 
         parent::updateEntity($em, $entityInstance);
     }
-<<<<<<< HEAD
-=======
-
-
-    
->>>>>>> baptiste
 }
