@@ -42,8 +42,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $firstName = null;
 
-    #[ORM\Column]
-    private ?bool $isVerified = null;
+    #[ORM\Column(options: ["default" => false])]
+    private ?bool $isVerified = false;
 
     #[ORM\Column(options: ["default" => true])]
     private ?bool $isActive = true;
