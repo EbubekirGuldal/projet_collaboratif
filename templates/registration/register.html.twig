@@ -1,0 +1,135 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    Créer un compte | {{ parent() }}
+{% endblock %}
+
+{% block body %}
+    {% for flash_error in app.flashes('verify_email_error') %}
+        <div class="alert alert-danger" role="alert">{{ flash_error }}</div>
+    {% endfor %}
+
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-12 col-sm-10 col-md-8 col-lg-6">
+                <div class="card shadow-sm border-0">
+                    <div class="card-body p-4 p-md-5">
+
+                        <div class="text-center mb-4">
+                            <div class="mb-2">
+                                <i class="fa-solid fa-user-plus fa-xl text-primary"></i>
+                            </div>
+                            <h1 class="h4 mb-1 fw-semibold">Créer un compte</h1>
+                            <p class="text-muted mb-0">Renseignez vos informations pour vous inscrire</p>
+                        </div>
+
+                        {# Affiche toutes les erreurs globales (si besoin) #}
+                        {{ form_errors(registrationForm) }}
+
+                        {{ form_start(registrationForm, {'attr': {'class': 'needs-validation'}}) }}
+
+                            <div class="mb-3">
+                                <label class="form-label" for="{{ registrationForm.email.vars.id }}">
+                                    <i class="fa-solid fa-envelope me-2 text-muted"></i>Email
+                                </label>
+                                {{ form_widget(registrationForm.email, {
+                                    'attr': {
+                                        'class': 'form-control',
+                                        'placeholder': 'ex: nom@domaine.com'
+                                    }
+                                }) }}
+                                <div class="form-text">Nous ne partagerons jamais votre email.</div>
+                                {{ form_errors(registrationForm.email) }}
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label" for="{{ registrationForm.username.vars.id }}">
+                                    <i class="fa-solid fa-at me-2 text-muted"></i>Nom d'utilisateur
+                                </label>
+                                {{ form_widget(registrationForm.username, {
+                                    'attr': {
+                                        'class': 'form-control',
+                                        'placeholder': 'ex: squeezie'
+                                    }
+                                }) }}
+                                {{ form_errors(registrationForm.username) }}
+                            </div>
+
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label" for="{{ registrationForm.firstName.vars.id }}">
+                                            <i class="fa-solid fa-id-card me-2 text-muted"></i>Prénom
+                                        </label>
+                                        {{ form_widget(registrationForm.firstName, {
+                                            'attr': {
+                                                'class': 'form-control',
+                                                'placeholder': 'Votre prénom'
+                                            }
+                                        }) }}
+                                        {{ form_errors(registrationForm.firstName) }}
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label" for="{{ registrationForm.lastName.vars.id }}">
+                                            <i class="fa-solid fa-id-card-clip me-2 text-muted"></i>Nom
+                                        </label>
+                                        {{ form_widget(registrationForm.lastName, {
+                                            'attr': {
+                                                'class': 'form-control',
+                                                'placeholder': 'Votre nom'
+                                            }
+                                        }) }}
+                                        {{ form_errors(registrationForm.lastName) }}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label" for="{{ registrationForm.plainPassword.vars.id }}">
+                                    <i class="fa-solid fa-lock me-2 text-muted"></i>Mot de passe
+                                </label>
+                                {{ form_widget(registrationForm.plainPassword, {
+                                    'attr': {
+                                        'class': 'form-control',
+                                        'placeholder': '••••••••'
+                                    }
+                                }) }}
+                                <div class="form-text">
+                                    Minimum 6 caractères.
+                                </div>
+                                {{ form_errors(registrationForm.plainPassword) }}
+                            </div>
+
+                            <div class="mb-4">
+                                <div class="form-check">
+                                    {{ form_widget(registrationForm.agreeTerms, {'attr': {'class': 'form-check-input'}}) }}
+                                    <label class="form-check-label" for="{{ registrationForm.agreeTerms.vars.id }}">
+                                        J'accepte les conditions d'utilisation
+                                    </label>
+                                </div>
+                                {{ form_errors(registrationForm.agreeTerms) }}
+                            </div>
+
+                            <button type="submit" class="btn btn-primary btn-lg w-100">
+                                <i class="fa-solid fa-check me-2"></i>Créer mon compte
+                            </button>
+
+                            <div class="text-center mt-4">
+                                <p class="mb-0 text-muted">
+                                    Vous avez déjà un compte ?
+                                    <a class="text-decoration-none fw-semibold" href="{{ path('app_login') }}">
+                                        Se connecter
+                                    </a>
+                                </p>
+                            </div>
+
+                        {{ form_end(registrationForm) }}
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

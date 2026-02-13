@@ -2,13 +2,17 @@
 
 namespace App\Entity;
 
-use App\Repository\ResourceRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\ResourceRepository;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\HttpFoundation\File\File;
+use Vich\UploaderBundle\Mapping\Attribute as Vich;
 
 #[ORM\Entity(repositoryClass: ResourceRepository::class)]
+#[ORM\HasLifecycleCallbacks]
+#[Vich\Uploadable]
 class Resource
 {
     #[ORM\Id]
@@ -46,14 +50,20 @@ class Resource
     #[ORM\Column(length: 255)]
     private ?string $visibilityStatus = null;
 
-    #[ORM\Column]
-    private ?int $sharesCount = null;
+    #[ORM\Column(options: ["default" => 0])]
+    private ?int $sharesCount = 0;
 
     /**
      * @var Collection<int, Comment>
      */
     #[ORM\OneToMany(targetEntity: Comment::class, mappedBy: 'resource', orphanRemoval: true)]
     private Collection $comments;
+
+    /**
+     * NOTE: This is not a mapped field of entity metadata, just a simple property.
+     */
+    #[Vich\UploadableField(mapping: 'products', fileNameProperty: 'image')]
+    private ?File $imageFile = null;
 
     public function __toString()
     {
@@ -65,7 +75,12 @@ class Resource
         $this->createdAt = new \DateTimeImmutable();
         $this->comments = new ArrayCollection();
     }
-    
+
+    #[ORM\PreUpdate]
+    public function onUpdated(): void
+    {
+        $this->updatedAt = new \DateTimeImmutable();
+    } 
 
     public function getId(): ?int
     {
@@ -233,4 +248,20 @@ class Resource
 
         return $this;
     }
+
+    public function setImageFile(?File $imageFile = null): void
+    {
+        $this->imageFile = $imageFile;
+
+        if (null !== $imageFile) {
+            // Important : force update pour déclencher l’upload
+            $this->updatedAt = new \DateTimeImmutable();
+        }
+    }
+
+    public function getImageFile(): ?File
+    {
+        return $this->imageFile;
+    }
+
 }

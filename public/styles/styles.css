@@ -1,0 +1,85 @@
+/* Fond soft (optionnel) */
+body {
+  background: #f7f8fb;
+  font-family: "Poppins", sans-serif !important;
+}
+
+.login-divider{
+  position: relative;
+  display: inline-block;
+  padding: 0 .75rem;
+  background: #fff;
+}
+
+.login-divider::before{
+  content:"";
+  position:absolute;
+  top:50%;
+  left:-140px;
+  width:130px;
+  height:1px;
+  background: rgba(0,0,0,.12);
+  transform: translateY(-50%);
+}
+
+.login-divider::after{
+  content:"";
+  position:absolute;
+  top:50%;
+  right:-140px;
+  width:130px;
+  height:1px;
+  background: rgba(0,0,0,.12);
+  transform: translateY(-50%);
+}
+
+/* Focus plus clean */
+.form-control:focus {
+  box-shadow: 0 0 0 .2rem rgba(43, 59, 130, .15);
+  border-color: #2B3B82;
+}
+
+/* ===== Search bar (navbar) - clean & premium ===== */
+.nav-search {
+  min-width: 0; /* IMPORTANT: permet au flex-grow de fonctionner correctement */
+}
+
+.nav-search__group {
+  border-radius: 999px;
+  overflow: hidden;
+  background: #f5f6fb;
+  border: 1px solid rgba(0,0,0,.08);
+  transition: border-color .2s ease, box-shadow .2s ease, background-color .2s ease;
+}
+
+.nav-search__icon {
+  background: transparent;
+  border: 0;
+  padding-left: 1rem;
+  padding-right: .75rem;
+  color: rgba(0,0,0,.45);
+}
+
+.nav-search__input {
+  background: transparent;
+  border: 0;
+  padding-left: .25rem;
+}
+
+.nav-search__input:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+/* Focus premium (avec ton primary) */
+.nav-search__group:focus-within {
+  background: #fff;
+  border-color: #2B3B82;
+  box-shadow: 0 0 0 .2rem rgba(43, 59, 130, .15);
+}
+
+.nav-search__btn {
+  border-radius: 999px;
+  padding-left: 1.1rem;
+  padding-right: 1.1rem;
+}
