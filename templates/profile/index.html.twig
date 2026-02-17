@@ -86,6 +86,10 @@
 							</div>
 
 							<div class="ms-md-auto d-flex gap-2">
+								<button type="button" class="btn btn-outline-dark" data-bs-toggle="modal" data-bs-target="#changePasswordModal">
+									<i class="fa-solid fa-key me-2"></i>
+									Changer le mot de passe
+								</button>
 
 								<a href="{{ path('app_logout') }}" class="btn btn-dark">
 									<i class="fa-solid fa-right-from-bracket me-2"></i>
@@ -317,6 +321,96 @@
 											<i class="fa-regular fa-calendar-check"></i>
 										</span>
 										Date de création
+									</label>
+								</div>
+							</div>
+
+						</div>
+
+						<hr class="my-4">
+
+						<div class="small text-body-secondary mb-3">
+							<i class="fa-solid fa-circle-info me-2"></i>
+							Pensez à enregistrer vos modifications avant de fermer.
+						</div>
+					</div>
+
+					{# Footer #}
+					<div class="modal-footer border-0 px-4 pb-4 pt-0">
+						<button type="button" class="btn btn-outline-dark px-3" data-bs-dismiss="modal">
+							<i class="fa-solid fa-xmark me-2"></i>
+							Annuler
+						</button>
+						<button type="submit" class="btn btn-dark px-3">
+							<i class="fa-regular fa-floppy-disk me-2"></i>
+							Enregistrer
+						</button>
+					</div>
+				</form>
+
+			</div>
+		</div>
+	</div>
+
+	<!--##############################-->
+	<!--Modal changer son mot de passe-->
+	<!--##############################-->
+
+	<div class="modal fade" id="changePasswordModal" tabindex="-1" aria-labelledby="changePasswordModalLabel" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered modal-lg">
+			<div class="modal-content border-0 shadow">
+
+				<div class="modal-header border-0 px-4 pt-4 pb-2">
+					<div class="d-flex align-items-center gap-2">
+						<div class="icon-chip">
+							<i class="fa-solid fa-key"></i>
+						</div>
+						<div>
+							<h5 class="modal-title mb-0" id="changePasswordModalLabel">Changer mon mot de passe</h5>
+							<div class="small text-body-secondary">Remplissez les champs necessaires</div>
+						</div>
+					</div>
+
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+				</div>
+
+				<form method="post" action="{{ path("change_password") }}">
+
+					<div class="modal-body px-4 pb-0">
+						<div class="row g-3">
+
+							<div class="col-12">
+								<div class="form-floating">
+									<input type="password" class="form-control" id="currentPassword" name="currentPassword" placeholder="name@example.com" required>
+									<label for="currentPassword">
+										<span class="me-2 text-muted">
+											<i class="fa-solid fa-key"></i>
+										</span>
+										Mot de passe actuel
+									</label>
+								</div>
+							</div>
+
+							<div class="col-12">
+								<div class="form-floating">
+									<input type="password" class="form-control" id="newPassword" name="newPassword" placeholder="name@example.com" required>
+									<label for="newPassword">
+										<span class="me-2 text-muted">
+											<i class="fa-solid fa-lock"></i>
+										</span>
+										Nouveau mot de passe
+									</label>
+								</div>
+							</div>
+
+							<div class="col-12">
+								<div class="form-floating">
+									<input type="password" class="form-control" id="confirmNewPassword" name="confirmNewPassword" placeholder="name@example.com" required>
+									<label for="confirmNewPassword">
+										<span class="me-2 text-muted">
+											<i class="fa-solid fa-lock"></i>
+										</span>
+										Confirmer le nouveau mot de passe
 									</label>
 								</div>
 							</div>

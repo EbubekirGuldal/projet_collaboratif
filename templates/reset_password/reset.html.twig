@@ -1,0 +1,115 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+	Réinitialiser le mot de passe |
+	{{ parent() }}
+{% endblock %}
+
+{% block body %}
+	<div class="container py-5">
+		<div class="row justify-content-center">
+			<div class="col-12 col-sm-10 col-md-8 col-lg-5">
+
+				<div class="card shadow-sm border-0">
+					<div class="card-body p-4 p-md-5">
+
+						<div class="text-center mb-4">
+							<div class="mb-2">
+								<i class="fa-solid fa-lock fa-xl text-primary"></i>
+							</div>
+							<h1 class="h4 mb-1 fw-semibold">Réinitialiser le mot de passe</h1>
+							<p class="text-muted mb-0">
+								Choisissez un nouveau mot de passe sécurisé.
+							</p>
+						</div>
+
+						{{ form_start(resetForm, {'attr': {'class': 'needs-validation'}}) }}
+
+						{# 1) Erreurs globales (ex: mots de passe non identiques) en Alert Bootstrap #}
+						{% set globalErrors = form_errors(resetForm.plainPassword) %}
+						{% if globalErrors is not empty %}
+							<div class="alert alert-danger d-flex align-items-start gap-2" role="alert">
+								<i class="fa-solid fa-triangle-exclamation mt-1"></i>
+								<div>
+									<div class="fw-semibold">Impossible d’enregistrer</div>
+									<div class="small">{{ globalErrors }}</div>
+								</div>
+							</div>
+						{% endif %}
+
+						<div
+							class="mb-3">
+							{# 2) Champ 1 (nouveau mot de passe) #}
+							<div class="form-floating mb-2">
+								{{ form_widget(resetForm.plainPassword.first, {
+                                    attr: {
+                                    class: 'form-control ' ~ (resetForm.plainPassword.first.vars.errors|length ? 'is-invalid' : ''),
+                                    placeholder: '••••••••'
+                                    }
+                                }) }}
+								<label for="{{ resetForm.plainPassword.first.vars.id }}">
+									<span class="me-2 text-muted">
+										<i class="fa-solid fa-key"></i>
+									</span>
+									Nouveau mot de passe
+								</label>
+
+								{% if resetForm.plainPassword.first.vars.errors|length %}
+									<div class="invalid-feedback d-block">
+										{{ form_errors(resetForm.plainPassword.first) }}
+									</div>
+								{% endif %}
+							</div>
+
+							{# 3) Champ 2 (confirmation) #}
+							<div class="form-floating">
+								{{ form_widget(resetForm.plainPassword.second, {
+                                    attr: {
+                                    class: 'form-control ' ~ (resetForm.plainPassword.second.vars.errors|length or resetForm.plainPassword.vars.errors|length ? 'is-invalid' : ''),
+                                    placeholder: '••••••••'
+                                    }
+                                }) }}
+								<label for="{{ resetForm.plainPassword.second.vars.id }}">
+									<span class="me-2 text-muted">
+										<i class="fa-regular fa-copy"></i>
+									</span>
+									Répéter le mot de passe
+								</label>
+
+								{% if resetForm.plainPassword.vars.errors|length %}
+									<div class="invalid-feedback d-block">
+										{{ form_errors(resetForm.plainPassword) }}
+									</div>
+								{% elseif resetForm.plainPassword.second.vars.errors|length %}
+									<div class="invalid-feedback d-block">
+										{{ form_errors(resetForm.plainPassword.second) }}
+									</div>
+								{% endif %}
+							</div>
+
+							<div class="form-text mt-2">
+								Utilisez au minimum 8 caractères (idéalement avec lettres, chiffres et un symbole).
+							</div>
+						</div>
+
+						<button class="btn btn-primary w-100" type="submit">
+							<i class="fa-regular fa-floppy-disk me-2"></i>
+							Enregistrer le nouveau mot de passe
+						</button>
+
+						{{ form_end(resetForm) }}
+
+
+					</div>
+				</div>
+
+				<p class="text-center text-muted small mt-3 mb-0">
+					©
+					{{ "now"|date("Y") }}
+					— Ressources Relationnelles
+				</p>
+
+			</div>
+		</div>
+	</div>
+{% endblock %}
