@@ -1,11 +1,71 @@
-<h1>Hi! Please confirm your email!</h1>
+<div style="margin:0; padding:0; background:#f6f7fb;">
+	<div style="max-width:640px; margin:0 auto; padding:32px 16px;">
+		<div
+			style="background:#ffffff; border:1px solid #e9ecf2; border-radius:16px; overflow:hidden; box-shadow:0 6px 24px rgba(15, 23, 42, 0.06);">
 
-<p>
-    Please confirm your email address by clicking the following link: <br><br>
-    <a href="{{ signedUrl|raw }}">Confirm my Email</a>.
-    This link will expire in {{ expiresAtMessageKey|trans(expiresAtMessageData, 'VerifyEmailBundle') }}.
-</p>
+			{# Header #}
+			<div style="padding:28px 28px 14px 28px; border-bottom:1px solid #eef1f6;">
+				<div style="font-family:Arial, sans-serif; font-size:14px; color:#64748b; letter-spacing:0.2px;">
+					Sécurité du compte
+				</div>
+				<div style="font-family:Arial, sans-serif; font-size:22px; font-weight:700; color:#0f172a; margin-top:6px; line-height:1.25;">
+					Confirmez votre adresse e-mail
+				</div>
+			</div>
 
-<p>
-    Cheers!
-</p>
+			{# Body #}
+			<div style="padding:22px 28px 10px 28px; font-family:Arial, sans-serif; color:#0f172a;">
+				<p style="margin:0 0 12px 0; font-size:14px; line-height:1.6; color:#334155;">
+					Bonjour,
+				</p>
+
+				<p style="margin:0 0 18px 0; font-size:14px; line-height:1.6; color:#334155;">
+					Pour finaliser votre inscription, veuillez confirmer votre adresse e-mail en cliquant sur le bouton ci-dessous.
+				</p>
+
+				{# Button #}
+				<div style="text-align:left; margin:18px 0 18px 0;">
+					<a href="{{ signedUrl|raw }}" style="display:inline-block; padding:12px 18px; background:#0f172a; color:#ffffff; text-decoration:none; border-radius:12px; font-weight:700; font-size:14px;">
+						Confirmer mon e-mail
+					</a>
+				</div>
+
+				<p style="margin:0 0 14px 0; font-size:12px; line-height:1.6; color:#64748b;">
+					Ce lien expirera dans
+					<strong style="color:#334155;">{{ expiresAtMessageKey|trans(expiresAtMessageData, 'VerifyEmailBundle') }}</strong>.
+				</p>
+
+				<div style="margin-top:14px; padding:12px 14px; background:#f8fafc; border:1px solid #e9ecf2; border-radius:12px;">
+					<div style="font-size:12px; color:#64748b; line-height:1.5;">
+						Si le bouton ne fonctionne pas, copiez/collez ce lien dans votre navigateur :
+					</div>
+					<div style="font-size:12px; line-height:1.5; margin-top:6px; word-break:break-all;">
+						<a href="{{ signedUrl|raw }}" style="color:#2563eb; text-decoration:none;">
+							{{ signedUrl|raw }}
+						</a>
+					</div>
+				</div>
+
+				<p style="margin:18px 0 0 0; font-size:12px; line-height:1.6; color:#64748b;">
+					Si vous n’êtes pas à l’origine de cette demande, vous pouvez ignorer ce message.
+				</p>
+			</div>
+
+			{# Footer #}
+			<div style="padding:18px 28px; border-top:1px solid #eef1f6; background:#ffffff;">
+				<div style="font-family:Arial, sans-serif; font-size:12px; color:#94a3b8; line-height:1.6;">
+					—<br>
+					<strong style="color:#64748b;">Ressources Relationnelles</strong><br>
+					<span style="color:#94a3b8;">Message automatique, merci de ne pas répondre.</span>
+				</div>
+			</div>
+
+		</div>
+
+		<div style="text-align:center; margin-top:14px; font-family:Arial, sans-serif; font-size:12px; color:#94a3b8;">
+			©
+			{{ "now"|date("Y") }}
+			Ressources Relationnelles
+		</div>
+	</div>
+</div>
