@@ -1,0 +1,54 @@
+/* --- Profile page (minimal, pro) --- */
+
+.profile-card {
+  border-radius: 1rem;
+}
+
+.profile-title {
+  letter-spacing: -0.02em;
+}
+
+.profile-avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 1rem;
+  display: grid;
+  place-items: center;
+  background: rgba(0,0,0,.06);
+  border: 1px solid rgba(0,0,0,.08);
+}
+
+.profile-avatar-text {
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+
+.icon-chip {
+  width: 42px;
+  height: 42px;
+  border-radius: 0.9rem;
+  display: grid;
+  place-items: center;
+  background: rgba(0,0,0,.06);
+  border: 1px solid rgba(0,0,0,.08);
+}
+
+.profile-field {
+  padding: 0.9rem 1rem;
+  border-radius: 0.9rem;
+  border: 1px solid rgba(0,0,0,.08);
+  background: #fff;
+}
+
+.profile-field-label {
+  font-size: 0.85rem;
+  color: rgba(0,0,0,.60);
+  margin-bottom: 0.25rem;
+  display: flex;
+  align-items: center;
+}
+
+.profile-field-value {
+  font-weight: 600;
+  word-break: break-word;
+}

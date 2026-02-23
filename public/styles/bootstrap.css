@@ -1,0 +1,37 @@
+/* ===== Override Bootstrap primary color ===== */
+
+/* Texte */
+.text-primary {
+    color: #2B3B82 !important;
+}
+
+/* Background */
+.bg-primary {
+    background-color: #2B3B82 !important;
+}
+
+/* Bouton primary */
+.btn-primary {
+    background-color: #2B3B82;
+    border-color: #2B3B82;
+}
+
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-primary:active,
+.btn-primary.active {
+    background-color: #24336f; /* légèrement plus foncé */
+    border-color: #24336f;
+}
+
+/* Bouton outline primary (bonus) */
+.btn-outline-primary {
+    color: #2B3B82;
+    border-color: #2B3B82;
+}
+
+.btn-outline-primary:hover {
+    background-color: #2B3B82;
+    border-color: #2B3B82;
+    color: #fff;
+}
