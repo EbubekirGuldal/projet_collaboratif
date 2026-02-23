@@ -12,12 +12,14 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Assets;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractDashboardController;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[IsGranted('ROLE_ADMIN')]
 #[AdminDashboard(routePath: '/admin', routeName: 'admin')]
 class DashboardController extends AbstractDashboardController
 {
-
     public function __construct( 
         private readonly DashboardStatsRepository $dashboardStatsRepository,
         private readonly RequestStack $requestStack
@@ -38,8 +40,6 @@ class DashboardController extends AbstractDashboardController
             'resourceIsExploited' => $stats['exploitedResources'],
             'isFavorited' => $stats['favoritesCount'],
             'isShared' => $stats['sharesCount'],
-
-
         ]);
     }
 
@@ -64,7 +64,6 @@ class DashboardController extends AbstractDashboardController
         yield MenuItem::linkToCrud('Utilisateur', 'fas fa-user', User::class);
         yield MenuItem::linkToCrud('Commentaire', 'fas fa-comment', Comment::class);
         yield MenuItem::linkToCrud('Ressource', 'fas fa-image', Resource::class);
-       // yield MenuItem::linkToRoute('Statistiques', 'fas fa-chart-line', 'admin_stats');
         yield MenuItem::linkToCrud('Moderation', 'fas fa-user-tie', ModerationLog::class);
         yield MenuItem::section();
         yield MenuItem::linkToRoute('Quitter', 'fas fa-right-from-bracket', 'app_home');
