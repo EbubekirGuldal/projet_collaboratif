@@ -2,26 +2,47 @@
 
 namespace App\Controller\Admin;
 
-use App\Entity\User;
 use App\Entity\Comment;
 use App\Entity\ModerationLog;
 use App\Entity\Resource;
-use Symfony\Component\HttpFoundation\Response;
-use EasyCorp\Bundle\EasyAdminBundle\Config\Assets;
-use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
-use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
+use App\Entity\User;
+use App\Repository\DashboardStatsRepository;
 use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminDashboard;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Assets;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
+use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractDashboardController;
-use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[IsGranted('ROLE_ADMIN')]
 #[AdminDashboard(routePath: '/admin', routeName: 'admin')]
 class DashboardController extends AbstractDashboardController
 {
+
+    public function __construct( 
+        private readonly DashboardStatsRepository $dashboardStatsRepository,
+        private readonly RequestStack $requestStack
+        
+    ) {
+    }
     public function index(): Response
     {
-        return $this->render('admin/index.html.twig');
+        $request = $this->requestStack->getMainRequest() ?? $this->requestStack->getCurrentRequest();
+        $period = (string) ($request?->query->get('period', '30d'));
+        $stats = $this->dashboardStatsRepository->getStats($period);
+
+        return $this->render('admin/index.html.twig', [
+            'stats' => $stats,
+            'resourceCount' => $stats['totalResources'],
+            'UserCount' => $stats['activeUsers'],
+            'CommentCount' => $stats['commentsCount'],
+            'resourceIsExploited' => $stats['exploitedResources'],
+            'isFavorited' => $stats['favoritesCount'],
+            'isShared' => $stats['sharesCount'],
+
+
+        ]);
     }
+
 
     public function configureAssets(): Assets
     {
@@ -43,6 +64,7 @@ class DashboardController extends AbstractDashboardController
         yield MenuItem::linkToCrud('Utilisateur', 'fas fa-user', User::class);
         yield MenuItem::linkToCrud('Commentaire', 'fas fa-comment', Comment::class);
         yield MenuItem::linkToCrud('Ressource', 'fas fa-image', Resource::class);
+       // yield MenuItem::linkToRoute('Statistiques', 'fas fa-chart-line', 'admin_stats');
         yield MenuItem::linkToCrud('Moderation', 'fas fa-user-tie', ModerationLog::class);
         yield MenuItem::section();
         yield MenuItem::linkToRoute('Quitter', 'fas fa-right-from-bracket', 'app_home');

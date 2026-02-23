@@ -7,4 +7,163 @@
 {% block content_title %}{% endblock %}
 
 {% block page_content %}
+<section class="admin-stats-toolbar">
+        <div class="admin-period-filters" role="tablist" aria-label="Filtre de periode">
+            {% for option in stats.periodOptions %}
+                <a
+                    href="{{ path('admin', { period: option.key }) }}"
+                    class="admin-period-btn {{ stats.selectedPeriod == option.key ? 'is-active' : '' }}"
+                >
+                    {{ option.label }}
+                </a>
+            {% endfor %}
+        </div>
+        <p class="admin-period-hint">Periode active: <strong>{{ stats.selectedPeriodLabel }}</strong></p>
+    </section>
+
+    <section class="admin-insights-row">
+        {% for insight in stats.quickInsights %}
+            <article class="admin-insight-pill is-{{ insight.tone }}">
+                <p class="admin-insight-label">{{ insight.label }}</p>
+                <p class="admin-insight-value">{{ insight.value }}</p>
+            </article>
+        {% endfor %}
+    </section>
+
+
+    <div class="admin-inline-metrics">     
+        <!-- Carte statistique pour les utilisateurs actifs -->
+        <div class="stat-feature-card">
+            <div class="stat-feature-header">
+                <span class="stat-feature-icon">
+                    <i class="fa fa-users"></i>
+                 </span>
+                <h3 class="stat-feature-title">Utilisateurs actifs</h3>
+            </div>
+
+            <p class="stat-feature-value">{{ UserCount }}</p>
+            <p class="stat-feature-caption">aujourd'hui</p>
+       </div>
+        <!-- Carte statistique pour les commentaires des ressources -->
+        
+            <div class="stat-feature-card">
+            <div class="stat-feature-header">
+                <span class="stat-feature-icon">
+                    <i class="fa fa-comment"></i>
+                 </span>
+                <h3 class="stat-feature-title">Commentaires</h3>
+            </div>
+
+            <p class="stat-feature-value">{{ CommentCount }}</p>
+            <p class="stat-feature-caption">aujourd'hui</p>
+       </div>
+        <!-- Carte statistique pour les les ressources exploitées -->
+       
+            <div class="stat-feature-card">
+                <div class="stat-feature-header">
+                    <span class="stat-feature-icon">
+                        <i class="fa fa-check"></i>
+                    </span>
+                    <h3 class="stat-feature-title">Ressources exploitées</h3>
+                </div>
+    
+                <p class="stat-feature-value">{{ resourceIsExploited }}</p>
+                <p class="stat-feature-caption">aujourd'hui</p>
+            </div>
+           <!-- Carte statistique pour les favoris -->
+        
+            <div class="stat-feature-card">
+                <div class="stat-feature-header">
+                    <span class="stat-feature-icon">
+                        <i class="fa fa-star"></i>
+                    </span>
+                    <h3 class="stat-feature-title">Ressources favorites</h3>
+                </div>
+    
+                <p class="stat-feature-value">{{ isFavorited }}</p>
+                <p class="stat-feature-caption">aujourd'hui</p>
+            </div>
+
+         <!-- Carte statistique pour les partages -->   
+ 
+            <div class="stat-feature-card">
+                <div class="stat-feature-header">
+                    <span class="stat-feature-icon">
+                        <i class="fa fa-share"></i>
+                    </span>
+                    <h3 class="stat-feature-title">Ressources partagées</h3>
+                </div>
+    
+                <p class="stat-feature-value">{{ isShared }}</p>
+                <p class="stat-feature-caption">aujourd'hui</p>
+            </div>
+
+           <!-- Carte statistique pour le taux d'exploitation -->   
+ 
+            <div class="stat-feature-card">
+                <div class="stat-feature-header">
+                    <span class="stat-feature-icon">
+                        <i class="fa fa-share"></i>
+                    </span>
+                    <h3 class="stat-feature-title">Taux d'exploitation</h3>
+                </div>
+    
+                <p class="stat-feature-value">{{ stats.exploitationRate }}%</p>
+                <p class="stat-feature-caption">sur la période</p>
+            </div> 
+    </div>
+
+
+    <div class="admin-stats-columns">
+        <section class="admin-stats-section">
+            <h2 class="admin-stats-subtitle">Repartition par categorie</h2>
+
+            {% if stats.categoryDistributionSource == 'resource_status' %}
+                <p class="admin-stats-note">
+                    Affichage provisoire base sur <code>resourceStatus</code>.
+                    On doit relier <code>Resource</code> a <code>Category</code> pour la vraie repartition.
+                </p>
+            {% endif %}
+
+            {% if stats.categoryDistribution is empty %}
+                <p class="admin-stats-empty">Aucune donnee disponible.</p>
+            {% else %}
+                <div class="admin-distribution-list">
+                    {% for item in stats.categoryDistribution %}
+                        {% set percent = ((item.total / stats.distributionTotal) * 100) %}
+                        <article class="admin-distribution-item">
+                            <header class="admin-distribution-header">
+                                <span>{{ item.label }}</span>
+                                <strong>{{ item.total }}</strong>
+                            </header>
+                            <div class="admin-distribution-track">
+                                <span class="admin-distribution-fill" style="width: {{ percent|number_format(1, '.', '') }}%;"></span>
+                            </div>
+                            <p class="admin-distribution-percent">{{ percent|number_format(1, ',', ' ') }}%</p>
+                        </article>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </section>
+
+        <section class="admin-stats-section">
+            <h2 class="admin-stats-subtitle">Top 5 ressources (partages + commentaires)</h2>
+
+            {% if stats.topResources is empty %}
+                <p class="admin-stats-empty">Aucune ressource avec engagement pour cette periode.</p>
+            {% else %}
+                <div class="admin-top-list">
+                    {% for resource in stats.topResources %}
+                        <article class="admin-top-item">
+                            <div class="admin-top-main">
+                                <p class="admin-top-title">{{ resource.title }}</p>
+                                <p class="admin-top-meta">Partages: {{ resource.shares }} | Commentaires: {{ resource.comments }}</p>
+                            </div>
+                            <span class="admin-top-score">Score {{ resource.engagementScore }}</span>
+                        </article>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </section>
+    </div>
 {% endblock %}
