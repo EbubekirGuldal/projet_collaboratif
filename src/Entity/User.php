@@ -2,7 +2,10 @@
 
 namespace App\Entity;
 
+use App\Entity\Resource;
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
@@ -31,6 +34,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private array $roles = [];
 
+    #[ORM\ManyToMany(targetEntity: Resource::class)]
+    #[ORM\JoinTable(name: 'user_favorites')]
+    private Collection $favorites;
+
     /**
      * @var string The hashed password
      */
@@ -58,9 +65,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $updatedAt = null;
 
-    #[ORM\Column(nullable: true)]
-    private ?\DateTimeImmutable $lastConnexion = null;
-
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $picture = null;
 
@@ -70,9 +74,20 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Vich\UploadableField(mapping: 'users', fileNameProperty: 'picture')]
     private ?File $imageFile = null;
 
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $lastConnexion = null;
+
+    /**
+     * @var Collection<int, Resource>
+     */
+    #[ORM\OneToMany(targetEntity: Resource::class, mappedBy: 'user')]
+    private Collection $resources;
+
     public function __construct()
     {
         $this->createdAt = new \DateTimeImmutable();
+        $this->resources = new ArrayCollection();
+        $this->favorites = new ArrayCollection();
     }
 
     #[ORM\PreUpdate]
@@ -116,45 +131,27 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setEmail(string $email): static
     {
         $this->email = $email;
-
         return $this;
     }
 
-    /**
-     * A visual identifier that represents this user.
-     *
-     * @see UserInterface
-     */
     public function getUserIdentifier(): string
     {
         return (string) $this->email;
     }
 
-    /**
-     * @see UserInterface
-     */
     public function getRoles(): array
     {
         $roles = $this->roles;
-        // guarantee every user at least has ROLE_USER
         $roles[] = 'ROLE_USER';
-
         return array_unique($roles);
     }
 
-    /**
-     * @param list<string> $roles
-     */
     public function setRoles(array $roles): static
     {
         $this->roles = $roles;
-
         return $this;
     }
 
-    /**
-     * @see PasswordAuthenticatedUserInterface
-     */
     public function getPassword(): ?string
     {
         return $this->password;
@@ -163,15 +160,19 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setPassword(string $password): static
     {
         $this->password = $password;
-
         return $this;
     }
 
+    public function __serialize(): array
+    {
+        $data = (array) $this;
+        $data["\0".self::class."\0password"] = hash('crc32c', $this->password);
+        return $data;
+    }
 
     #[\Deprecated]
     public function eraseCredentials(): void
     {
-        // @deprecated, to be removed when upgrading to Symfony 8
     }
 
     public function getUsername(): ?string
@@ -182,7 +183,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setUsername(string $username): static
     {
         $this->username = $username;
-
         return $this;
     }
 
@@ -194,7 +194,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setLastName(string $lastName): static
     {
         $this->lastName = $lastName;
-
         return $this;
     }
 
@@ -206,7 +205,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setFirstName(string $firstName): static
     {
         $this->firstName = $firstName;
-
         return $this;
     }
 
@@ -218,7 +216,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setIsVerified(bool $isVerified): static
     {
         $this->isVerified = $isVerified;
-
         return $this;
     }
 
@@ -230,7 +227,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setIsActive(?bool $isActive): static
     {
         $this->isActive = $isActive;
-
         return $this;
     }
 
@@ -242,7 +238,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setCreatedAt(\DateTimeImmutable $createdAt): static
     {
         $this->createdAt = $createdAt;
-
         return $this;
     }
 
@@ -254,7 +249,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setUpdatedAt(?\DateTimeImmutable $updatedAt): static
     {
         $this->updatedAt = $updatedAt;
-
         return $this;
     }
 
@@ -266,11 +260,66 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setLastConnexion(\DateTimeImmutable $lastConnexion): static
     {
         $this->lastConnexion = $lastConnexion;
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Resource>
+     */
+    public function getResources(): Collection
+    {
+        return $this->resources;
+    }
+
+    public function addResource(Resource $resource): static
+    {
+        if (!$this->resources->contains($resource)) {
+            $this->resources->add($resource);
+            $resource->setUser($this);
+        }
 
         return $this;
     }
 
-    public function getPicture(): ?string
+    public function removeResource(Resource $resource): static
+    {
+        if ($this->resources->removeElement($resource)) {
+            if ($resource->getUser() === $this) {
+                $resource->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Resource>
+     */
+    public function getFavorites(): Collection
+    {
+        return $this->favorites;
+    }
+
+    public function addFavorite(Resource $resource): static
+    {
+        if (!$this->favorites->contains($resource)) {
+            $this->favorites->add($resource);
+        }
+        return $this;
+    }
+
+    public function removeFavorite(Resource $resource): static
+    {
+        $this->favorites->removeElement($resource);
+        return $this;
+    }
+
+    public function isFavorite(Resource $resource): bool
+    {
+        return $this->favorites->contains($resource);
+    }
+
+     public function getPicture(): ?string
     {
         return $this->picture;
     }
@@ -297,3 +346,4 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->imageFile;
     }
 }
+

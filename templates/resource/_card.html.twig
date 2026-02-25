@@ -1,0 +1,94 @@
+{# templates/resource/_card.html.twig #}
+
+{% set excerpt = resource.content|striptags %}
+{% if excerpt|length > 240 %}
+    {% set excerpt = excerpt|slice(0, 240) ~ '…' %}
+{% endif %}
+
+<article class="card feed-card border-0 shadow-sm mb-3">
+    <div class="card-body">
+
+        <div class="d-flex align-items-start justify-content-between gap-3">
+            <div class="flex-grow-1">
+                <h3 class="h6 mb-1">
+                    <a class="text-decoration-none text-light"
+                       href="{{ path('resource_show', { id: resource.id }) }}">
+                        {{ resource.title }}
+                    </a>
+                </h3>
+
+                <div class="text-muted small mb-2">
+                    {% if resource.publishedAt %}
+                        <i class="fa-regular fa-calendar me-1"></i>
+                        {{ resource.publishedAt|date('d/m/Y H:i') }}
+                    {% elseif resource.createdAt %}
+                        <i class="fa-regular fa-calendar me-1"></i>
+                        {{ resource.createdAt|date('d/m/Y H:i') }}
+                    {% endif %}
+                </div>
+
+                <p class="mb-2">{{ excerpt }}</p>
+
+                {% if resource.externalUrl %}
+                    <a class="small text-decoration-none" href="{{ resource.externalUrl }}" target="_blank" rel="noopener">
+                        <i class="fa-solid fa-arrow-up-right-from-square me-1"></i>Voir la ressource externe
+                    </a>
+                {% endif %}
+            </div>
+
+            {% if resource.image %}
+                <div class="feed-thumb">
+                    <img
+                        src="/images/resources/{{ resource.image }}"
+                        alt="Illustration"
+                        class="img-fluid rounded"
+                        loading="lazy"
+                    >
+                </div>
+            {% endif %}
+        </div>
+
+        <hr class="my-3">
+
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+
+            <div class="d-flex align-items-center gap-3 small">
+                <a class="text-muted text-decoration-none"
+                   href="{{ path('resource_show', { id: resource.id }) }}"
+                   title="Voir les commentaires">
+                    <i class="fa-regular fa-comment me-1"></i>
+                    {{ commentsCount }}
+                </a>
+
+                <button
+                    class="btn btn-sm btn-like {{ (resource.likesCount ?? 0) > 0 ? 'btn-primary' : 'btn-outline-primary' }}"
+                    data-id="{{ resource.id }}"
+                    title="Marquer comme utile"
+                >
+                    <i class="fa-regular fa-thumbs-up me-1"></i>
+                    <span class="like-count">{{ resource.likesCount ?? 0 }}</span>
+                </button>
+
+                <button
+                    class="btn btn-sm btn-outline-secondary btn-share"
+                    data-id="{{ resource.id }}"
+                    data-url="{{ absolute_url(path('resource_show', { id: resource.id })) }}"
+                    title="Partager"
+                >
+                    <i class="fa-solid fa-share-nodes me-1"></i>
+                    <span class="share-count">{{ resource.sharesCount ?? 0 }}</span>
+                </button>
+            </div>
+
+            <button
+                class="btn btn-sm btn-outline-warning btn-favorite"
+                data-id="{{ resource.id }}"
+                title="Enregistrer"
+            >
+                <i class="fa-regular fa-bookmark me-1"></i>
+                Sauvegarder
+            </button>
+
+        </div>
+    </div>
+</article>

@@ -16,28 +16,39 @@ class ResourceRepository extends ServiceEntityRepository
         parent::__construct($registry, Resource::class);
     }
 
-    //    /**
-    //     * @return Resource[] Returns an array of Resource objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('r')
-    //            ->andWhere('r.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('r.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+    public function findFeed(?string $q, string $sort = 'new', int $limit = 20): array
+    {
+        $qb = $this->createQueryBuilder('r')
+            ->leftJoin('r.comments', 'c')
+            ->addSelect('COUNT(c.id) AS commentsCount')
+            ->groupBy('r.id')
+            ->setMaxResults($limit);
 
-    //    public function findOneBySomeField($value): ?Resource
-    //    {
-    //        return $this->createQueryBuilder('r')
-    //            ->andWhere('r.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+        if ($q) {
+            $qb->andWhere('LOWER(r.title) LIKE :q OR LOWER(r.content) LIKE :q OR LOWER(r.externalUrl) LIKE :q')
+            ->setParameter('q', '%' . mb_strtolower($q) . '%');
+        }
+
+        if ($sort === 'top') {
+            // "Top" = + de likes + de commentaires
+            $qb->orderBy('r.likesCount', 'DESC')
+            ->addOrderBy('commentsCount', 'DESC')
+            ->addOrderBy('r.createdAt', 'DESC');
+        } else {
+            // "New" = plus récent
+            $qb->orderBy('r.createdAt', 'DESC');
+        }
+
+        $rows = $qb->getQuery()->getResult();
+
+        $items = [];
+        foreach ($rows as $row) {
+            $items[] = [
+                'resource' => $row[0],
+                'commentsCount' => (int) ($row['commentsCount'] ?? 0),
+            ];
+        }
+
+        return $items;
+    }
 }
