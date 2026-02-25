@@ -1,10 +1,10 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}
-    Accueil
-{% endblock %}
+{% block title %}Accueil{% endblock %}
 
 {% block body %}
+<div class="container py-4">
+    {# Flash messages #}
     {% for label, messages in app.flashes %}
         {% for message in messages %}
             <div class="alert alert-{{ label }} alert-dismissible fade show" role="alert">
@@ -13,5 +13,88 @@
             </div>
         {% endfor %}
     {% endfor %}
-    
+
+    <div class="row g-4 feed-layout">
+        {# FEED #}
+        <div class="col-12 col-lg-8">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <h1 class="h4 m-0">Fil d’actualité</h1>
+
+                <div class="btn-group" role="group" aria-label="Tri">
+                    <a class="btn btn-sm {{ sort == 'new' ? 'btn-primary' : 'btn-outline-primary' }}"
+                       href="{{ path('app_home', { q: q, sort: 'new' }) }}">
+                        <i class="fa-regular fa-clock me-1"></i> Récent
+                    </a>
+                    <a class="btn btn-sm {{ sort == 'top' ? 'btn-primary' : 'btn-outline-primary' }}"
+                       href="{{ path('app_home', { q: q, sort: 'top' }) }}">
+                        <i class="fa-solid fa-arrow-trend-up me-1"></i> Populaire
+                    </a>
+                </div>
+            </div>
+
+            {% if q %}
+                <div class="mb-3 small text-muted">
+                    Résultats pour : <span class="fw-semibold">“{{ q }}”</span>
+                    <a class="ms-2" href="{{ path('app_home') }}">Effacer</a>
+                </div>
+            {% endif %}
+
+            {% if feedItems is empty %}
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body">
+                        <p class="mb-0">Aucune ressource pour le moment. Essayez une autre recherche.</p>
+                    </div>
+                </div>
+            {% endif %}
+
+            {% for item in feedItems %}
+                {% include 'resource/_card.html.twig' with {
+                    resource: item.resource,
+                    commentsCount: item.commentsCount
+                } only %}
+            {% endfor %}
+        </div>
+
+        {# SIDEBAR #}
+        <div class="col-12 col-lg-4">
+            <div class="card border-0 shadow-sm mb-3">
+                <div class="card-body">
+                    <h2 class="h6">À propos</h2>
+                    <p class="text-muted small mb-0">
+                        (RE)Sources Relationnelles : ressources, échanges et entraide pour renforcer les liens sociaux.
+                    </p>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h2 class="h6">Actions rapides</h2>
+
+                    {% if app.user %}
+                        <div class="d-grid gap-2">
+                            {# Si vous ajoutez plus tard une création côté citoyen, remplacez le lien ici #}
+                            <a class="btn btn-primary" href="{{ path('admin') }}">
+                                <i class="fa-solid fa-plus me-2"></i>Proposer une ressource
+                            </a>
+                            <a class="btn btn-outline-primary" href="{{ path('app_profile') }}">
+                                <i class="fa-solid fa-user me-2"></i>Voir mon profil
+                            </a>
+                        </div>
+                        <p class="text-muted small mt-2 mb-0">
+                            (Prototype) La création côté citoyen peut être branchée ensuite sur un formulaire dédié.
+                        </p>
+                    {% else %}
+                        <p class="text-muted small">
+                            Connectez-vous pour proposer, commenter et sauvegarder des ressources.
+                        </p>
+                        <div class="d-grid gap-2">
+                            <a class="btn btn-primary" href="{{ path('app_login') }}">Connexion</a>
+                            <a class="btn btn-outline-primary" href="{{ path('app_register') }}">Inscription</a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
