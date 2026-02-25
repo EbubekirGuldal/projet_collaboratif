@@ -65,6 +65,10 @@ class Resource
     #[Vich\UploadableField(mapping: 'products', fileNameProperty: 'image')]
     private ?File $imageFile = null;
 
+    #[ORM\ManyToOne(inversedBy: 'resources')]
+    #[ORM\JoinColumn(nullable: true)]
+    private ?User $user = null;
+
     public function __toString()
     {
         return $this->id." | ".$this->title;
@@ -81,6 +85,20 @@ class Resource
     {
         $this->updatedAt = new \DateTimeImmutable();
     } 
+
+    #[ORM\Column(nullable: true)]
+    private ?int $likesCount = 0;
+
+    public function getLikesCount(): ?int
+    {
+        return $this->likesCount;
+    }
+
+    public function setLikesCount(?int $likesCount): static
+    {
+        $this->likesCount = $likesCount;
+        return $this;
+    }
 
     public function getId(): ?int
     {
@@ -262,6 +280,18 @@ class Resource
     public function getImageFile(): ?File
     {
         return $this->imageFile;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): static
+    {
+        $this->user = $user;
+
+        return $this;
     }
 
 }

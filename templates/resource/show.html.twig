@@ -1,0 +1,131 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ resource.title }}{% endblock %}
+
+{% block body %}
+<div class="container py-4">
+
+    {# Flash messages #}
+    {% for label, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="alert alert-{{ label }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endfor %}
+
+    <div class="row g-4">
+        <div class="col-12 col-lg-8">
+
+            {# Ressource #}
+            <article class="card border-0 shadow-sm mb-3">
+                <div class="card-body">
+                    <a class="text-decoration-none small" href="{{ path('app_home') }}">
+                        ← Retour au fil
+                    </a>
+
+                    <h1 class="h4 mt-2 mb-2">{{ resource.title }}</h1>
+
+                    <div class="text-muted small mb-3">
+                        {% if resource.publishedAt %}
+                            {{ resource.publishedAt|date('d/m/Y H:i') }}
+                        {% elseif resource.createdAt %}
+                            {{ resource.createdAt|date('d/m/Y H:i') }}
+                        {% endif %}
+                    </div>
+
+                    {% if resource.image %}
+                        <img
+                            src="/images/resources/{{ resource.image }}"
+                            class="img-fluid rounded mb-3"
+                            alt="Illustration"
+                            loading="lazy"
+                        >
+                    {% endif %}
+
+                    <div class="mb-3">
+                        {{ resource.content|raw }}
+                    </div>
+
+                    {% if resource.externalUrl %}
+                        <a class="btn btn-outline-primary btn-sm" href="{{ resource.externalUrl }}" target="_blank" rel="noopener">
+                            Ouvrir la ressource externe
+                        </a>
+                    {% endif %}
+                </div>
+            </article>
+
+            {# Ajout commentaire #}
+            <div class="card border-0 shadow-sm mb-3">
+                <div class="card-body">
+                    <h2 class="h6 mb-3">Ajouter un commentaire</h2>
+
+                    {% if app.user %}
+                        <form method="post">
+                            <div class="mb-2">
+                                <textarea class="form-control" name="content" rows="3" placeholder="Écrire un commentaire..."></textarea>
+                            </div>
+                            <button class="btn btn-primary btn-sm" type="submit">Publier</button>
+                        </form>
+                    {% else %}
+                        <p class="text-muted small mb-0">
+                            Connecte-toi pour commenter.
+                            <a href="{{ path('app_login') }}">Connexion</a>
+                        </p>
+                    {% endif %}
+                </div>
+            </div>
+
+            {# Liste commentaires #}
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h2 class="h6 mb-3">Commentaires ({{ comments|length }})</h2>
+
+                    {% if comments is empty %}
+                        <p class="text-muted small mb-0">Aucun commentaire pour le moment.</p>
+                    {% else %}
+                        <div class="d-flex flex-column gap-3">
+                            {% for comment in comments %}
+                                <div class="border rounded p-3">
+                                    <div class="d-flex justify-content-between small text-muted mb-1">
+                                        <span>
+                                            {% if comment.user %}
+                                                {{ comment.user.email }}
+                                            {% else %}
+                                                Anonyme
+                                            {% endif %}
+                                        </span>
+                                        <span>
+                                            {% if comment.createdAt %}
+                                                {{ comment.createdAt|date('d/m/Y H:i') }}
+                                            {% endif %}
+                                        </span>
+                                    </div>
+                                    <div>{{ comment.content }}</div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+        </div>
+
+        <div class="col-12 col-lg-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h2 class="h6">Actions</h2>
+                    <div class="d-grid gap-2">
+                        <a class="btn btn-outline-primary" href="{{ path('app_home') }}">Retour fil</a>
+                        {% if app.user %}
+                            <a class="btn btn-primary" href="{{ path('admin') }}">Admin</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

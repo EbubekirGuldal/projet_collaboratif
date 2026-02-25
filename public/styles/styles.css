@@ -1,85 +1,26 @@
-/* Fond soft (optionnel) */
-body {
-  background: #f7f8fb;
-  font-family: "Poppins", sans-serif !important;
+/* ===== Feed (Twitter/Reddit-like) ===== */
+.feed-layout .feed-card {
+  border-radius: 16px;
 }
 
-.login-divider{
-  position: relative;
-  display: inline-block;
-  padding: 0 .75rem;
-  background: #fff;
-}
-
-.login-divider::before{
-  content:"";
-  position:absolute;
-  top:50%;
-  left:-140px;
-  width:130px;
-  height:1px;
-  background: rgba(0,0,0,.12);
-  transform: translateY(-50%);
-}
-
-.login-divider::after{
-  content:"";
-  position:absolute;
-  top:50%;
-  right:-140px;
-  width:130px;
-  height:1px;
-  background: rgba(0,0,0,.12);
-  transform: translateY(-50%);
-}
-
-/* Focus plus clean */
-.form-control:focus {
-  box-shadow: 0 0 0 .2rem rgba(43, 59, 130, .15);
-  border-color: #2B3B82;
-}
-
-/* ===== Search bar (navbar) - clean & premium ===== */
-.nav-search {
-  min-width: 0; /* IMPORTANT: permet au flex-grow de fonctionner correctement */
-}
-
-.nav-search__group {
-  border-radius: 999px;
+.feed-card .feed-thumb {
+  width: 140px;
+  min-width: 140px;
+  height: 92px;
   overflow: hidden;
-  background: #f5f6fb;
-  border: 1px solid rgba(0,0,0,.08);
-  transition: border-color .2s ease, box-shadow .2s ease, background-color .2s ease;
+  border-radius: 12px;
 }
 
-.nav-search__icon {
-  background: transparent;
-  border: 0;
-  padding-left: 1rem;
-  padding-right: .75rem;
-  color: rgba(0,0,0,.45);
+.feed-card .feed-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
-.nav-search__input {
-  background: transparent;
-  border: 0;
-  padding-left: .25rem;
-}
-
-.nav-search__input:focus {
-  outline: none;
-  box-shadow: none;
-}
-
-/* Focus premium (avec ton primary) */
-.nav-search__group:focus-within {
-  background: #fff;
-  border-color: #2B3B82;
-  box-shadow: 0 0 0 .2rem rgba(43, 59, 130, .15);
-}
-
-.nav-search__btn {
-  border-radius: 999px;
-  padding-left: 1.1rem;
-  padding-right: 1.1rem;
+@media (max-width: 576px) {
+  .feed-card .feed-thumb {
+    width: 110px;
+    min-width: 110px;
+    height: 78px;
+  }
 }
