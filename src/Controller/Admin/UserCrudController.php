@@ -12,9 +12,11 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\EmailField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\ImageField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Vich\UploaderBundle\Form\Type\VichImageType;
 
 #[IsGranted('ROLE_ADMIN')]
 class UserCrudController extends AbstractCrudController
@@ -66,6 +68,21 @@ class UserCrudController extends AbstractCrudController
             BooleanField::new('isActive'),
             DateTimeField::new('createdAt')->hideOnForm(),
             DateTimeField::new('updatedAt')->hideOnForm(),
+            // Affichage de l'image sur index/detail
+            ImageField::new('picture', 'Image')
+                ->setBasePath('/images/users')
+                ->onlyOnIndex(),
+
+            // VRAI input upload (Vich) sur les formulaires
+            TextField::new('imageFile', 'Uploader une image')
+                ->setFormType(VichImageType::class)
+                ->onlyOnForms()
+                ->setFormTypeOptions([
+                    'required'      => false,
+                    'allow_delete'  => true,
+                    'download_uri'  => true,
+                ])
+                ->setHelp('Formats conseillés : JPG/PNG/WebP'),
         ];
     }
 

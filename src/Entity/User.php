@@ -10,11 +10,14 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\HttpFoundation\File\File;
+use Vich\UploaderBundle\Mapping\Attribute as Vich;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
 #[UniqueEntity(fields: ['email'], message: 'There is already an account with this email')]
 #[ORM\HasLifecycleCallbacks]
+#[Vich\Uploadable]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
@@ -62,6 +65,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $updatedAt = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $picture = null;
+
+    /**
+     * NOTE: This is not a mapped field of entity metadata, just a simple property.
+     */
+    #[Vich\UploadableField(mapping: 'users', fileNameProperty: 'picture')]
+    private ?File $imageFile = null;
+
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $lastConnexion = null;
 
@@ -71,17 +83,46 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: Resource::class, mappedBy: 'user')]
     private Collection $resources;
 
+    /**
+     * @var Collection<int, Comment>
+     */
+    #[ORM\OneToMany(targetEntity: Comment::class, mappedBy: 'user')]
+    private Collection $comments;
+
     public function __construct()
     {
         $this->createdAt = new \DateTimeImmutable();
         $this->resources = new ArrayCollection();
         $this->favorites = new ArrayCollection();
+        $this->comments = new ArrayCollection();
     }
 
     #[ORM\PreUpdate]
     public function onUpdate(): void
     {
         $this->updatedAt = new \DateTimeImmutable();
+    }
+
+    public function __serialize(): array
+    {
+        return [
+            'id' => $this->id,
+            'email' => $this->email,
+            'roles' => $this->roles,
+            'username' => $this->username,
+            'password' => $this->password ? hash('crc32c', $this->password) : null,
+        ];
+    }
+
+    public function __unserialize(array $data): void
+    {
+        $this->id = $data['id'] ?? null;
+        $this->email = $data['email'] ?? null;
+        $this->roles = $data['roles'] ?? [];
+        $this->username = $data['username'] ?? null;
+
+        // on ne peut pas reconstruire le vrai hash depuis crc32c -> donc on laisse null
+        $this->password = null;
     }
 
     public function getId(): ?int
@@ -127,13 +168,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         $this->password = $password;
         return $this;
-    }
-
-    public function __serialize(): array
-    {
-        $data = (array) $this;
-        $data["\0".self::class."\0password"] = hash('crc32c', $this->password);
-        return $data;
     }
 
     #[\Deprecated]
@@ -259,6 +293,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
+     * @return Collection<int, Comment>
+     */
+    public function getComments(): Collection
+    {
+        return $this->comments;
+    }
+
+    /**
      * @return Collection<int, Resource>
      */
     public function getFavorites(): Collection
@@ -284,4 +326,32 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         return $this->favorites->contains($resource);
     }
+
+     public function getPicture(): ?string
+    {
+        return $this->picture;
+    }
+
+    public function setPicture(?string $picture): static
+    {
+        $this->picture = $picture;
+
+        return $this;
+    }
+
+    public function setImageFile(?File $imageFile = null): void
+    {
+        $this->imageFile = $imageFile;
+
+        if (null !== $imageFile) {
+            // Important : force update pour déclencher l’upload
+            $this->updatedAt = new \DateTimeImmutable();
+        }
+    }
+
+    public function getImageFile(): ?File
+    {
+        return $this->imageFile;
+    }
 }
+

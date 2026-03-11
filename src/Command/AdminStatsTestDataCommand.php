@@ -140,32 +140,6 @@ class AdminStatsTestDataCommand extends Command
         $resourceBId = $this->fetchResourceId(self::MARKER.' Ressource B');
         $resourceCId = $this->fetchResourceId(self::MARKER.' Ressource C');
 
-        $comments = [
-            ['Comment 1', 'Publie', $resourceAId],
-            ['Comment 2', 'Publie', $resourceAId],
-            ['Comment 3', 'Publie', $resourceBId],
-            ['Comment 4', 'En attente', $resourceCId],
-        ];
-
-        foreach ($comments as [$commentName, $status, $resourceId]) {
-            $this->connection->executeStatement(
-                'INSERT INTO comment (content, created_at, status, updated_at, resource_id)
-                 VALUES (:content, NOW(), :status, NULL, :resourceId)',
-                [
-                    'content' => self::MARKER.' '.$commentName,
-                    'status' => $status,
-                    'resourceId' => $resourceId,
-                ]
-            );
-        }
-
-        foreach (['whatsapp', 'email', 'slack', 'teams', 'linkedin'] as $channel) {
-            $this->connection->executeStatement(
-                'INSERT INTO share (channel, created_at) VALUES (:channel, NOW())',
-                ['channel' => self::MARKER.' '.$channel]
-            );
-        }
-
         $users = [
             ['stats.test.active1@example.com', 'stats_active_1', 'Active1', 1],
             ['stats.test.active2@example.com', 'stats_active_2', 'Active2', 1],
@@ -185,6 +159,34 @@ class AdminStatsTestDataCommand extends Command
                     'firstName' => $firstName,
                     'isActive' => $isActive,
                 ]
+            );
+        }
+
+        $commentUserId = $this->fetchUserId('stats.test.active1@example.com');
+
+        $comments = [
+            ['Comment 1', $resourceAId],
+            ['Comment 2', $resourceAId],
+            ['Comment 3', $resourceBId],
+            ['Comment 4', $resourceCId],
+        ];
+
+        foreach ($comments as [$commentName, $resourceId]) {
+            $this->connection->executeStatement(
+                'INSERT INTO comment (content, created_at, resource_id, user_id)
+                 VALUES (:content, NOW(), :resourceId, :userId)',
+                [
+                    'content' => self::MARKER.' '.$commentName,
+                    'resourceId' => $resourceId,
+                    'userId' => $commentUserId,
+                ]
+            );
+        }
+
+        foreach (['whatsapp', 'email', 'slack', 'teams', 'linkedin'] as $channel) {
+            $this->connection->executeStatement(
+                'INSERT INTO share (channel, created_at) VALUES (:channel, NOW())',
+                ['channel' => self::MARKER.' '.$channel]
             );
         }
 
@@ -220,6 +222,20 @@ class AdminStatsTestDataCommand extends Command
 
         if ($id === false) {
             throw new \RuntimeException(sprintf('Resource not found for title "%s".', $title));
+        }
+
+        return (int) $id;
+    }
+
+    private function fetchUserId(string $email): int
+    {
+        $id = $this->connection->fetchOne(
+            'SELECT id FROM `user` WHERE email = :email LIMIT 1',
+            ['email' => $email]
+        );
+
+        if ($id === false) {
+            throw new \RuntimeException(sprintf('User not found for email "%s".', $email));
         }
 
         return (int) $id;

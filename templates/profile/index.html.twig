@@ -23,6 +23,7 @@
 		{% endfor %}
 
 		{% set u = app.user %}
+		{% set profilePhoto = u.picture ? asset('images/users/' ~ u.picture) : asset('images/users/default-avatar.svg') %}
 
 		<div class="row g-4">
 			<div
@@ -32,6 +33,22 @@
 				<div class="card profile-card border-0 shadow-sm">
 					<div class="card-body p-4 p-md-5">
 						<div class="d-flex flex-column flex-md-row align-items-start align-items-md-center gap-3 gap-md-4">
+
+							<div class="profile-avatar-section">
+								<div class="profile-avatar-wrap">
+									<img src="{{ profilePhoto }}" alt="Photo de profil" class="profile-avatar-image" onerror="this.src='{{ asset('images/users/default-avatar.svg') }}'">
+								</div>
+
+								<form method="post" action="{{ path('update_profile_photo') }}" enctype="multipart/form-data" class="mt-2 profile-photo-form">
+									<input type="hidden" name="_token" value="{{ csrf_token('update_profile_photo') }}">
+									<input type="file" class="d-none" id="profilePictureInput" name="profilePicture" accept=".jpg,.jpeg,.png,.webp,.gif" onchange="this.form.submit()">
+									<label for="profilePictureInput" class="btn btn-outline-dark btn-sm w-100">
+										<i class="fa-regular fa-image me-2"></i>
+										Modifier la photo
+									</label>
+									<div class="small text-body-secondary mt-1 text-center">JPG, PNG, GIF, WebP - 5 Mo max</div>
+								</form>
+							</div>
 
 							<div class="flex-grow-1">
 								<div class="d-flex flex-wrap align-items-center gap-2">
@@ -95,6 +112,13 @@
 									<i class="fa-solid fa-right-from-bracket me-2"></i>
 									Déconnexion
 								</a>
+								<form method="post" action="{{ path('delete_account') }}" onsubmit="return confirm('Supprimer définitivement votre compte ?')">
+									<input type="hidden" name="_token" value="{{ csrf_token('delete_account') }}">
+									<button type="submit" class="btn btn-outline-danger">
+										<i class="fa-solid fa-user-xmark me-2"></i>Supprimer mon compte
+									</button>
+								</form>
+
 							</div>
 
 						</div>

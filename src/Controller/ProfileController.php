@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -103,4 +104,83 @@ final class ProfileController extends AbstractController
         $this->addFlash('success', 'Votre mot de passe a été mis à jour avec succès.');
         return $this->redirectToRoute('app_profile');
     }
+
+    #[Route('/profile/photo', name: 'update_profile_photo', methods: ['POST'])]
+    public function updateProfilePhoto(Request $request): Response
+    {
+        /** @var User|null $user */
+        $user = $this->getUser();
+        if (!$user) {
+            return $this->redirectToRoute('app_login');
+        }
+
+        if (!$this->isCsrfTokenValid('update_profile_photo', (string) $request->request->get('_token'))) {
+            $this->addFlash('warning', 'Session invalide, merci de réessayer.');
+            return $this->redirectToRoute('app_profile');
+        }
+
+        $pictureFile = $request->files->get('profilePicture');
+        if (!$pictureFile instanceof UploadedFile) {
+            $this->addFlash('warning', 'Aucun fichier image sélectionné.');
+            return $this->redirectToRoute('app_profile');
+        }
+
+        if ($pictureFile->getError() !== \UPLOAD_ERR_OK) {
+            $this->addFlash('warning', 'Le fichier n a pas pu etre téléversé.');
+            return $this->redirectToRoute('app_profile');
+        }
+
+        if ($pictureFile->getSize() > 5 * 1024 * 1024) {
+            $this->addFlash('warning', 'La taille maximale autorisée est de 5 Mo.');
+            return $this->redirectToRoute('app_profile');
+        }
+
+        $allowedMimeTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+        if (!in_array($pictureFile->getMimeType(), $allowedMimeTypes, true)) {
+            $this->addFlash('warning', 'Format invalide. Utilisez JPG, PNG, GIF ou WebP.');
+            return $this->redirectToRoute('app_profile');
+        }
+
+        $user->setImageFile($pictureFile);
+        $this->em->flush();
+
+        $this->addFlash('success', 'Photo de profil mise à jour.');
+        return $this->redirectToRoute('app_profile');
+    }
+
+    #[Route('/profile/delete', name: 'delete_account', methods: ['POST'])]
+    public function deleteAccount(Request $request): Response
+    {
+        /** @var User|null $user */
+        $user = $this->getUser();
+        if (!$user) {
+            return $this->redirectToRoute('app_login');
+        }
+
+        if (!$this->isCsrfTokenValid('delete_account', (string) $request->request->get('_token'))) {
+            $this->addFlash('warning', 'Requête invalide.');
+            return $this->redirectToRoute('app_profile');
+        }
+
+        // Evite les erreurs FK
+        foreach ($user->getResources() as $resource) {
+            $resource->setUser(null);
+        }
+
+        foreach ($user->getComments() as $comment) {
+            $this->em->remove($comment);
+        }
+
+        $user->getFavorites()->clear();
+
+        $this->em->remove($user);
+        $this->em->flush();
+
+        $request->getSession()->invalidate();
+        $this->container->get('security.token_storage')->setToken(null);
+
+        $this->addFlash('success', 'Votre compte a ete supprimé.');
+        return $this->redirectToRoute('app_home');
+    }
+
 }

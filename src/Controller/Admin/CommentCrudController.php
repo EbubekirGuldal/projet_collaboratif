@@ -11,7 +11,6 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextEditorField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[IsGranted('ROLE_ADMIN')]
@@ -25,7 +24,7 @@ class CommentCrudController extends AbstractCrudController
     public function configureCrud(Crud $crud): Crud
     {
         return $crud
-            ->setSearchFields(['id', 'content', 'status', 'resource.title', 'resource.id'])
+            ->setSearchFields(['id', 'content', 'resource.title', 'resource.id', 'user.email', 'user.username'])
             ->setEntityLabelInSingular('Commentaire')
             ->setEntityLabelInPlural('Commentaires')
             ->setAutofocusSearch()
@@ -49,10 +48,9 @@ class CommentCrudController extends AbstractCrudController
         return [
             IdField::new('id')->hideOnForm(),
             TextEditorField::new('content'),
-            TextField::new('status'),
             AssociationField::new('resource'),
+            AssociationField::new('user'),
             DateTimeField::new('createdAt')->hideOnForm(),
-            DateTimeField::new('updatedAt')->hideOnForm(),
         ];
     }
     
