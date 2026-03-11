@@ -8,6 +8,35 @@
   letter-spacing: -0.02em;
 }
 
+.profile-avatar-section {
+  width: 172px;
+  flex-shrink: 0;
+}
+
+.profile-avatar-wrap {
+  width: 120px;
+  height: 120px;
+  margin: 0 auto;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.profile-avatar-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.profile-photo-form .btn {
+  white-space: normal;
+  line-height: 1.2;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+}
+
 .profile-avatar {
   width: 64px;
   height: 64px;
@@ -51,4 +80,11 @@
 .profile-field-value {
   font-weight: 600;
   word-break: break-word;
+}
+
+@media (max-width: 767.98px) {
+  .profile-avatar-section {
+    width: 100%;
+    max-width: 220px;
+  }
 }
