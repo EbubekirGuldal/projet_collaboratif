@@ -2,14 +2,38 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use App\Repository\ResourceRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use App\Repository\ResourceRepository;
-use Doctrine\Common\Collections\Collection;
-use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Vich\UploaderBundle\Mapping\Attribute as Vich;
 
+#[ApiResource(
+    paginationItemsPerPage: 10,
+    paginationPartial: true,
+    operations: [
+        new GetCollection(
+            normalizationContext: ['groups' => ['resource:read']],
+            security: "true"
+        ),
+        new Get(
+            normalizationContext: ['groups' => ['resource:read']],
+            security: "true"
+        ),
+        new Patch(
+            normalizationContext: ['groups' => ['resource:read']],
+            denormalizationContext: ['groups' => ['resource:update']],
+            security: "object.getUser() == user"
+        ),
+    ]
+)]
 #[ORM\Entity(repositoryClass: ResourceRepository::class)]
 #[ORM\HasLifecycleCallbacks]
 #[Vich\Uploadable]
@@ -18,39 +42,51 @@ class Resource
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['resource:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['resource:read'])]
     private ?string $title = null;
 
     #[ORM\Column(type: Types::TEXT)]
+    #[Groups(['resource:read'])]
     private ?string $content = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['resource:read'])]
     private ?string $externalUrl = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['resource:read'])]
     private ?\DateTimeImmutable $publishedAt = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['resource:read'])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['resource:read'])]
     private ?\DateTimeImmutable $updatedAt = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['resource:read'])]
     private ?string $image = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['resource:read'])]
     private ?string $video = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['resource:read'])]
     private ?string $resourceStatus = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['resource:read'])]
     private ?string $visibilityStatus = null;
 
     #[ORM\Column(options: ["default" => 0])]
+    #[Groups(['resource:read'])]
     private ?int $sharesCount = 0;
 
     /**
@@ -67,6 +103,7 @@ class Resource
 
     #[ORM\ManyToOne(inversedBy: 'resources')]
     #[ORM\JoinColumn(nullable: true)]
+    #[Groups(['resource:read'])]
     private ?User $user = null;
 
     public function __toString()
