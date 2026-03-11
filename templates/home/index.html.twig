@@ -3,98 +3,143 @@
 {% block title %}Accueil{% endblock %}
 
 {% block body %}
-<div class="container py-4">
-    {# Flash messages #}
+<div class="container py-4 py-lg-5 feed-page">
     {% for label, messages in app.flashes %}
         {% for message in messages %}
             <div class="alert alert-{{ label }} alert-dismissible fade show" role="alert">
                 {{ message }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
             </div>
         {% endfor %}
     {% endfor %}
 
-    <div class="row g-4 feed-layout">
-        {# FEED #}
-        <div class="col-12 col-lg-8">
-            <div class="d-flex align-items-center justify-content-between mb-3">
-                <h1 class="h4 m-0">Fil d’actualité</h1>
+    <div class="feed-shell">
+        <div class="feed-main">
+            <section class="feed-hero card border-0 shadow-sm">
+                <div class="card-body p-4 p-lg-5">
+                    <div class="feed-hero-row">
+                        <div class="feed-hero-copy">
+                            <span class="feed-eyebrow">Ressources relationnelles</span>
+                            <h1 class="feed-title mb-2">Fil d&apos;actualit&eacute;</h1>
+                            <p class="feed-subtitle mb-0">
+                                Un espace clair pour trouver, partager et suivre les ressources utiles de la communaut&eacute;.
+                            </p>
+                        </div>
 
-                <div class="btn-group" role="group" aria-label="Tri">
-                    <a class="btn btn-sm {{ sort == 'new' ? 'btn-primary' : 'btn-outline-primary' }}"
-                       href="{{ path('app_home', { q: q, sort: 'new' }) }}">
-                        <i class="fa-regular fa-clock me-1"></i> Récent
-                    </a>
-                    <a class="btn btn-sm {{ sort == 'top' ? 'btn-primary' : 'btn-outline-primary' }}"
-                       href="{{ path('app_home', { q: q, sort: 'top' }) }}">
-                        <i class="fa-solid fa-arrow-trend-up me-1"></i> Populaire
-                    </a>
-                </div>
-            </div>
-
-            {% if q %}
-                <div class="mb-3 small text-muted">
-                    Résultats pour : <span class="fw-semibold">“{{ q }}”</span>
-                    <a class="ms-2" href="{{ path('app_home') }}">Effacer</a>
-                </div>
-            {% endif %}
-
-            {% if feedItems is empty %}
-                <div class="card border-0 shadow-sm">
-                    <div class="card-body">
-                        <p class="mb-0">Aucune ressource pour le moment. Essayez une autre recherche.</p>
-                    </div>
-                </div>
-            {% endif %}
-
-            {% for item in feedItems %}
-                {% include 'resource/_card.html.twig' with {
-                    resource: item.resource,
-                    commentsCount: item.commentsCount
-                } only %}
-            {% endfor %}
-        </div>
-
-        {# SIDEBAR #}
-        <div class="col-12 col-lg-4">
-            <div class="card border-0 shadow-sm mb-3">
-                <div class="card-body">
-                    <h2 class="h6">À propos</h2>
-                    <p class="text-muted small mb-0">
-                        (RE)Sources Relationnelles : ressources, échanges et entraide pour renforcer les liens sociaux.
-                    </p>
-                </div>
-            </div>
-
-            <div class="card border-0 shadow-sm">
-                <div class="card-body">
-                    <h2 class="h6">Actions rapides</h2>
-
-                    {% if app.user %}
-                        <div class="d-grid gap-2">
-                            {# Si vous ajoutez plus tard une création côté citoyen, remplacez le lien ici #}
-                            <a class="btn btn-primary" href="{{ path('admin') }}">
-                                <i class="fa-solid fa-plus me-2"></i>Proposer une ressource
+                        <div class="feed-sort" role="group" aria-label="Tri du fil">
+                            <a
+                                class="feed-sort__btn {{ sort == 'new' ? 'is-active' : '' }}"
+                                href="{{ path('app_home', { q: q, sort: 'new' }) }}"
+                            >
+                                <i class="fa-regular fa-clock"></i>
+                                <span>R&eacute;cent</span>
                             </a>
-                            <a class="btn btn-outline-primary" href="{{ path('app_profile') }}">
-                                <i class="fa-solid fa-user me-2"></i>Voir mon profil
+                            <a
+                                class="feed-sort__btn {{ sort == 'top' ? 'is-active' : '' }}"
+                                href="{{ path('app_home', { q: q, sort: 'top' }) }}"
+                            >
+                                <i class="fa-solid fa-arrow-trend-up"></i>
+                                <span>Populaire</span>
                             </a>
                         </div>
-                        <p class="text-muted small mt-2 mb-0">
-                            (Prototype) La création côté citoyen peut être branchée ensuite sur un formulaire dédié.
-                        </p>
-                    {% else %}
-                        <p class="text-muted small">
-                            Connectez-vous pour proposer, commenter et sauvegarder des ressources.
-                        </p>
-                        <div class="d-grid gap-2">
-                            <a class="btn btn-primary" href="{{ path('app_login') }}">Connexion</a>
-                            <a class="btn btn-outline-primary" href="{{ path('app_register') }}">Inscription</a>
+                    </div>
+
+                    {% if q %}
+                        <div class="feed-search-state">
+                            <span class="feed-search-pill">
+                                <i class="fa-solid fa-magnifying-glass"></i>
+                                R&eacute;sultats pour : "{{ q }}"
+                            </span>
+                            <a class="feed-search-reset" href="{{ path('app_home') }}">Effacer</a>
                         </div>
                     {% endif %}
                 </div>
+            </section>
+
+            <div class="feed-list mt-4">
+                {% if feedItems is empty %}
+                    <section class="card border-0 shadow-sm feed-empty-state">
+                        <div class="card-body p-4 p-lg-5">
+                            <div class="feed-empty-icon">
+                                <i class="fa-regular fa-folder-open"></i>
+                            </div>
+                            <h2 class="h5 mt-3 mb-2">Aucune ressource &agrave; afficher</h2>
+                            <p class="text-body-secondary mb-0">
+                                Essayez une autre recherche ou revenez plus tard pour voir les prochaines publications.
+                            </p>
+                        </div>
+                    </section>
+                {% endif %}
+
+                {% for item in feedItems %}
+                    {% include 'resource/_card.html.twig' with {
+                        resource: item.resource,
+                        commentsCount: item.commentsCount
+                    } only %}
+                {% endfor %}
             </div>
         </div>
+
+        <aside class="feed-sidebar">
+            <div class="feed-sidebar__inner">
+                <section class="card border-0 shadow-sm feed-side-card">
+                    <div class="card-body p-4">
+                        <div class="feed-side-head">
+                            <span class="feed-side-icon">
+                                <i class="fa-solid fa-circle-info"></i>
+                            </span>
+                            <div>
+                                <h2 class="h6 mb-1">&Agrave; propos</h2>
+                                <p class="feed-side-subtitle mb-0">Le projet en bref</p>
+                            </div>
+                        </div>
+
+                        <p class="feed-side-copy mb-0">
+                            Ressources relationnelles rassemble des contenus utiles, des rep&egrave;res fiables et des pistes concr&egrave;tes
+                            pour renforcer les liens sociaux et l&apos;entraide.
+                        </p>
+                    </div>
+                </section>
+
+                <section class="card border-0 shadow-sm feed-side-card">
+                    <div class="card-body p-4">
+                        <div class="feed-side-head">
+                            <span class="feed-side-icon">
+                                <i class="fa-solid fa-bolt"></i>
+                            </span>
+                            <div>
+                                <h2 class="h6 mb-1">Actions rapides</h2>
+                                <p class="feed-side-subtitle mb-0">Acc&egrave;s directs</p>
+                            </div>
+                        </div>
+
+                        {% if app.user %}
+                            <div class="d-grid gap-2 mt-3">
+                                <a class="btn btn-dark" href="{{ path('admin') }}">
+                                    <i class="fa-solid fa-plus me-2"></i>
+                                    Proposer une ressource
+                                </a>
+                                <a class="btn btn-outline-dark" href="{{ path('app_profile') }}">
+                                    <i class="fa-regular fa-user me-2"></i>
+                                    Voir mon profil
+                                </a>
+                            </div>
+                            <p class="feed-side-note mb-0 mt-3">
+                                La proposition de ressource reste branch&eacute;e sur le flux de cr&eacute;ation actuel.
+                            </p>
+                        {% else %}
+                            <p class="feed-side-copy mt-3">
+                                Connectez-vous pour commenter, sauvegarder et proposer des ressources.
+                            </p>
+                            <div class="d-grid gap-2">
+                                <a class="btn btn-dark" href="{{ path('app_login') }}">Connexion</a>
+                                <a class="btn btn-outline-dark" href="{{ path('app_register') }}">Inscription</a>
+                            </div>
+                        {% endif %}
+                    </div>
+                </section>
+            </div>
+        </aside>
     </div>
 </div>
 {% endblock %}

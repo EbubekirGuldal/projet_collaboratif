@@ -1,8 +1,10 @@
-<nav class="navbar navbar-expand-lg bg-white border-bottom sticky-top">
+<nav class="navbar navbar-expand-lg bg-white border-bottom sticky-top app-navbar">
 	<div class="container">
 
-		<a class="navbar-brand fw-semibold d-flex align-items-center gap-2" href="{{ path('app_home') }}">
-			<i class="fa-solid fa-hand-holding-heart text-primary"></i>
+		<a class="navbar-brand fw-semibold d-flex align-items-center gap-2 app-navbar__brand" href="{{ path('app_home') }}">
+			<span class="app-navbar__brand-mark">
+				<i class="fa-solid fa-hand-holding-heart"></i>
+			</span>
 			<span>Ressources relationnelles</span>
 		</a>
 
@@ -13,48 +15,48 @@
 		<div
 			class="collapse navbar-collapse" id="mainNavbar">
 
-			{# ✅ La recherche prend toute la place dispo #}
-			<form class="nav-search d-flex flex-grow-1 mx-lg-4 my-3 my-lg-0" role="search" method="get" action="{{ path('app_home') }}">
-				<div class="input-group nav-search__group w-100">
+			{# La recherche prend toute la place disponible #}
+			<form class="nav-search d-flex flex-grow-1 mx-lg-4 my-3 my-lg-0 app-navbar__search" role="search" method="get" action="{{ path('app_home') }}">
+				<div class="input-group nav-search__group w-100 app-navbar__search-group">
 					<span class="input-group-text nav-search__icon">
 						<i class="fa-solid fa-magnifying-glass"></i>
 					</span>
 
 					<input
-					class="form-control nav-search__input" type="search" name="q" value="{{ app.request.query.get('q') }}" placeholder="Rechercher une ressource (ex: santé, aide, démarches...)" aria-label="Search">
+					class="form-control nav-search__input app-navbar__search-input" type="search" name="q" value="{{ app.request.query.get('q') }}" placeholder="Rechercher une ressource..." aria-label="Rechercher">
 
-					{# Optionnel mais très pro sur desktop #}
-					<button class="btn btn-primary nav-search__btn d-none d-lg-inline-flex" type="submit">
+					{# Optionnel mais tres pratique sur desktop #}
+					<button class="btn btn-primary nav-search__btn d-none d-lg-inline-flex app-navbar__search-btn" type="submit">
 						Rechercher
 					</button>
 				</div>
 			</form>
 
-			<div class="d-flex align-items-center gap-2 ms-lg-2">
+			<div class="d-flex align-items-center gap-2 ms-lg-2 app-navbar__actions">
 				{% if app.user %}
-					<a class="btn btn-primary" href="{{ path('app_profile') }}">
-						<i class="fa-solid fa-user me-2"></i>
+					<a class="btn btn-outline-dark app-navbar__action app-navbar__action--profile" href="{{ path('app_profile') }}">
+						<i class="fa-solid fa-user"></i>
 						Profil
 					</a>
 
-					<a class="btn btn-outline-primary" href="{{ logout_path() }}">
-						<i class="fa-solid fa-right-from-bracket me-2"></i>
-						Déconnexion
+					<a class="btn app-navbar__action app-navbar__action--ghost" href="{{ logout_path() }}">
+						<i class="fa-solid fa-right-from-bracket"></i>
+						D&eacute;connexion
 					</a>
 				{% else %}
-					<a class="btn btn-outline-primary" href="{{ path('app_login') }}">
-						<i class="fa-solid fa-right-to-bracket me-2"></i>
+					<a class="btn btn-outline-dark app-navbar__action" href="{{ path('app_login') }}">
+						<i class="fa-solid fa-right-to-bracket"></i>
 						Connexion
 					</a>
 
-					<a class="btn btn-primary" href="{{ path('app_register') }}">
-						<i class="fa-solid fa-user-plus me-2"></i>
+					<a class="btn btn-dark app-navbar__action" href="{{ path('app_register') }}">
+						<i class="fa-solid fa-user-plus"></i>
 						Inscription
 					</a>
 				{% endif %}
 
 				{% if is_granted('ROLE_ADMIN') %}
-					<a href="{{ path('admin') }}" class="btn btn-outline-primary btn-sm d-flex align-items-center gap-2 px-3 rounded-pill shadow-sm">
+					<a href="{{ path('admin') }}" class="btn btn-outline-primary btn-sm d-flex align-items-center gap-2 px-3 rounded-pill shadow-sm app-navbar__admin">
 
 						<i class="fa-solid fa-shield-halved"></i>
 						<span>Admin</span>

@@ -202,6 +202,10 @@
 
                         <div class="card-body p-4">
                             <p class="small text-body-secondary mb-3">Utilisez cette action si vous changez d'appareil ou quittez un poste partag&eacute;.</p>
+                            <a href="{{ path('app_profile_saved_resources') }}" class="btn btn-outline-dark btn-sm profile-logout-btn mb-2">
+                                <i class="fa-regular fa-bookmark me-2"></i>
+                                Mes ressources sauvegard&eacute;es ({{ u.favorites|length }})
+                            </a>
                             <a href="{{ path('app_logout') }}" class="btn btn-outline-secondary btn-sm profile-logout-btn">
                                 <i class="fa-solid fa-right-from-bracket me-2"></i>
                                 D&eacute;connexion
