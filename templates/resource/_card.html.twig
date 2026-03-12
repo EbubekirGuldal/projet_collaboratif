@@ -1,9 +1,9 @@
-{# templates/resource/_card.html.twig #}
-
 {% set excerpt = resource.content|striptags %}
 {% if excerpt|length > 240 %}
     {% set excerpt = excerpt|slice(0, 240) ~ '…' %}
 {% endif %}
+
+{% set isFavorited = app.user ? app.user.isFavorite(resource) : false %}
 
 <article class="card feed-card border-0 shadow-sm mb-3">
     <div class="card-body">
@@ -81,12 +81,12 @@
             </div>
 
             <button
-                class="btn btn-sm btn-outline-warning btn-favorite"
+                class="btn btn-sm btn-favorite {{ isFavorited ? 'btn-warning' : 'btn-outline-warning' }}"
                 data-id="{{ resource.id }}"
                 title="Enregistrer"
             >
                 <i class="fa-regular fa-bookmark me-1"></i>
-                Sauvegarder
+                {{ isFavorited ? 'Enregistré' : 'Sauvegarder' }}
             </button>
 
         </div>

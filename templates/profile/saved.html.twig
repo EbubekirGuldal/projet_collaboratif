@@ -1,0 +1,39 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mes enregistrements{% endblock %}
+
+{% block body %}
+<div class="container py-4">
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-4">
+        <div>
+            <h1 class="h4 m-0">Mes enregistrements</h1>
+            <div class="text-muted small">
+                Toutes les ressources que tu as sauvegardées.
+            </div>
+        </div>
+
+        <a href="{{ path('app_home') }}" class="btn btn-outline-primary">
+            <i class="fa-solid fa-arrow-left me-2"></i>
+            Retour au fil
+        </a>
+    </div>
+
+    {% if feedItems is empty %}
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <p class="mb-2 fw-semibold">Tu n’as encore rien enregistré.</p>
+                <p class="mb-0 text-muted">
+                    Clique sur “Sauvegarder” dans le fil pour retrouver ici tes ressources préférées.
+                </p>
+            </div>
+        </div>
+    {% else %}
+        {% for item in feedItems %}
+            {% include 'resource/_card.html.twig' with {
+                resource: item.resource,
+                commentsCount: item.commentsCount
+            } only %}
+        {% endfor %}
+    {% endif %}
+</div>
+{% endblock %}

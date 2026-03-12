@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Repository\ResourceRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -28,6 +29,38 @@ final class ProfileController extends AbstractController
         return $this->render('profile/index.html.twig');
     }
 
+    #[Route('/profile/saved', name: 'app_profile_saved', methods: ['GET'])]
+    public function saved(ResourceRepository $resourceRepository): Response
+    {
+        /** @var User|null $user */
+        $user = $this->getUser();
+
+        if (!$user) {
+            return $this->redirectToRoute('app_login');
+        }
+
+        $favorites = $user->getFavorites()->toArray();
+
+        usort($favorites, static function ($a, $b) {
+            $aDate = $a->getCreatedAt()?->getTimestamp() ?? 0;
+            $bDate = $b->getCreatedAt()?->getTimestamp() ?? 0;
+
+            return $bDate <=> $aDate;
+        });
+
+        $feedItems = [];
+        foreach ($favorites as $resource) {
+            $feedItems[] = [
+                'resource' => $resource,
+                'commentsCount' => $resource->getComments()->count(),
+            ];
+        }
+
+        return $this->render('profile/saved.html.twig', [
+            'feedItems' => $feedItems,
+        ]);
+    }
+
     #[Route('/profile/edit', name: 'edit_profile')]
     public function edit(Request $request): Response
     {
@@ -37,7 +70,7 @@ final class ProfileController extends AbstractController
 
         $data = $request->request->all();
 
-        /**@var User $user */
+        /** @var User $user */
         $user = $this->getUser();
 
         $user->setUsername($data["username"])
@@ -57,7 +90,6 @@ final class ProfileController extends AbstractController
         $this->em->flush();
 
         if ($emailChanged) {
-
             $this->addFlash('success', 'Votre email a été modifié. Veuillez vous reconnecter après vérification.');
             $this->container->get('security.token_storage')->setToken(null);
 
@@ -162,7 +194,6 @@ final class ProfileController extends AbstractController
             return $this->redirectToRoute('app_profile');
         }
 
-        // Evite les erreurs FK
         foreach ($user->getResources() as $resource) {
             $resource->setUser(null);
         }
@@ -182,5 +213,4 @@ final class ProfileController extends AbstractController
         $this->addFlash('success', 'Votre compte a ete supprimé.');
         return $this->redirectToRoute('app_home');
     }
-
 }
