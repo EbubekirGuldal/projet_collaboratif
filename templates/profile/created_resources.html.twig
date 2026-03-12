@@ -81,7 +81,8 @@
                         {% include 'resource/_card.html.twig' with {
                             resource: item.resource,
                             commentsCount: item.commentsCount,
-                            isFavorite: app.user ? app.user.isFavorite(item.resource) : false
+                            isFavorite: app.user ? app.user.isFavorite(item.resource) : false,
+                            editPath: path('resource_edit', { id: item.resource.id })
                         } only %}
                     {% endfor %}
                 </div>
