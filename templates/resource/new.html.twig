@@ -1,0 +1,70 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Proposer une ressource{% endblock %}
+
+{% block body %}
+<div class="container py-4 py-lg-5">
+    <div class="mx-auto" style="max-width: 880px;">
+        <div class="mb-4">
+            <a href="{{ path('app_home') }}" class="small-link">
+                <i class="fa-solid fa-arrow-left me-2"></i>
+                Retour au fil
+            </a>
+        </div>
+
+        <section class="card border-0 shadow-sm">
+            <div class="card-body p-4 p-lg-5">
+                <div class="mb-4">
+                    <span class="feed-eyebrow">Contribution</span>
+                    <h1 class="feed-title mb-2">Proposer une ressource</h1>
+                    <p class="feed-subtitle mb-0">
+                        Partage une ressource utile à la communauté. Sois clair, précis et donne assez de contexte pour qu’elle soit facilement exploitable.
+                    </p>
+                </div>
+
+                {{ form_start(form) }}
+                    <div class="row g-4">
+                        <div class="col-12">
+                            {{ form_label(form.title, null, {'label_attr': {'class': 'form-label fw-semibold'}}) }}
+                            {{ form_widget(form.title, {'attr': {'class': 'form-control'}}) }}
+                            {{ form_errors(form.title) }}
+                        </div>
+
+                        <div class="col-12">
+                            {{ form_label(form.content, null, {'label_attr': {'class': 'form-label fw-semibold'}}) }}
+                            {{ form_widget(form.content, {'attr': {'class': 'form-control'}}) }}
+                            {{ form_errors(form.content) }}
+                        </div>
+
+                        <div class="col-12">
+                            {{ form_label(form.externalUrl, null, {'label_attr': {'class': 'form-label fw-semibold'}}) }}
+                            {{ form_widget(form.externalUrl, {'attr': {'class': 'form-control'}}) }}
+                            {{ form_errors(form.externalUrl) }}
+                        </div>
+
+                        <div class="col-12">
+                            {{ form_label(form.imageFile, null, {'label_attr': {'class': 'form-label fw-semibold'}}) }}
+                            {{ form_widget(form.imageFile, {'attr': {'class': 'form-control'}}) }}
+                            {{ form_errors(form.imageFile) }}
+                            <div class="form-text text-muted mt-2">
+                                Une image rend la ressource plus visible dans le fil, mais elle reste optionnelle.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex flex-wrap gap-2 mt-4">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fa-solid fa-paper-plane me-2"></i>
+                            Publier la ressource
+                        </button>
+
+                        <a href="{{ path('app_home') }}" class="btn btn-outline-secondary">
+                            Annuler
+                        </a>
+                    </div>
+                {{ form_end(form) }}
+            </div>
+        </section>
+    </div>
+</div>
+{% endblock %}

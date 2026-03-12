@@ -2,8 +2,8 @@
 
 namespace App\Controller;
 
-use App\Entity\Resource;
 use App\Entity\User;
+use App\Repository\ResourceRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -23,101 +23,49 @@ final class ProfileController extends AbstractController
     public function index(): Response
     {
         if (!$this->getUser()) {
-            return $this->redirectToRoute("app_login");
+            return $this->redirectToRoute('app_login');
         }
 
         return $this->render('profile/index.html.twig');
     }
 
-    #[Route('/profile/saved-resources', name: 'app_profile_saved_resources', methods: ['GET'])]
-    public function savedResources(Request $request): Response
+    #[Route('/profile/saved', name: 'app_profile_saved', methods: ['GET'])]
+    public function saved(ResourceRepository $resourceRepository): Response
     {
         /** @var User|null $user */
         $user = $this->getUser();
+
         if (!$user) {
             return $this->redirectToRoute('app_login');
         }
 
-        $resources = $user->getFavorites()->toArray();
-        $query = trim((string) $request->query->get('q', ''));
-        $sort = (string) $request->query->get('sort', 'new');
-        $allowedSorts = ['new', 'top', 'title'];
+        $favorites = $user->getFavorites()->toArray();
 
-        if (!in_array($sort, $allowedSorts, true)) {
-            $sort = 'new';
-        }
+        usort($favorites, static function ($a, $b) {
+            $aDate = $a->getCreatedAt()?->getTimestamp() ?? 0;
+            $bDate = $b->getCreatedAt()?->getTimestamp() ?? 0;
 
-        if ($query !== '') {
-            $normalizedQuery = mb_strtolower($query);
-
-            $resources = array_values(array_filter(
-                $resources,
-                static function (Resource $resource) use ($normalizedQuery): bool {
-                    $haystack = implode(' ', [
-                        $resource->getTitle(),
-                        strip_tags($resource->getContent()),
-                        $resource->getExternalUrl() ?? '',
-                    ]);
-
-                    return str_contains(mb_strtolower($haystack), $normalizedQuery);
-                }
-            ));
-        }
-
-        usort($resources, static function (Resource $left, Resource $right) use ($sort): int {
-            if ($sort === 'title') {
-                return strcasecmp($left->getTitle(), $right->getTitle());
-            }
-
-            if ($sort === 'top') {
-                $leftScore = ($left->getLikesCount() ?? 0) + ($left->getSharesCount() ?? 0) + $left->getComments()->count();
-                $rightScore = ($right->getLikesCount() ?? 0) + ($right->getSharesCount() ?? 0) + $right->getComments()->count();
-
-                if ($leftScore !== $rightScore) {
-                    return $rightScore <=> $leftScore;
-                }
-            }
-
-            $leftDate = $left->getPublishedAt() ?? $left->getCreatedAt();
-            $rightDate = $right->getPublishedAt() ?? $right->getCreatedAt();
-
-            if ($leftDate === null && $rightDate === null) {
-                return 0;
-            }
-
-            if ($leftDate === null) {
-                return 1;
-            }
-
-            if ($rightDate === null) {
-                return -1;
-            }
-
-            return $rightDate <=> $leftDate;
+            return $bDate <=> $aDate;
         });
 
-        $savedItems = array_map(
-            static fn (Resource $resource): array => [
+        $feedItems = [];
+        foreach ($favorites as $resource) {
+            $feedItems[] = [
                 'resource' => $resource,
                 'commentsCount' => $resource->getComments()->count(),
-            ],
-            $resources
-        );
+            ];
+        }
 
-        return $this->render('profile/saved_resources.html.twig', [
-            'savedItems' => $savedItems,
-            'q' => $query,
-            'sort' => $sort,
-            'savedCount' => count($resources),
-            'totalSavedCount' => $user->getFavorites()->count(),
+        return $this->render('profile/saved.html.twig', [
+            'feedItems' => $feedItems,
         ]);
     }
 
-    #[Route('/profile/edit', name: 'edit_profile')]
+    #[Route('/profile/edit', name: 'edit_profile', methods: ['POST'])]
     public function edit(Request $request): Response
     {
         if (!$this->getUser()) {
-            return $this->redirectToRoute("app_login");
+            return $this->redirectToRoute('app_login');
         }
 
         $data = $request->request->all();
@@ -125,17 +73,16 @@ final class ProfileController extends AbstractController
         /** @var User $user */
         $user = $this->getUser();
 
-        $user->setUsername($data["username"])
-            ->setFirstName($data["firstName"])
-            ->setLastName($data["lastName"]);
+        $user->setUsername($data['username'] ?? $user->getUsername())
+            ->setFirstName($data['firstName'] ?? $user->getFirstName())
+            ->setLastName($data['lastName'] ?? $user->getLastName());
 
         $emailChanged = false;
-
         $newEmail = trim((string) ($data['email'] ?? ''));
 
         if ($newEmail !== '' && $newEmail !== $user->getEmail()) {
             $emailChanged = true;
-            $user->setEmail($data["email"]);
+            $user->setEmail($newEmail);
             $user->setIsVerified(false);
         }
 
@@ -145,18 +92,19 @@ final class ProfileController extends AbstractController
             $this->addFlash('success', 'Votre email a été modifié. Veuillez vous reconnecter après vérification.');
             $this->container->get('security.token_storage')->setToken(null);
 
-            return $this->redirectToRoute("app_login");
+            return $this->redirectToRoute('app_login');
         }
 
         $this->addFlash('success', 'Votre profil a été mis à jour avec succès.');
-        return $this->redirectToRoute("app_profile");
+        return $this->redirectToRoute('app_profile');
     }
 
-    #[Route('/profile/change-password', name: 'change_password', methods: ["POST"])]
+    #[Route('/profile/change-password', name: 'change_password', methods: ['POST'])]
     public function changePassword(Request $request): Response
     {
         /** @var User|null $user */
         $user = $this->getUser();
+
         if (!$user) {
             return $this->redirectToRoute('app_login');
         }
@@ -194,6 +142,7 @@ final class ProfileController extends AbstractController
     {
         /** @var User|null $user */
         $user = $this->getUser();
+
         if (!$user) {
             return $this->redirectToRoute('app_login');
         }
@@ -237,6 +186,7 @@ final class ProfileController extends AbstractController
     {
         /** @var User|null $user */
         $user = $this->getUser();
+
         if (!$user) {
             return $this->redirectToRoute('app_login');
         }

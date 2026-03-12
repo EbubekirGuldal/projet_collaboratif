@@ -13,8 +13,6 @@
 		</button>
 
 		<div class="collapse navbar-collapse" id="mainNavbar">
-
-			{# La recherche prend toute la place disponible #}
 			<form class="nav-search d-flex flex-grow-1 mx-lg-4 my-3 my-lg-0 app-navbar__search" role="search" method="get" action="{{ path('app_home') }}">
 				<div class="input-group nav-search__group w-100 app-navbar__search-group">
 					<span class="input-group-text nav-search__icon">
@@ -22,17 +20,32 @@
 					</span>
 
 					<input
-					class="form-control nav-search__input app-navbar__search-input" type="search" name="q" value="{{ app.request.query.get('q') }}" placeholder="Rechercher une ressource..." aria-label="Rechercher">
+						class="form-control nav-search__input app-navbar__search-input"
+						type="search"
+						name="q"
+						value="{{ app.request.query.get('q') }}"
+						placeholder="Rechercher une ressource..."
+						aria-label="Rechercher"
+					>
 
-					{# Optionnel mais tres pratique sur desktop #}
 					<button class="btn btn-primary nav-search__btn d-none d-lg-inline-flex app-navbar__search-btn" type="submit">
 						Rechercher
 					</button>
 				</div>
 			</form>
 
-			<div class="d-flex align-items-center gap-2 ms-lg-2 app-navbar__actions">
+			<div class="d-flex align-items-center gap-2 ms-lg-2 app-navbar__actions flex-wrap">
 				{% if app.user %}
+					<a class="btn btn-dark app-navbar__action" href="{{ path('resource_new') }}">
+						<i class="fa-solid fa-plus"></i>
+						Proposer
+					</a>
+
+					<a class="btn btn-outline-dark app-navbar__action" href="{{ path('app_profile_saved') }}">
+						<i class="fa-regular fa-bookmark"></i>
+						Enregistrés
+					</a>
+
 					<a class="btn btn-outline-dark app-navbar__action app-navbar__action--profile" href="{{ path('app_profile') }}">
 						<i class="fa-solid fa-user"></i>
 						Profil
@@ -40,7 +53,7 @@
 
 					<a class="btn app-navbar__action app-navbar__action--ghost" href="{{ logout_path() }}">
 						<i class="fa-solid fa-right-from-bracket"></i>
-						D&eacute;connexion
+						Déconnexion
 					</a>
 				{% else %}
 					<a class="btn btn-outline-dark app-navbar__action" href="{{ path('app_login') }}">
@@ -56,13 +69,11 @@
 
 				{% if is_granted('ROLE_ADMIN') %}
 					<a href="{{ path('admin') }}" class="btn btn-outline-primary btn-sm d-flex align-items-center gap-2 px-3 rounded-pill shadow-sm app-navbar__admin">
-
 						<i class="fa-solid fa-shield-halved"></i>
 						<span>Admin</span>
 					</a>
 				{% endif %}
 			</div>
-
 		</div>
 	</div>
 </nav>

@@ -74,7 +74,8 @@
                 {% for item in feedItems %}
                     {% include 'resource/_card.html.twig' with {
                         resource: item.resource,
-                        commentsCount: item.commentsCount
+                        commentsCount: item.commentsCount,
+                        isFavorite: app.user ? app.user.isFavorite(item.resource) : false
                     } only %}
                 {% endfor %}
             </div>
@@ -115,7 +116,7 @@
 
                         {% if app.user %}
                             <div class="d-grid gap-2 mt-3">
-                                <a class="btn btn-dark" href="{{ path('admin') }}">
+                                <a class="btn btn-dark" href="{{ path('resource_new') }}">
                                     <i class="fa-solid fa-plus me-2"></i>
                                     Proposer une ressource
                                 </a>
@@ -123,9 +124,13 @@
                                     <i class="fa-regular fa-user me-2"></i>
                                     Voir mon profil
                                 </a>
+                                <a class="btn btn-outline-dark" href="{{ path('app_profile_saved') }}">
+                                    <i class="fa-regular fa-bookmark me-2"></i>
+                                    Voir mes enregistrements
+                                </a>
                             </div>
                             <p class="feed-side-note mb-0 mt-3">
-                                La proposition de ressource reste branch&eacute;e sur le flux de cr&eacute;ation actuel.
+                                Tu peux maintenant publier une ressource directement depuis l’interface utilisateur.
                             </p>
                         {% else %}
                             <p class="feed-side-copy mt-3">
