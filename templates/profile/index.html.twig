@@ -67,12 +67,12 @@
                     </div>
 
                     <div class="profile-hero-actions">
-                        <button type="button" class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#editProfileModal">
+                        <button type="button" class="btn btn-dark profile-btn-primary" data-bs-toggle="modal" data-bs-target="#editProfileModal">
                             <i class="fa-regular fa-pen-to-square me-2"></i>
                             Modifier le profil
                         </button>
 
-                        <button type="button" class="btn btn-outline-dark" data-bs-toggle="modal" data-bs-target="#changePasswordModal">
+                        <button type="button" class="btn btn-outline-dark profile-btn-secondary" data-bs-toggle="modal" data-bs-target="#changePasswordModal">
                             <i class="fa-solid fa-key me-2"></i>
                             Changer le mot de passe
                         </button>
@@ -89,12 +89,12 @@
                         <p class="fw-semibold mb-1">Votre email n'est pas encore v&eacute;rifi&eacute;.</p>
                         <p class="small mb-3">Certaines fonctionnalit&eacute;s peuvent &ecirc;tre limit&eacute;es tant que la v&eacute;rification n'est pas termin&eacute;e.</p>
                         <div class="d-flex flex-wrap gap-2">
-                            <a href="{{ path('app_resend_verification_email') }}" class="btn btn-warning btn-sm px-3">
+                            <a href="{{ path('app_resend_verification_email') }}" class="btn btn-warning btn-sm px-3 profile-btn-alert-primary">
                                 <i class="fa-regular fa-paper-plane me-2"></i>
                                 V&eacute;rifier mon email
                             </a>
 
-                            <button type="button" class="btn btn-outline-dark btn-sm px-3" data-bs-toggle="modal" data-bs-target="#howToVerifyModal">
+                            <button type="button" class="btn btn-outline-dark btn-sm px-3 profile-btn-alert-secondary" data-bs-toggle="modal" data-bs-target="#howToVerifyModal">
                                 <i class="fa-regular fa-circle-question me-2"></i>
                                 Je ne le re&ccedil;ois pas
                             </button>
@@ -106,52 +106,50 @@
 
         <div class="row g-4 mt-1 profile-content">
             <div class="col-12 col-xl-8">
-                <section class="card border-0 shadow-sm profile-section-card h-100">
-                    <div class="card-header bg-white border-0 pt-4 px-4 pb-0">
-                        <div class="profile-section-head">
-                            <span class="icon-chip" aria-hidden="true">
-                                <i class="fa-regular fa-id-card"></i>
-                            </span>
-                            <div>
-                                <h2 class="h6 mb-1 profile-section-title">Informations du compte</h2>
-                                <p class="profile-section-subtitle mb-0">Vos donn&eacute;es personnelles en lecture seule.</p>
+                <div class="profile-main-stack">
+                    <section class="card border-0 shadow-sm profile-section-card">
+                        <div class="card-header bg-white border-0 pt-4 px-4 pb-0">
+                            <div class="profile-section-head">
+                                <span class="icon-chip" aria-hidden="true">
+                                    <i class="fa-regular fa-id-card"></i>
+                                </span>
+                                <div>
+                                    <h2 class="h6 mb-1 profile-section-title">Informations du compte</h2>
+                                    <p class="profile-section-subtitle mb-0">Vos donn&eacute;es personnelles en lecture seule.</p>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <div class="card-body p-4">
-                        <div class="profile-field-grid">
-                            <div class="profile-field-card">
-                                <span class="profile-field-label">Email</span>
-                                <p class="profile-field-value mb-0">{{ u.email }}</p>
-                            </div>
+                        <div class="card-body p-4">
+                            <div class="profile-field-grid">
+                                <div class="profile-field-card">
+                                    <span class="profile-field-label">Email</span>
+                                    <p class="profile-field-value mb-0">{{ u.email }}</p>
+                                </div>
 
-                            <div class="profile-field-card">
-                                <span class="profile-field-label">Nom d'utilisateur</span>
-                                <p class="profile-field-value mb-0">{{ u.username }}</p>
-                            </div>
+                                <div class="profile-field-card">
+                                    <span class="profile-field-label">Nom d'utilisateur</span>
+                                    <p class="profile-field-value mb-0">{{ u.username }}</p>
+                                </div>
 
-                            <div class="profile-field-card">
-                                <span class="profile-field-label">Pr&eacute;nom</span>
-                                <p class="profile-field-value mb-0">{{ u.firstName ?: '-' }}</p>
-                            </div>
+                                <div class="profile-field-card">
+                                    <span class="profile-field-label">Pr&eacute;nom</span>
+                                    <p class="profile-field-value mb-0">{{ u.firstName ?: '-' }}</p>
+                                </div>
 
-                            <div class="profile-field-card">
-                                <span class="profile-field-label">Nom</span>
-                                <p class="profile-field-value mb-0">{{ u.lastName ?: '-' }}</p>
-                            </div>
+                                <div class="profile-field-card">
+                                    <span class="profile-field-label">Nom</span>
+                                    <p class="profile-field-value mb-0">{{ u.lastName ?: '-' }}</p>
+                                </div>
 
-                            <div class="profile-field-card profile-field-card--wide">
-                                <span class="profile-field-label">Date de cr&eacute;ation</span>
-                                <p class="profile-field-value mb-0">{{ u.createdAt ? u.createdAt|date('d/m/Y H:i') : '-' }}</p>
+                                <div class="profile-field-card profile-field-card--wide">
+                                    <span class="profile-field-label">Date de cr&eacute;ation</span>
+                                    <p class="profile-field-value mb-0">{{ u.createdAt ? u.createdAt|date('d/m/Y H:i') : '-' }}</p>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </section>
-            </div>
+                    </section>
 
-            <div class="col-12 col-xl-4">
-                <div class="profile-side-stack">
                     <section class="card border-0 shadow-sm profile-section-card">
                         <div class="card-header bg-white border-0 pt-4 px-4 pb-0">
                             <div class="profile-section-head">
@@ -160,7 +158,7 @@
                                 </span>
                                 <div>
                                     <h2 class="h6 mb-1 profile-section-title">S&eacute;curit&eacute;</h2>
-                                    <p class="profile-section-subtitle mb-0">Statut global de votre compte.</p>
+                                    <p class="profile-section-subtitle mb-0">Statut global de votre compte et de vos acc&egrave;s.</p>
                                 </div>
                             </div>
                         </div>
@@ -186,6 +184,43 @@
                             </ul>
                         </div>
                     </section>
+                </div>
+            </div>
+
+            <div class="col-12 col-xl-4">
+                <div class="profile-side-stack">
+                    <section class="card border-0 shadow-sm profile-section-card">
+                        <div class="card-header bg-white border-0 pt-4 px-4 pb-0">
+                            <div class="profile-section-head">
+                                <span class="icon-chip" aria-hidden="true">
+                                    <i class="fa-regular fa-compass"></i>
+                                </span>
+                                <div>
+                                    <h2 class="h6 mb-1 profile-section-title">Navigation</h2>
+                                    <p class="profile-section-subtitle mb-0">Acc&eacute;dez rapidement &agrave; vos espaces utiles.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card-body p-4">
+                            <div class="profile-session-group">
+                                <a href="{{ path('app_profile_created_resources') }}" class="btn btn-outline-dark btn-sm profile-nav-btn">
+                                    <span class="profile-nav-btn__content">
+                                        <i class="fa-regular fa-folder-open"></i>
+                                        <span>Mes ressources cr&eacute;&eacute;es</span>
+                                    </span>
+                                    <span class="profile-nav-btn__meta">{{ u.resources|length }}</span>
+                                </a>
+                                <a href="{{ path('app_profile_saved_resources') }}" class="btn btn-outline-dark btn-sm profile-nav-btn">
+                                    <span class="profile-nav-btn__content">
+                                        <i class="fa-regular fa-bookmark"></i>
+                                        <span>Mes ressources sauvegard&eacute;es</span>
+                                    </span>
+                                    <span class="profile-nav-btn__meta">{{ u.favorites|length }}</span>
+                                </a>
+                            </div>
+                        </div>
+                    </section>
 
                     <section class="card border-0 shadow-sm profile-session-card">
                         <div class="card-header bg-white border-0 pt-4 px-4 pb-0">
@@ -202,14 +237,12 @@
 
                         <div class="card-body p-4">
                             <p class="small text-body-secondary mb-3">Utilisez cette action si vous changez d'appareil ou quittez un poste partag&eacute;.</p>
-                            <a href="{{ path('app_profile_saved_resources') }}" class="btn btn-outline-dark btn-sm profile-logout-btn mb-2">
-                                <i class="fa-regular fa-bookmark me-2"></i>
-                                Mes ressources sauvegard&eacute;es ({{ u.favorites|length }})
-                            </a>
-                            <a href="{{ path('app_logout') }}" class="btn btn-outline-secondary btn-sm profile-logout-btn">
-                                <i class="fa-solid fa-right-from-bracket me-2"></i>
-                                D&eacute;connexion
-                            </a>
+                            <div class="profile-session-group">
+                                <a href="{{ path('app_logout') }}" class="btn btn-outline-secondary btn-sm profile-session-btn">
+                                    <i class="fa-solid fa-right-from-bracket me-2"></i>
+                                    D&eacute;connexion
+                                </a>
+                            </div>
                         </div>
                     </section>
                 </div>

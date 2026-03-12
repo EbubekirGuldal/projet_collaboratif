@@ -274,6 +274,11 @@ body {
   text-align: center;
 }
 
+.feed-empty-state--created .card-body {
+  padding-top: 2.25rem !important;
+  padding-bottom: 2.4rem !important;
+}
+
 .feed-empty-icon {
   width: 56px;
   height: 56px;
@@ -284,6 +289,36 @@ body {
   background: var(--feed-soft);
   color: var(--feed-accent);
   font-size: 1.35rem;
+}
+
+.feed-empty-icon--created {
+  width: 72px;
+  height: 72px;
+  border-radius: 1.35rem;
+  background: linear-gradient(180deg, #eef4ff 0%, #e4edff 100%);
+  box-shadow: 0 12px 28px rgba(29, 78, 216, 0.12);
+  font-size: 1.65rem;
+}
+
+.feed-empty-title {
+  color: var(--feed-text);
+  font-size: clamp(1.28rem, 2vw, 1.55rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.feed-empty-copy {
+  max-width: 46ch;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1.7;
+}
+
+.feed-empty-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.85rem;
 }
 
 .feed-card {
@@ -500,6 +535,17 @@ body {
   line-height: 1.65;
 }
 
+.feed-side-list {
+  margin: 0.95rem 0 1rem;
+  padding-left: 1.1rem;
+  color: #334155;
+  line-height: 1.7;
+}
+
+.feed-side-list li + li {
+  margin-top: 0.35rem;
+}
+
 .feed-side-note {
   color: var(--feed-muted);
   font-size: 0.84rem;
@@ -582,6 +628,15 @@ body {
 
   .feed-card__footer {
     gap: 0.5rem;
+  }
+
+  .feed-empty-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .feed-empty-actions .btn {
+    width: 100%;
   }
 
   .feed-action {
