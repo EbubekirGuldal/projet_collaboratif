@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Resource;
 use App\Entity\User;
 use App\Repository\ResourceRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -29,35 +30,87 @@ final class ProfileController extends AbstractController
         return $this->render('profile/index.html.twig');
     }
 
-    #[Route('/profile/saved', name: 'app_profile_saved', methods: ['GET'])]
-    public function saved(ResourceRepository $resourceRepository): Response
+    #[Route('/profile/saved-resources', name: 'app_profile_saved_resources', methods: ['GET'])]
+    public function savedResources(Request $request): Response
     {
         /** @var User|null $user */
         $user = $this->getUser();
-
         if (!$user) {
             return $this->redirectToRoute('app_login');
         }
 
-        $favorites = $user->getFavorites()->toArray();
+        $resources = $user->getFavorites()->toArray();
+        $query = trim((string) $request->query->get('q', ''));
+        $sort = (string) $request->query->get('sort', 'new');
+        $allowedSorts = ['new', 'top', 'title'];
 
-        usort($favorites, static function ($a, $b) {
-            $aDate = $a->getCreatedAt()?->getTimestamp() ?? 0;
-            $bDate = $b->getCreatedAt()?->getTimestamp() ?? 0;
-
-            return $bDate <=> $aDate;
-        });
-
-        $feedItems = [];
-        foreach ($favorites as $resource) {
-            $feedItems[] = [
-                'resource' => $resource,
-                'commentsCount' => $resource->getComments()->count(),
-            ];
+        if (!in_array($sort, $allowedSorts, true)) {
+            $sort = 'new';
         }
 
-        return $this->render('profile/saved.html.twig', [
-            'feedItems' => $feedItems,
+        if ($query !== '') {
+            $normalizedQuery = mb_strtolower($query);
+
+            $resources = array_values(array_filter(
+                $resources,
+                static function (Resource $resource) use ($normalizedQuery): bool {
+                    $haystack = implode(' ', [
+                        $resource->getTitle(),
+                        strip_tags($resource->getContent()),
+                        $resource->getExternalUrl() ?? '',
+                    ]);
+
+                    return str_contains(mb_strtolower($haystack), $normalizedQuery);
+                }
+            ));
+        }
+
+        usort($resources, static function (Resource $left, Resource $right) use ($sort): int {
+            if ($sort === 'title') {
+                return strcasecmp($left->getTitle(), $right->getTitle());
+            }
+
+            if ($sort === 'top') {
+                $leftScore = ($left->getLikesCount() ?? 0) + ($left->getSharesCount() ?? 0) + $left->getComments()->count();
+                $rightScore = ($right->getLikesCount() ?? 0) + ($right->getSharesCount() ?? 0) + $right->getComments()->count();
+
+                if ($leftScore !== $rightScore) {
+                    return $rightScore <=> $leftScore;
+                }
+            }
+
+            $leftDate = $left->getPublishedAt() ?? $left->getCreatedAt();
+            $rightDate = $right->getPublishedAt() ?? $right->getCreatedAt();
+
+            if ($leftDate === null && $rightDate === null) {
+                return 0;
+            }
+
+            if ($leftDate === null) {
+                return 1;
+            }
+
+            if ($rightDate === null) {
+                return -1;
+            }
+
+            return $rightDate <=> $leftDate;
+        });
+
+        $savedItems = array_map(
+            static fn (Resource $resource): array => [
+                'resource' => $resource,
+                'commentsCount' => $resource->getComments()->count(),
+            ],
+            $resources
+        );
+
+        return $this->render('profile/saved_resources.html.twig', [
+            'savedItems' => $savedItems,
+            'q' => $query,
+            'sort' => $sort,
+            'savedCount' => count($resources),
+            'totalSavedCount' => $user->getFavorites()->count(),
         ]);
     }
 

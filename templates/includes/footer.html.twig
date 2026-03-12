@@ -1,0 +1,23 @@
+<footer class="app-footer" role="contentinfo">
+    <div class="container app-footer__inner">
+        <div class="app-footer__shell">
+            <div class="app-footer__content">
+                <p class="app-footer__copyright">
+                    <span class="app-footer__brand">© 2026 Ressources relationnelles</span>
+                    <span class="app-footer__divider" aria-hidden="true">—</span>
+                    <span>Tous droits réservés</span>
+                </p>
+
+                <p class="app-footer__note">
+                    Conformément au RGPD, vous pouvez demander l’accès, la modification ou la suppression de vos données personnelles.
+                </p>
+            </div>
+
+            <nav class="app-footer__nav" aria-label="Liens légaux">
+                <a class="app-footer__link" href="{{ path('app_legal_notice') }}">Mentions légales</a>
+                <a class="app-footer__link" href="{{ path('app_privacy_policy') }}">Politique de confidentialité</a>
+                <a class="app-footer__link" href="{{ path('app_personal_data') }}">Gestion des données personnelles</a>
+            </nav>
+        </div>
+    </div>
+</footer>

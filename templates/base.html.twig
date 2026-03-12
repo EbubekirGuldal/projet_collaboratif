@@ -25,57 +25,7 @@
 
     {% block body %}{% endblock %}
 
-    <div class="modal fade" id="shareModal" tabindex="-1" aria-labelledby="shareModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content bg-dark text-light border-secondary">
-                <div class="modal-header border-secondary">
-                    <h5 class="modal-title" id="shareModalLabel">Partager la ressource</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fermer"></button>
-                </div>
-
-                <div class="modal-body">
-                    <label for="shareLinkInput" class="form-label">Lien à partager</label>
-
-                    <div class="input-group mb-3">
-                        <input type="text" id="shareLinkInput" class="form-control" readonly>
-                        <button type="button" class="btn btn-outline-light" id="copyShareLinkBtn">
-                            Copier
-                        </button>
-                    </div>
-
-                    <div class="d-grid gap-2">
-                        <button type="button" class="btn btn-primary" id="nativeShareBtn">
-                            <i class="fa-solid fa-share-nodes me-2"></i>
-                            Partager via une application
-                        </button>
-
-                        <a href="#" class="btn btn-outline-light" id="shareXBtn" target="_blank" rel="noopener">
-                            <i class="fa-brands fa-x-twitter me-2"></i>
-                            Partager sur X / Twitter
-                        </a>
-
-                        <a href="#" class="btn btn-outline-light" id="shareWhatsappBtn" target="_blank" rel="noopener">
-                            <i class="fa-brands fa-whatsapp me-2"></i>
-                            Partager sur WhatsApp
-                        </a>
-
-                        <a href="#" class="btn btn-outline-light" id="shareFacebookBtn" target="_blank" rel="noopener">
-                            <i class="fa-brands fa-facebook me-2"></i>
-                            Partager sur Facebook
-                        </a>
-
-                        <a href="#" class="btn btn-outline-light" id="shareMailBtn">
-                            <i class="fa-solid fa-envelope me-2"></i>
-                            Partager par email
-                        </a>
-                    </div>
-
-                    <div class="small text-muted mt-3 d-none" id="shareFeedback"></div>
-                </div>
-            </div>
-        </div>
-    </div>
-
+    {% include "includes/footer.html.twig" %}
     {% block javascripts %}
         {{ encore_entry_script_tags('app') }}
         {% block importmap %}{{ importmap('app') }}{% endblock %}

@@ -1,469 +1,428 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}
-	Mon profil |
-	{{ parent() }}
+    Mon profil |
+    {{ parent() }}
 {% endblock %}
 
 {% block stylesheets %}
-	{{ parent() }}
-	<link rel="stylesheet" href="{{ asset("styles/profile.css") }}">
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('styles/profile.css') }}">
 {% endblock %}
 
 {% block body %}
-	<div class="container py-4 py-md-5">
+    <div class="container py-4 py-lg-5 profile-page">
 
-		{% for label, messages in app.flashes %}
-			{% for message in messages %}
-				<div class="alert alert-{{ label }} alert-dismissible fade show" role="alert">
-					{{ message }}
-					<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-				</div>
-			{% endfor %}
-		{% endfor %}
+        {% for label, messages in app.flashes %}
+            {% for message in messages %}
+                <div class="alert alert-{{ label }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
+                </div>
+            {% endfor %}
+        {% endfor %}
 
-		{% set u = app.user %}
-		{% set profilePhoto = u.picture ? asset('images/users/' ~ u.picture) : asset('images/users/default-avatar.svg') %}
+        {% set u = app.user %}
+        {% set fullName = ((u.firstName ?? '') ~ ' ' ~ (u.lastName ?? ''))|trim %}
+        {% set displayName = fullName ?: u.username %}
+        {% set profilePhoto = u.picture ? asset('images/users/' ~ u.picture) : asset('images/users/default-avatar.svg') %}
+        {% set roleMap = {'ROLE_USER': 'Utilisateur', 'ROLE_ADMIN': 'Administrateur', 'ROLE_SUPER_ADMIN': 'Super administrateur'} %}
+        {% set primaryRole = u.roles|first|default('ROLE_USER') %}
+        {% set roleLabel = roleMap[primaryRole] is defined ? roleMap[primaryRole] : (primaryRole|replace({'ROLE_': '', '_': ' '})|lower|capitalize) %}
 
-		<div class="row g-4">
-			<div
-				class="col-12">
+        <section class="card border-0 shadow-sm profile-hero">
+            <div class="card-body p-4 p-lg-5">
+                <div class="profile-hero-grid">
+                    <div class="profile-avatar-column">
+                        <div class="profile-avatar-wrap">
+                            <img src="{{ profilePhoto }}" alt="Photo de profil" class="profile-avatar-image" onerror="this.src='{{ asset('images/users/default-avatar.svg') }}'">
 
-				{# Header profil #}
-				<div class="card profile-card border-0 shadow-sm">
-					<div class="card-body p-4 p-md-5">
-						<div class="d-flex flex-column flex-md-row align-items-start align-items-md-center gap-3 gap-md-4">
+                            <form method="post" action="{{ path('update_profile_photo') }}" enctype="multipart/form-data" class="profile-photo-form">
+                                <input type="hidden" name="_token" value="{{ csrf_token('update_profile_photo') }}">
+                                <input type="file" class="d-none" id="profilePictureInput" name="profilePicture" accept=".jpg,.jpeg,.png,.webp,.gif" onchange="this.form.submit()">
+                                <label for="profilePictureInput" class="profile-photo-trigger" title="Modifier la photo">
+                                    <i class="fa-regular fa-image"></i>
+                                    <span class="visually-hidden">Modifier la photo</span>
+                                </label>
+                            </form>
+                        </div>
+                        <p class="profile-avatar-hint mb-0">JPG, PNG, GIF, WebP - 5 Mo max</p>
+                    </div>
 
-							<div class="profile-avatar-section">
-								<div class="profile-avatar-wrap">
-									<img src="{{ profilePhoto }}" alt="Photo de profil" class="profile-avatar-image" onerror="this.src='{{ asset('images/users/default-avatar.svg') }}'">
-								</div>
+                    <div class="profile-identity">
+                        <div class="d-flex flex-wrap align-items-center gap-2">
+                            <h1 class="h3 mb-0 profile-name">{{ displayName }}</h1>
 
-								<form method="post" action="{{ path('update_profile_photo') }}" enctype="multipart/form-data" class="mt-2 profile-photo-form">
-									<input type="hidden" name="_token" value="{{ csrf_token('update_profile_photo') }}">
-									<input type="file" class="d-none" id="profilePictureInput" name="profilePicture" accept=".jpg,.jpeg,.png,.webp,.gif" onchange="this.form.submit()">
-									<label for="profilePictureInput" class="btn btn-outline-dark btn-sm w-100">
-										<i class="fa-regular fa-image me-2"></i>
-										Modifier la photo
-									</label>
-									<div class="small text-body-secondary mt-1 text-center">JPG, PNG, GIF, WebP - 5 Mo max</div>
-								</form>
-							</div>
+                            {% if not u.isVerified %}
+                                <span class="badge text-bg-warning-subtle border border-warning-subtle text-warning-emphasis">
+                                    <i class="fa-solid fa-circle-exclamation me-1"></i>
+                                    Email non v&eacute;rifi&eacute;
+                                </span>
+                            {% endif %}
+                        </div>
 
-							<div class="flex-grow-1">
-								<div class="d-flex flex-wrap align-items-center gap-2">
-									<h1 class="h4 mb-0 profile-title">
-										{% if u.firstName or u.lastName %}
-											{{ (u.firstName ?? '') ~ ' ' ~ (u.lastName ?? '')|trim }}
-										{% else %}
-											{{ u.username }}
-										{% endif %}
-									</h1>
+                        <p class="profile-email mb-0">
+                            <i class="fa-regular fa-envelope me-2"></i>{{ u.email }}
+                        </p>
+                    </div>
 
-									{# Badge vérification email #}
-									{% if u.isVerified %}
-										<span class="badge text-bg-success-subtle border border-success-subtle text-success-emphasis">
-											<i class="fa-solid fa-circle-check me-1"></i>
-											Email vérifié
-										</span>
-									{% else %}
-										<span class="badge text-bg-warning-subtle border border-warning-subtle text-warning-emphasis">
-											<i class="fa-solid fa-circle-exclamation me-1"></i>
-											Email non vérifié
-										</span>
-									{% endif %}
-								</div>
+                    <div class="profile-hero-actions">
+                        <button type="button" class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#editProfileModal">
+                            <i class="fa-regular fa-pen-to-square me-2"></i>
+                            Modifier le profil
+                        </button>
 
-								<div class="text-body-secondary mt-2">
-									<div class="d-flex flex-wrap gap-3 align-items-center">
-										<span>
-											<i class="fa-regular fa-user me-2"></i>
-											<span class="fw-semibold">{{ u.username }}</span>
-										</span>
-										<span class="text-muted">•</span>
-										<span>
-											<i class="fa-regular fa-envelope me-2"></i>
-											{{ u.email }}
-										</span>
-									</div>
-								</div>
+                        <button type="button" class="btn btn-outline-dark" data-bs-toggle="modal" data-bs-target="#changePasswordModal">
+                            <i class="fa-solid fa-key me-2"></i>
+                            Changer le mot de passe
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
 
-								<div class="mt-3 d-flex flex-wrap gap-2">
-									<span class="badge text-bg-light border">
-										<i class="fa-solid fa-shield-halved me-1"></i>
-										{{ u.roles|join(', ') }}
-									</span>
+        {% if not u.isVerified %}
+            <section class="alert profile-verification-alert border mt-4 mb-0" role="status" aria-live="polite">
+                <div class="d-flex gap-3 align-items-start">
+                    <i class="fa-solid fa-triangle-exclamation mt-1"></i>
+                    <div class="flex-grow-1">
+                        <p class="fw-semibold mb-1">Votre email n'est pas encore v&eacute;rifi&eacute;.</p>
+                        <p class="small mb-3">Certaines fonctionnalit&eacute;s peuvent &ecirc;tre limit&eacute;es tant que la v&eacute;rification n'est pas termin&eacute;e.</p>
+                        <div class="d-flex flex-wrap gap-2">
+                            <a href="{{ path('app_resend_verification_email') }}" class="btn btn-warning btn-sm px-3">
+                                <i class="fa-regular fa-paper-plane me-2"></i>
+                                V&eacute;rifier mon email
+                            </a>
 
-									<span class="badge text-bg-light border">
-										<i class="fa-regular fa-calendar-plus me-1"></i>
-										Créé le
-										{{ u.createdAt ? u.createdAt|date('d/m/Y') : '-' }}
-									</span>
-								</div>
-							</div>
+                            <button type="button" class="btn btn-outline-dark btn-sm px-3" data-bs-toggle="modal" data-bs-target="#howToVerifyModal">
+                                <i class="fa-regular fa-circle-question me-2"></i>
+                                Je ne le re&ccedil;ois pas
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        {% endif %}
 
-							<div class="ms-md-auto d-flex gap-2">
-								<button type="button" class="btn btn-outline-dark" data-bs-toggle="modal" data-bs-target="#changePasswordModal">
-									<i class="fa-solid fa-key me-2"></i>
-									Changer le mot de passe
-								</button>
+        <div class="row g-4 mt-1 profile-content">
+            <div class="col-12 col-xl-8">
+                <section class="card border-0 shadow-sm profile-section-card h-100">
+                    <div class="card-header bg-white border-0 pt-4 px-4 pb-0">
+                        <div class="profile-section-head">
+                            <span class="icon-chip" aria-hidden="true">
+                                <i class="fa-regular fa-id-card"></i>
+                            </span>
+                            <div>
+                                <h2 class="h6 mb-1 profile-section-title">Informations du compte</h2>
+                                <p class="profile-section-subtitle mb-0">Vos donn&eacute;es personnelles en lecture seule.</p>
+                            </div>
+                        </div>
+                    </div>
 
-								<a href="{{ path('app_logout') }}" class="btn btn-dark">
-									<i class="fa-solid fa-right-from-bracket me-2"></i>
-									Déconnexion
-								</a>
-								<form method="post" action="{{ path('delete_account') }}" onsubmit="return confirm('Supprimer définitivement votre compte ?')">
-									<input type="hidden" name="_token" value="{{ csrf_token('delete_account') }}">
-									<button type="submit" class="btn btn-outline-danger">
-										<i class="fa-solid fa-user-xmark me-2"></i>Supprimer mon compte
-									</button>
-								</form>
+                    <div class="card-body p-4">
+                        <div class="profile-field-grid">
+                            <div class="profile-field-card">
+                                <span class="profile-field-label">Email</span>
+                                <p class="profile-field-value mb-0">{{ u.email }}</p>
+                            </div>
 
-							</div>
+                            <div class="profile-field-card">
+                                <span class="profile-field-label">Nom d'utilisateur</span>
+                                <p class="profile-field-value mb-0">{{ u.username }}</p>
+                            </div>
 
-						</div>
-					</div>
-				</div>
+                            <div class="profile-field-card">
+                                <span class="profile-field-label">Pr&eacute;nom</span>
+                                <p class="profile-field-value mb-0">{{ u.firstName ?: '-' }}</p>
+                            </div>
 
-			</div>
+                            <div class="profile-field-card">
+                                <span class="profile-field-label">Nom</span>
+                                <p class="profile-field-value mb-0">{{ u.lastName ?: '-' }}</p>
+                            </div>
 
-			{# Colonne infos #}
-			<div class="col-12 col-lg-7">
-				<div class="card border-0 shadow-sm h-100">
-					<div class="card-header bg-white border-0 pt-4 px-4">
-						<div class="d-flex justify-content-between align-items-center">
+                            <div class="profile-field-card profile-field-card--wide">
+                                <span class="profile-field-label">Date de cr&eacute;ation</span>
+                                <p class="profile-field-value mb-0">{{ u.createdAt ? u.createdAt|date('d/m/Y H:i') : '-' }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
 
-							<div class="d-flex align-items-center gap-2">
-								<div class="icon-chip">
-									<i class="fa-regular fa-id-card"></i>
-								</div>
-								<div>
-									<div class="fw-semibold">Informations</div>
-									<div class="small text-body-secondary">
-										Données de votre compte
-									</div>
-								</div>
-							</div>
+            <div class="col-12 col-xl-4">
+                <div class="profile-side-stack">
+                    <section class="card border-0 shadow-sm profile-section-card">
+                        <div class="card-header bg-white border-0 pt-4 px-4 pb-0">
+                            <div class="profile-section-head">
+                                <span class="icon-chip" aria-hidden="true">
+                                    <i class="fa-solid fa-shield-halved"></i>
+                                </span>
+                                <div>
+                                    <h2 class="h6 mb-1 profile-section-title">S&eacute;curit&eacute;</h2>
+                                    <p class="profile-section-subtitle mb-0">Statut global de votre compte.</p>
+                                </div>
+                            </div>
+                        </div>
 
-							{# Bouton Edit #}
-							<button type="button" class="btn btn-outline-dark btn-sm px-3" data-bs-toggle="modal" data-bs-target="#editProfileModal">
-								<i class="fa-regular fa-pen-to-square me-2"></i>
-								Modifier
-							</button>
+                        <div class="card-body p-4">
+                            <ul class="profile-security-list list-unstyled mb-0">
+                                <li class="profile-security-item">
+                                    <span class="profile-security-label">Statut du compte</span>
+                                    <span class="profile-security-value text-success-emphasis">Actif</span>
+                                </li>
+                                <li class="profile-security-item">
+                                    <span class="profile-security-label">Type de compte</span>
+                                    <span class="profile-security-value">{{ roleLabel }}</span>
+                                </li>
+                                <li class="profile-security-item">
+                                    <span class="profile-security-label">Email de connexion</span>
+                                    <span class="profile-security-value {{ u.isVerified ? 'text-success-emphasis' : 'text-warning-emphasis' }}">{{ u.isVerified ? 'V&eacute;rifi&eacute;' : 'En attente de v&eacute;rification' }}</span>
+                                </li>
+                                <li class="profile-security-item">
+                                    <span class="profile-security-label">Mot de passe</span>
+                                    <span class="profile-security-value">Modifiable depuis l'en-t&ecirc;te</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </section>
 
-						</div>
-					</div>
+                    <section class="card border-0 shadow-sm profile-session-card">
+                        <div class="card-header bg-white border-0 pt-4 px-4 pb-0">
+                            <div class="profile-section-head">
+                                <span class="icon-chip" aria-hidden="true">
+                                    <i class="fa-solid fa-right-from-bracket"></i>
+                                </span>
+                                <div>
+                                    <h2 class="h6 mb-1 profile-section-title">Session</h2>
+                                    <p class="profile-section-subtitle mb-0">G&eacute;rez votre session courante.</p>
+                                </div>
+                            </div>
+                        </div>
 
-					<div class="card-body px-4 pb-4">
-						<div class="row g-3">
-							<div class="col-12 col-md-6">
-								<div class="profile-field">
-									<div class="profile-field-label">
-										<i class="fa-regular fa-envelope me-2"></i>Email
-									</div>
-									<div class="profile-field-value">{{ u.email }}</div>
-								</div>
-							</div>
+                        <div class="card-body p-4">
+                            <p class="small text-body-secondary mb-3">Utilisez cette action si vous changez d'appareil ou quittez un poste partag&eacute;.</p>
+                            <a href="{{ path('app_profile_saved_resources') }}" class="btn btn-outline-dark btn-sm profile-logout-btn mb-2">
+                                <i class="fa-regular fa-bookmark me-2"></i>
+                                Mes ressources sauvegard&eacute;es ({{ u.favorites|length }})
+                            </a>
+                            <a href="{{ path('app_logout') }}" class="btn btn-outline-secondary btn-sm profile-logout-btn">
+                                <i class="fa-solid fa-right-from-bracket me-2"></i>
+                                D&eacute;connexion
+                            </a>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
 
-							<div class="col-12 col-md-6">
-								<div class="profile-field">
-									<div class="profile-field-label">
-										<i class="fa-regular fa-user me-2"></i>Username
-									</div>
-									<div class="profile-field-value">{{ u.username }}</div>
-								</div>
-							</div>
+        <section class="card shadow-sm profile-danger-card mt-4">
+            <div class="card-body p-4 d-flex flex-column flex-lg-row align-items-start align-items-lg-center justify-content-between gap-3">
+                <div>
+                    <h2 class="h6 mb-1 text-danger-emphasis">Zone dangereuse</h2>
+                    <p class="profile-danger-copy mb-0">La suppression du compte est irr&eacute;versible.</p>
+                </div>
 
-							<div class="col-12 col-md-6">
-								<div class="profile-field">
-									<div class="profile-field-label">
-										<i class="fa-regular fa-user me-2"></i>Prénom
-									</div>
-									<div class="profile-field-value">{{ u.firstName ?? '—' }}</div>
-								</div>
-							</div>
+                <form method="post" action="{{ path('delete_account') }}" onsubmit="return confirm('Supprimer d&eacute;finitivement votre compte ?')">
+                    <input type="hidden" name="_token" value="{{ csrf_token('delete_account') }}">
+                    <button type="submit" class="btn btn-outline-danger">
+                        <i class="fa-solid fa-user-xmark me-2"></i>
+                        Supprimer mon compte
+                    </button>
+                </form>
+            </div>
+        </section>
 
-							<div class="col-12 col-md-6">
-								<div class="profile-field">
-									<div class="profile-field-label">
-										<i class="fa-regular fa-user me-2"></i>Nom
-									</div>
-									<div class="profile-field-value">{{ u.lastName ?? '—' }}</div>
-								</div>
-							</div>
+        {% if not u.isVerified %}
+            <div class="modal fade" id="howToVerifyModal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content border-0 shadow">
+                        <div class="modal-header border-0">
+                            <h5 class="modal-title">Aide - Email de v&eacute;rification</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                        </div>
+                        <div class="modal-body">
+                            <ul class="mb-0">
+                                <li>V&eacute;rifiez vos spams et ind&eacute;sirables.</li>
+                                <li>Attendez 1 &agrave; 2 minutes avant une nouvelle tentative.</li>
+                                <li>Contr&ocirc;lez l'adresse email renseign&eacute;e dans votre profil.</li>
+                            </ul>
+                        </div>
+                        <div class="modal-footer border-0">
+                            <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Fermer</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
 
-							<div class="col-12">
-								<div class="profile-field">
-									<div class="profile-field-label">
-										<i class="fa-regular fa-calendar-check me-2"></i>Date de création
-									</div>
-									<div class="profile-field-value">
-										{{ u.createdAt ? u.createdAt|date('d/m/Y à H:i') : '—' }}
-									</div>
-								</div>
-							</div>
-						</div>
+    <div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header border-0 px-4 pt-4 pb-2">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="icon-chip">
+                            <i class="fa-regular fa-pen-to-square"></i>
+                        </div>
+                        <div>
+                            <h5 class="modal-title mb-0" id="editProfileModalLabel">Modifier mon profil</h5>
+                            <div class="small text-body-secondary">Mettez &agrave; jour vos informations</div>
+                        </div>
+                    </div>
 
-						{% if not u.isVerified %}
-							<div class="alert alert-warning mt-4 mb-0">
-								<div class="d-flex gap-2">
-									<i class="fa-solid fa-triangle-exclamation mt-1"></i>
-									<div class="flex-grow-1">
-										<div class="fw-semibold">Vérifiez votre email</div>
-										<div class="small">
-											Certaines fonctionnalités peuvent être limitées tant que l’adresse n’est pas vérifiée.
-										</div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                </div>
 
-										<div class="mt-3 d-flex flex-wrap gap-2">
-											<a href="{{ path('app_resend_verification_email') }}" class="btn btn-warning btn-sm px-3">
-												<i class="fa-regular fa-paper-plane me-2"></i>
-												Renvoyer l’email de vérification
-											</a>
+                <form method="post" action="{{ path('edit_profile') }}">
+                    <div class="modal-body px-4 pb-0">
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <div class="form-floating">
+                                    <input type="email" class="form-control" id="profileEmail" name="email" placeholder="name@example.com" value="{{ u.email }}">
+                                    <label for="profileEmail">
+                                        <span class="me-2 text-muted"><i class="fa-regular fa-envelope"></i></span>
+                                        Email
+                                    </label>
+                                </div>
+                                <div class="form-text">Nous ne partagerons jamais votre email.</div>
+                            </div>
 
-											<button type="button" class="btn btn-outline-dark btn-sm px-3" data-bs-toggle="modal" data-bs-target="#howToVerifyModal">
-												<i class="fa-regular fa-circle-question me-2"></i>
-												Je ne le reçois pas
-											</button>
-										</div>
+                            <div class="col-12 col-md-6">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" id="profileUsername" name="username" placeholder="Nom d'utilisateur" value="{{ u.username }}">
+                                    <label for="profileUsername">
+                                        <span class="me-2 text-muted"><i class="fa-regular fa-user"></i></span>
+                                        Nom d'utilisateur
+                                    </label>
+                                </div>
+                            </div>
 
-									</div>
-								</div>
-							</div>
+                            <div class="col-12 col-md-6">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" id="profileFirstName" name="firstName" placeholder="Pr&eacute;nom" value="{{ u.firstName ?? '' }}">
+                                    <label for="profileFirstName">
+                                        <span class="me-2 text-muted"><i class="fa-regular fa-id-card"></i></span>
+                                        Pr&eacute;nom
+                                    </label>
+                                </div>
+                            </div>
 
-							{# Optionnel : mini aide #}
-							<div class="modal fade" id="howToVerifyModal" tabindex="-1" aria-hidden="true">
-								<div class="modal-dialog modal-dialog-centered">
-									<div class="modal-content border-0 shadow">
-										<div class="modal-header border-0">
-											<h5 class="modal-title">Aide — Email de vérification</h5>
-											<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-										</div>
-										<div class="modal-body">
-											<ul class="mb-0">
-												<li>Vérifiez vos spams / indésirables.</li>
-												<li>Attendez 1–2 minutes (parfois Gmail retarde).</li>
-												<li>Assurez-vous que l’email est correct dans votre profil.</li>
-											</ul>
-										</div>
-										<div class="modal-footer border-0">
-											<button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Fermer</button>
-										</div>
-									</div>
-								</div>
-							</div>
-						{% endif %}
+                            <div class="col-12 col-md-6">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" id="profileLastName" name="lastName" placeholder="Nom" value="{{ u.lastName ?? '' }}">
+                                    <label for="profileLastName">
+                                        <span class="me-2 text-muted"><i class="fa-regular fa-id-card"></i></span>
+                                        Nom
+                                    </label>
+                                </div>
+                            </div>
 
-					</div>
-				</div>
-			</div>
+                            <div class="col-12 col-md-6">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" id="profileCreatedAt" placeholder="Cr&eacute;ation" value="{{ u.createdAt ? u.createdAt|date('d/m/Y H:i') : '' }}" disabled>
+                                    <label for="profileCreatedAt">
+                                        <span class="me-2 text-muted"><i class="fa-regular fa-calendar-check"></i></span>
+                                        Date de cr&eacute;ation
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
 
-		</div>
+                        <hr class="my-4">
 
-	</div>
+                        <div class="small text-body-secondary mb-3">
+                            <i class="fa-solid fa-circle-info me-2"></i>
+                            Pensez &agrave; enregistrer vos modifications avant de fermer.
+                        </div>
+                    </div>
 
-	<!--Modal modifier son profil-->
-	<div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel" aria-hidden="true">
-		<div class="modal-dialog modal-dialog-centered modal-lg">
-			<div
-				class="modal-content border-0 shadow">
+                    <div class="modal-footer border-0 px-4 pb-4 pt-0">
+                        <button type="button" class="btn btn-outline-dark px-3" data-bs-dismiss="modal">
+                            <i class="fa-solid fa-xmark me-2"></i>
+                            Annuler
+                        </button>
+                        <button type="submit" class="btn btn-dark px-3">
+                            <i class="fa-regular fa-floppy-disk me-2"></i>
+                            Enregistrer
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 
-				{# Header #}
-				<div class="modal-header border-0 px-4 pt-4 pb-2">
-					<div class="d-flex align-items-center gap-2">
-						<div class="icon-chip">
-							<i class="fa-regular fa-pen-to-square"></i>
-						</div>
-						<div>
-							<h5 class="modal-title mb-0" id="editProfileModalLabel">Modifier mon profil</h5>
-							<div class="small text-body-secondary">Mettez à jour vos informations</div>
-						</div>
-					</div>
+    <div class="modal fade" id="changePasswordModal" tabindex="-1" aria-labelledby="changePasswordModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header border-0 px-4 pt-4 pb-2">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="icon-chip">
+                            <i class="fa-solid fa-key"></i>
+                        </div>
+                        <div>
+                            <h5 class="modal-title mb-0" id="changePasswordModalLabel">Changer mon mot de passe</h5>
+                            <div class="small text-body-secondary">Remplissez les champs n&eacute;cessaires</div>
+                        </div>
+                    </div>
 
-					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
-				</div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                </div>
 
-				<form method="post" action="{{ path("edit_profile") }}">
+                <form method="post" action="{{ path('change_password') }}">
+                    <div class="modal-body px-4 pb-0">
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <div class="form-floating">
+                                    <input type="password" class="form-control" id="currentPassword" name="currentPassword" placeholder="Mot de passe actuel" required>
+                                    <label for="currentPassword">
+                                        <span class="me-2 text-muted"><i class="fa-solid fa-key"></i></span>
+                                        Mot de passe actuel
+                                    </label>
+                                </div>
+                            </div>
 
-					<div class="modal-body px-4 pb-0">
-						<div class="row g-3">
+                            <div class="col-12">
+                                <div class="form-floating">
+                                    <input type="password" class="form-control" id="newPassword" name="newPassword" placeholder="Nouveau mot de passe" required>
+                                    <label for="newPassword">
+                                        <span class="me-2 text-muted"><i class="fa-solid fa-lock"></i></span>
+                                        Nouveau mot de passe
+                                    </label>
+                                </div>
+                            </div>
 
-							<div class="col-12">
-								<div class="form-floating">
-									<input type="email" class="form-control" id="profileEmail" name="email" placeholder="name@example.com" value="{{ u.email }}">
-									<label for="profileEmail">
-										<span class="me-2 text-muted">
-											<i class="fa-regular fa-envelope"></i>
-										</span>
-										Email
-									</label>
-								</div>
-								<div class="form-text">Nous ne partagerons jamais votre email.</div>
-							</div>
+                            <div class="col-12">
+                                <div class="form-floating">
+                                    <input type="password" class="form-control" id="confirmNewPassword" name="confirmNewPassword" placeholder="Confirmer le nouveau mot de passe" required>
+                                    <label for="confirmNewPassword">
+                                        <span class="me-2 text-muted"><i class="fa-solid fa-lock"></i></span>
+                                        Confirmer le nouveau mot de passe
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
 
-							<div class="col-12 col-md-6">
-								<div class="form-floating">
-									<input type="text" class="form-control" id="profileUsername" name="username" placeholder="Nom d'utilisateur" value="{{ u.username }}">
-									<label for="profileUsername">
-										<span class="me-2 text-muted">
-											<i class="fa-regular fa-user"></i>
-										</span>
-										Nom d'utilisateur
-									</label>
-								</div>
-							</div>
+                        <hr class="my-4">
 
-							<div class="col-12 col-md-6">
-								<div class="form-floating">
-									<input type="text" class="form-control" id="profileFirstName" name="firstName" placeholder="Prénom" value="{{ u.firstName ?? '' }}">
-									<label for="profileFirstName">
-										<span class="me-2 text-muted">
-											<i class="fa-regular fa-id-card"></i>
-										</span>
-										Prénom
-									</label>
-								</div>
-							</div>
+                        <div class="small text-body-secondary mb-3">
+                            <i class="fa-solid fa-circle-info me-2"></i>
+                            Pensez &agrave; enregistrer vos modifications avant de fermer.
+                        </div>
+                    </div>
 
-							<div class="col-12 col-md-6">
-								<div class="form-floating">
-									<input type="text" class="form-control" id="profileLastName" name="lastName" placeholder="Nom" value="{{ u.lastName ?? '' }}">
-									<label for="profileLastName">
-										<span class="me-2 text-muted">
-											<i class="fa-regular fa-id-card"></i>
-										</span>
-										Nom
-									</label>
-								</div>
-							</div>
-
-							{# Optionnel : info non editable #}
-							<div class="col-12 col-md-6">
-								<div class="form-floating">
-									<input type="text" class="form-control" id="profileCreatedAt" placeholder="Création" value="{{ u.createdAt ? u.createdAt|date('d/m/Y à H:i') : '' }}" disabled>
-									<label for="profileCreatedAt">
-										<span class="me-2 text-muted">
-											<i class="fa-regular fa-calendar-check"></i>
-										</span>
-										Date de création
-									</label>
-								</div>
-							</div>
-
-						</div>
-
-						<hr class="my-4">
-
-						<div class="small text-body-secondary mb-3">
-							<i class="fa-solid fa-circle-info me-2"></i>
-							Pensez à enregistrer vos modifications avant de fermer.
-						</div>
-					</div>
-
-					{# Footer #}
-					<div class="modal-footer border-0 px-4 pb-4 pt-0">
-						<button type="button" class="btn btn-outline-dark px-3" data-bs-dismiss="modal">
-							<i class="fa-solid fa-xmark me-2"></i>
-							Annuler
-						</button>
-						<button type="submit" class="btn btn-dark px-3">
-							<i class="fa-regular fa-floppy-disk me-2"></i>
-							Enregistrer
-						</button>
-					</div>
-				</form>
-
-			</div>
-		</div>
-	</div>
-
-	<!--##############################-->
-	<!--Modal changer son mot de passe-->
-	<!--##############################-->
-
-	<div class="modal fade" id="changePasswordModal" tabindex="-1" aria-labelledby="changePasswordModalLabel" aria-hidden="true">
-		<div class="modal-dialog modal-dialog-centered modal-lg">
-			<div class="modal-content border-0 shadow">
-
-				<div class="modal-header border-0 px-4 pt-4 pb-2">
-					<div class="d-flex align-items-center gap-2">
-						<div class="icon-chip">
-							<i class="fa-solid fa-key"></i>
-						</div>
-						<div>
-							<h5 class="modal-title mb-0" id="changePasswordModalLabel">Changer mon mot de passe</h5>
-							<div class="small text-body-secondary">Remplissez les champs necessaires</div>
-						</div>
-					</div>
-
-					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
-				</div>
-
-				<form method="post" action="{{ path("change_password") }}">
-
-					<div class="modal-body px-4 pb-0">
-						<div class="row g-3">
-
-							<div class="col-12">
-								<div class="form-floating">
-									<input type="password" class="form-control" id="currentPassword" name="currentPassword" placeholder="name@example.com" required>
-									<label for="currentPassword">
-										<span class="me-2 text-muted">
-											<i class="fa-solid fa-key"></i>
-										</span>
-										Mot de passe actuel
-									</label>
-								</div>
-							</div>
-
-							<div class="col-12">
-								<div class="form-floating">
-									<input type="password" class="form-control" id="newPassword" name="newPassword" placeholder="name@example.com" required>
-									<label for="newPassword">
-										<span class="me-2 text-muted">
-											<i class="fa-solid fa-lock"></i>
-										</span>
-										Nouveau mot de passe
-									</label>
-								</div>
-							</div>
-
-							<div class="col-12">
-								<div class="form-floating">
-									<input type="password" class="form-control" id="confirmNewPassword" name="confirmNewPassword" placeholder="name@example.com" required>
-									<label for="confirmNewPassword">
-										<span class="me-2 text-muted">
-											<i class="fa-solid fa-lock"></i>
-										</span>
-										Confirmer le nouveau mot de passe
-									</label>
-								</div>
-							</div>
-
-						</div>
-
-						<hr class="my-4">
-
-						<div class="small text-body-secondary mb-3">
-							<i class="fa-solid fa-circle-info me-2"></i>
-							Pensez à enregistrer vos modifications avant de fermer.
-						</div>
-					</div>
-
-					{# Footer #}
-					<div class="modal-footer border-0 px-4 pb-4 pt-0">
-						<button type="button" class="btn btn-outline-dark px-3" data-bs-dismiss="modal">
-							<i class="fa-solid fa-xmark me-2"></i>
-							Annuler
-						</button>
-						<button type="submit" class="btn btn-dark px-3">
-							<i class="fa-regular fa-floppy-disk me-2"></i>
-							Enregistrer
-						</button>
-					</div>
-				</form>
-
-			</div>
-		</div>
-	</div>
-
+                    <div class="modal-footer border-0 px-4 pb-4 pt-0">
+                        <button type="button" class="btn btn-outline-dark px-3" data-bs-dismiss="modal">
+                            <i class="fa-solid fa-xmark me-2"></i>
+                            Annuler
+                        </button>
+                        <button type="submit" class="btn btn-dark px-3">
+                            <i class="fa-regular fa-floppy-disk me-2"></i>
+                            Enregistrer
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 {% endblock %}

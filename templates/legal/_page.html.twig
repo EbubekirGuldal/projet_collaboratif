@@ -1,0 +1,31 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ title }} · Ressources relationnelles{% endblock %}
+
+{% block body %}
+    <section class="legal-page">
+        <div class="container legal-page__wrap">
+            <article class="legal-page__card">
+                <header class="legal-page__header">
+                    <span class="legal-page__eyebrow">
+                        <i class="fa-solid fa-shield-halved"></i>
+                        Informations légales
+                    </span>
+                    <h1 class="legal-page__title">{{ title }}</h1>
+                    <p class="legal-page__subtitle">{{ subtitle }}</p>
+                </header>
+
+                <div class="legal-page__body">
+                    {% for section in sections %}
+                        <section class="legal-page__section">
+                            <h2>{{ section.title }}</h2>
+                            {% for paragraph in section.paragraphs %}
+                                <p>{{ paragraph }}</p>
+                            {% endfor %}
+                        </section>
+                    {% endfor %}
+                </div>
+            </article>
+        </div>
+    </section>
+{% endblock %}

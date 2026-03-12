@@ -115,6 +115,7 @@ class Resource
     {
         $this->createdAt = new \DateTimeImmutable();
         $this->comments = new ArrayCollection();
+        $this->moderationLogs = new ArrayCollection();
     }
 
     #[ORM\PreUpdate]
@@ -125,6 +126,12 @@ class Resource
 
     #[ORM\Column(nullable: true)]
     private ?int $likesCount = 0;
+
+    /**
+     * @var Collection<int, ModerationLog>
+     */
+    #[ORM\OneToMany(targetEntity: ModerationLog::class, mappedBy: 'resource')]
+    private Collection $moderationLogs;
 
     public function getLikesCount(): ?int
     {
@@ -327,6 +334,36 @@ class Resource
     public function setUser(?User $user): static
     {
         $this->user = $user;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ModerationLog>
+     */
+    public function getModerationLogs(): Collection
+    {
+        return $this->moderationLogs;
+    }
+
+    public function addModerationLog(ModerationLog $moderationLog): static
+    {
+        if (!$this->moderationLogs->contains($moderationLog)) {
+            $this->moderationLogs->add($moderationLog);
+            $moderationLog->setResource($this);
+        }
+
+        return $this;
+    }
+
+    public function removeModerationLog(ModerationLog $moderationLog): static
+    {
+        if ($this->moderationLogs->removeElement($moderationLog)) {
+            // set the owning side to null (unless already changed)
+            if ($moderationLog->getResource() === $this) {
+                $moderationLog->setResource(null);
+            }
+        }
 
         return $this;
     }

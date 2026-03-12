@@ -1,94 +1,112 @@
 {% set excerpt = resource.content|striptags %}
-{% if excerpt|length > 240 %}
-    {% set excerpt = excerpt|slice(0, 240) ~ '…' %}
+{% if excerpt|length > 220 %}
+    {% set excerpt = excerpt|slice(0, 220) ~ '...' %}
 {% endif %}
 
-{% set isFavorited = app.user ? app.user.isFavorite(resource) : false %}
+{% set publishedLabel = resource.publishedAt ?: resource.createdAt %}
+{% set popularityScore = (resource.likesCount ?? 0) + (resource.sharesCount ?? 0) + commentsCount %}
+{% set isPopular = popularityScore >= 8 %}
+{% set isFavorited = isFavorite|default(false) %}
 
-<article class="card feed-card border-0 shadow-sm mb-3">
-    <div class="card-body">
+<article class="card feed-card border-0 shadow-sm">
+    <div class="card-body p-4">
+        <div class="feed-card__layout">
+            <div class="feed-card__main">
+                <header class="feed-card__header">
+                    <div class="feed-card__meta">
+                        {% if publishedLabel %}
+                            <span class="feed-card__date">
+                                <i class="fa-regular fa-calendar"></i>
+                                {{ publishedLabel|date('d/m/Y H:i') }}
+                            </span>
+                        {% endif %}
 
-        <div class="d-flex align-items-start justify-content-between gap-3">
-            <div class="flex-grow-1">
-                <h3 class="h6 mb-1">
-                    <a class="text-decoration-none text-light"
-                       href="{{ path('resource_show', { id: resource.id }) }}">
-                        {{ resource.title }}
-                    </a>
-                </h3>
+                        {% if isPopular %}
+                            <span class="feed-card__badge">
+                                <i class="fa-solid fa-fire"></i>
+                                Populaire
+                            </span>
+                        {% endif %}
+                    </div>
 
-                <div class="text-muted small mb-2">
-                    {% if resource.publishedAt %}
-                        <i class="fa-regular fa-calendar me-1"></i>
-                        {{ resource.publishedAt|date('d/m/Y H:i') }}
-                    {% elseif resource.createdAt %}
-                        <i class="fa-regular fa-calendar me-1"></i>
-                        {{ resource.createdAt|date('d/m/Y H:i') }}
+                    <h2 class="feed-card__title mb-0">
+                        <a class="feed-card__title-link" href="{{ path('resource_show', { id: resource.id }) }}">
+                            {{ resource.title }}
+                        </a>
+                    </h2>
+                </header>
+
+                <div class="feed-card__body">
+                    <p class="feed-card__excerpt mb-0">{{ excerpt }}</p>
+
+                    {% if resource.externalUrl %}
+                        <a
+                            class="feed-card__external"
+                            href="{{ resource.externalUrl }}"
+                            target="_blank"
+                            rel="noopener"
+                        >
+                            <i class="fa-solid fa-link"></i>
+                            <span>Consulter la ressource</span>
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </a>
                     {% endif %}
                 </div>
 
-                <p class="mb-2">{{ excerpt }}</p>
-
-                {% if resource.externalUrl %}
-                    <a class="small text-decoration-none" href="{{ resource.externalUrl }}" target="_blank" rel="noopener">
-                        <i class="fa-solid fa-arrow-up-right-from-square me-1"></i>Voir la ressource externe
+                <footer class="feed-card__footer">
+                    <a
+                        class="feed-action feed-action--link"
+                        href="{{ path('resource_show', { id: resource.id }) }}"
+                        title="Voir les commentaires"
+                    >
+                        <i class="fa-regular fa-comment"></i>
+                        <span>{{ commentsCount }}</span>
                     </a>
-                {% endif %}
+
+                    <button
+                        class="btn btn-sm feed-action btn-like {{ (resource.likesCount ?? 0) > 0 ? 'btn-primary' : 'btn-outline-primary' }}"
+                        data-id="{{ resource.id }}"
+                        title="Marquer comme utile"
+                        type="button"
+                    >
+                        <i class="fa-regular fa-thumbs-up"></i>
+                        <span class="like-count">{{ resource.likesCount ?? 0 }}</span>
+                    </button>
+
+                    <button
+                        class="btn btn-sm feed-action feed-action--share btn-share btn-outline-secondary"
+                        data-id="{{ resource.id }}"
+                        data-url="{{ absolute_url(path('resource_show', { id: resource.id })) }}"
+                        title="Partager"
+                        type="button"
+                    >
+                        <i class="fa-solid fa-share-nodes"></i>
+                        <span>Partager</span>
+                        <span class="share-count">{{ resource.sharesCount ?? 0 }}</span>
+                    </button>
+
+                    <button
+                        class="btn btn-sm feed-action feed-action--bookmark btn-favorite {{ isFavorited ? 'btn-warning' : 'btn-outline-warning' }}"
+                        data-id="{{ resource.id }}"
+                        title="Sauvegarder"
+                        aria-label="Sauvegarder"
+                        type="button"
+                    >
+                        <i class="fa-regular fa-bookmark"></i>
+                    </button>
+                </footer>
             </div>
 
             {% if resource.image %}
-                <div class="feed-thumb">
+                <a class="feed-thumb" href="{{ path('resource_show', { id: resource.id }) }}" aria-label="Voir la ressource {{ resource.title }}">
                     <img
                         src="/images/resources/{{ resource.image }}"
-                        alt="Illustration"
-                        class="img-fluid rounded"
+                        alt="Illustration de la ressource"
+                        class="img-fluid"
                         loading="lazy"
                     >
-                </div>
-            {% endif %}
-        </div>
-
-        <hr class="my-3">
-
-        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
-
-            <div class="d-flex align-items-center gap-3 small">
-                <a class="text-muted text-decoration-none"
-                   href="{{ path('resource_show', { id: resource.id }) }}"
-                   title="Voir les commentaires">
-                    <i class="fa-regular fa-comment me-1"></i>
-                    {{ commentsCount }}
                 </a>
-
-                <button
-                    class="btn btn-sm btn-like {{ (resource.likesCount ?? 0) > 0 ? 'btn-primary' : 'btn-outline-primary' }}"
-                    data-id="{{ resource.id }}"
-                    title="Marquer comme utile"
-                >
-                    <i class="fa-regular fa-thumbs-up me-1"></i>
-                    <span class="like-count">{{ resource.likesCount ?? 0 }}</span>
-                </button>
-
-                <button
-                    class="btn btn-sm btn-outline-secondary btn-share"
-                    data-id="{{ resource.id }}"
-                    data-url="{{ absolute_url(path('resource_show', { id: resource.id })) }}"
-                    title="Partager"
-                >
-                    <i class="fa-solid fa-share-nodes me-1"></i>
-                    <span class="share-count">{{ resource.sharesCount ?? 0 }}</span>
-                </button>
-            </div>
-
-            <button
-                class="btn btn-sm btn-favorite {{ isFavorited ? 'btn-warning' : 'btn-outline-warning' }}"
-                data-id="{{ resource.id }}"
-                title="Enregistrer"
-            >
-                <i class="fa-regular fa-bookmark me-1"></i>
-                {{ isFavorited ? 'Enregistré' : 'Sauvegarder' }}
-            </button>
-
+            {% endif %}
         </div>
     </div>
 </article>

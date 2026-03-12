@@ -1,0 +1,48 @@
+{% extends 'legal/_page.html.twig' %}
+
+{% set title = 'Mentions légales' %}
+{% set subtitle = 'Informations relatives à l’édition, à l’hébergement et aux conditions générales d’utilisation du site Ressources relationnelles.' %}
+{% set sections = [
+    {
+        title: 'Éditeur du site',
+        paragraphs: [
+            'Le site Ressources relationnelles est exploité dans le cadre du Projet Collaboratif. Il permet la publication, la consultation et l’interaction autour de ressources partagées entre utilisateurs.',
+            'Le responsable de publication, l’adresse de contact et les informations d’identification de l’éditeur doivent être complétés avec les coordonnées réelles de votre équipe ou de votre structure d’hébergement avant toute mise en production publique.'
+        ]
+    },
+    {
+        title: 'Contact',
+        paragraphs: [
+            'Pour toute question relative au fonctionnement de la plateforme, à un contenu publié ou à lexercice de vos droits, vous pouvez utiliser le canal de contact communiqué par l’équipe projet.',
+            "Si vous voulez contacter l'équipe projet, vous pouvez envoyer un email à l’adresse suivante : contact@ressourcesrelationnelles.fr"
+        ]
+    },
+    {
+        title: 'Hébergement',
+        paragraphs: [
+            'Le site est hébergé sur l’infrastructure technique choisie pour le projet. Les informations détaillées sur l’hébergeur, son adresse et ses coordonnées doivent être renseignées en fonction de l’environnement réellement utilisé.',
+            'En phase de développement ou de démonstration, cette section peut rester descriptive, mais elle doit être complétée avant une mise en ligne ouverte au public.'
+        ]
+    },
+    {
+        title: 'Accès au service',
+        paragraphs: [
+            'L’éditeur s’efforce d’assurer l’accessibilité du site et la disponibilité des fonctionnalités proposées, sans pouvoir garantir une disponibilité continue ni l’absence totale d’erreurs.',
+            'L’accès peut être suspendu temporairement pour des raisons de maintenance, de sécurité, de correction ou d’évolution du service.'
+        ]
+    },
+    {
+        title: 'Propriété intellectuelle',
+        paragraphs: [
+            'La structure du site, ses éléments graphiques, ses textes, ses composants d’interface et, plus généralement, l’ensemble des contenus propres à la plateforme sont protégés par les règles applicables en matière de propriété intellectuelle.',
+            'Les contenus publiés par les utilisateurs restent placés sous leur responsabilité. Toute reproduction, extraction ou réutilisation non autorisée des éléments du site peut engager la responsabilité de son auteur.'
+        ]
+    },
+    {
+        title: 'Responsabilité',
+        paragraphs: [
+            'Chaque utilisateur reste responsable des informations, commentaires, signalements et contenus qu’il publie, partage ou transmet via la plateforme.',
+            'L’éditeur se réserve la possibilité de modérer ou de retirer tout contenu manifestement inapproprié, illicite ou contraire à l’objet du service.'
+        ]
+    }
+] %}
