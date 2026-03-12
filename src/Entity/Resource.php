@@ -6,6 +6,7 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
+use App\Enum\ResourceStatus;
 use App\Repository\ResourceRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -77,14 +78,6 @@ class Resource
     #[Groups(['resource:read'])]
     private ?string $video = null;
 
-    #[ORM\Column(length: 255)]
-    #[Groups(['resource:read'])]
-    private ?string $resourceStatus = null;
-
-    #[ORM\Column(length: 255)]
-    #[Groups(['resource:read'])]
-    private ?string $visibilityStatus = null;
-
     #[ORM\Column(options: ["default" => 0])]
     #[Groups(['resource:read'])]
     private ?int $sharesCount = 0;
@@ -106,9 +99,21 @@ class Resource
     #[Groups(['resource:read'])]
     private ?User $user = null;
 
+    #[ORM\Column(nullable: true)]
+    private ?int $likesCount = 0;
+
+    /**
+     * @var Collection<int, ModerationLog>
+     */
+    #[ORM\OneToMany(targetEntity: ModerationLog::class, mappedBy: 'resource')]
+    private Collection $moderationLogs;
+
+    #[ORM\Column(enumType: ResourceStatus::class)]
+    private ResourceStatus $resourceStatus = ResourceStatus::PUBLIC;
+
     public function __toString()
     {
-        return $this->id." | ".$this->title;
+        return $this->id." - ".$this->title;
     }
 
     public function __construct()
@@ -123,15 +128,6 @@ class Resource
     {
         $this->updatedAt = new \DateTimeImmutable();
     } 
-
-    #[ORM\Column(nullable: true)]
-    private ?int $likesCount = 0;
-
-    /**
-     * @var Collection<int, ModerationLog>
-     */
-    #[ORM\OneToMany(targetEntity: ModerationLog::class, mappedBy: 'resource')]
-    private Collection $moderationLogs;
 
     public function getLikesCount(): ?int
     {
@@ -245,30 +241,6 @@ class Resource
         return $this;
     }
 
-    public function getResourceStatus(): ?string
-    {
-        return $this->resourceStatus;
-    }
-
-    public function setResourceStatus(string $resourceStatus): static
-    {
-        $this->resourceStatus = $resourceStatus;
-
-        return $this;
-    }
-
-    public function getVisibilityStatus(): ?string
-    {
-        return $this->visibilityStatus;
-    }
-
-    public function setVisibilityStatus(string $visibilityStatus): static
-    {
-        $this->visibilityStatus = $visibilityStatus;
-
-        return $this;
-    }
-
     public function getSharesCount(): ?int
     {
         return $this->sharesCount;
@@ -364,6 +336,18 @@ class Resource
                 $moderationLog->setResource(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getResourceStatus(): ?ResourceStatus
+    {
+        return $this->resourceStatus;
+    }
+
+    public function setResourceStatus(ResourceStatus $resourceStatus): static
+    {
+        $this->resourceStatus = $resourceStatus;
 
         return $this;
     }
