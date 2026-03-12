@@ -14,7 +14,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     {% block stylesheets %}
-        {# Si vous utilisez Webpack Encore #}
         {{ encore_entry_link_tags('app') }}
         <link rel="stylesheet" href="{{ asset('styles/bootstrap.css') }}">
         <link rel="stylesheet" href="{{ asset('styles/styles.css') }}">
@@ -26,96 +25,317 @@
 
     {% block body %}{% endblock %}
 
+    <div class="modal fade" id="shareModal" tabindex="-1" aria-labelledby="shareModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content bg-dark text-light border-secondary">
+                <div class="modal-header border-secondary">
+                    <h5 class="modal-title" id="shareModalLabel">Partager la ressource</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                </div>
+
+                <div class="modal-body">
+                    <label for="shareLinkInput" class="form-label">Lien à partager</label>
+
+                    <div class="input-group mb-3">
+                        <input type="text" id="shareLinkInput" class="form-control" readonly>
+                        <button type="button" class="btn btn-outline-light" id="copyShareLinkBtn">
+                            Copier
+                        </button>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="button" class="btn btn-primary" id="nativeShareBtn">
+                            <i class="fa-solid fa-share-nodes me-2"></i>
+                            Partager via une application
+                        </button>
+
+                        <a href="#" class="btn btn-outline-light" id="shareXBtn" target="_blank" rel="noopener">
+                            <i class="fa-brands fa-x-twitter me-2"></i>
+                            Partager sur X / Twitter
+                        </a>
+
+                        <a href="#" class="btn btn-outline-light" id="shareWhatsappBtn" target="_blank" rel="noopener">
+                            <i class="fa-brands fa-whatsapp me-2"></i>
+                            Partager sur WhatsApp
+                        </a>
+
+                        <a href="#" class="btn btn-outline-light" id="shareFacebookBtn" target="_blank" rel="noopener">
+                            <i class="fa-brands fa-facebook me-2"></i>
+                            Partager sur Facebook
+                        </a>
+
+                        <a href="#" class="btn btn-outline-light" id="shareMailBtn">
+                            <i class="fa-solid fa-envelope me-2"></i>
+                            Partager par email
+                        </a>
+                    </div>
+
+                    <div class="small text-muted mt-3 d-none" id="shareFeedback"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     {% block javascripts %}
-        {# Si vous utilisez Webpack Encore #}
         {{ encore_entry_script_tags('app') }}
-        {# Si vous utilisez Importmap (Symfony 7) #}
         {% block importmap %}{{ importmap('app') }}{% endblock %}
 
-        {# Scripts interactions feed #}
         <script>
-        document.addEventListener('click', function(e) {
+        document.addEventListener('DOMContentLoaded', function () {
+            const shareModalEl = document.getElementById('shareModal');
+            const shareModal = shareModalEl && typeof bootstrap !== 'undefined'
+                ? new bootstrap.Modal(shareModalEl)
+                : null;
 
-            // ===== LIKE =====
-            const likeBtn = e.target.closest('.btn-like');
-            if (likeBtn) {
-                const id = likeBtn.dataset.id;
+            const shareLinkInput = document.getElementById('shareLinkInput');
+            const copyShareLinkBtn = document.getElementById('copyShareLinkBtn');
+            const nativeShareBtn = document.getElementById('nativeShareBtn');
+            const shareXBtn = document.getElementById('shareXBtn');
+            const shareWhatsappBtn = document.getElementById('shareWhatsappBtn');
+            const shareFacebookBtn = document.getElementById('shareFacebookBtn');
+            const shareMailBtn = document.getElementById('shareMailBtn');
+            const shareFeedback = document.getElementById('shareFeedback');
 
-                fetch(`/resource/${id}/like`, {
+            let currentShare = {
+                id: null,
+                url: '',
+                title: '',
+                button: null,
+                counted: false
+            };
+
+            function showShareFeedback(message) {
+                if (!shareFeedback) return;
+                shareFeedback.textContent = message;
+                shareFeedback.classList.remove('d-none');
+            }
+
+            function clearShareFeedback() {
+                if (!shareFeedback) return;
+                shareFeedback.textContent = '';
+                shareFeedback.classList.add('d-none');
+            }
+
+            function updateShareCount(shares) {
+                if (!currentShare.button) return;
+                const countEl = currentShare.button.querySelector('.share-count');
+                if (countEl) {
+                    countEl.innerText = shares;
+                }
+            }
+
+            function markShareButton() {
+                if (!currentShare.button) return;
+                currentShare.button.classList.add('btn-secondary');
+                setTimeout(() => currentShare.button.classList.remove('btn-secondary'), 400);
+            }
+
+            function registerShare() {
+                if (!currentShare.id || currentShare.counted) return;
+
+                fetch(`/resource/${currentShare.id}/share`, {
                     method: 'POST',
                     headers: { 'X-Requested-With': 'XMLHttpRequest' }
                 })
-                .then(res => res.json())
+                .then(async res => {
+                    const data = await res.json().catch(() => null);
+                    if (!res.ok || !data) return null;
+                    return data;
+                })
                 .then(data => {
-                    if (!data || data.error) return;
-
-                    const countEl = likeBtn.querySelector('.like-count');
-                    if (countEl) countEl.innerText = data.likes;
-
-                    if (data.liked) {
-                        likeBtn.classList.remove('btn-outline-primary');
-                        likeBtn.classList.add('btn-primary');
-                    } else {
-                        likeBtn.classList.remove('btn-primary');
-                        likeBtn.classList.add('btn-outline-primary');
+                    if (!data) return;
+                    if (typeof data.shares !== 'undefined') {
+                        updateShareCount(data.shares);
                     }
-
-                    likeBtn.style.transform = "scale(1.1)";
-                    setTimeout(() => likeBtn.style.transform = "scale(1)", 150);
+                    markShareButton();
+                    currentShare.counted = true;
                 })
                 .catch(() => {});
-                return;
             }
 
-            // ===== SHARE (copie lien + anti autoclicker) =====
-            const shareBtn = e.target.closest('.btn-share');
-            if (shareBtn) {
-                const id = shareBtn.dataset.id;
-                const url = shareBtn.dataset.url;
+            document.addEventListener('click', function(e) {
+                const likeBtn = e.target.closest('.btn-like');
+                if (likeBtn) {
+                    const id = likeBtn.dataset.id;
 
-                if (url && navigator.clipboard) {
-                    navigator.clipboard.writeText(url).catch(() => {});
-                }
+                    fetch(`/resource/${id}/like`, {
+                        method: 'POST',
+                        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                    })
+                    .then(async res => {
+                        const data = await res.json().catch(() => null);
 
-                fetch(`/resource/${id}/share`, { method: 'POST' })
-                    .then(res => res.json())
+                        if (res.status === 403 || (data && data.error)) {
+                            window.location.href = "{{ path('app_login') }}";
+                            return null;
+                        }
+
+                        return data;
+                    })
                     .then(data => {
                         if (!data) return;
-                        const countEl = shareBtn.querySelector('.share-count');
-                        if (countEl) countEl.innerText = data.shares;
 
-                        shareBtn.classList.add('btn-secondary');
-                        setTimeout(() => shareBtn.classList.remove('btn-secondary'), 400);
+                        const countEl = likeBtn.querySelector('.like-count');
+                        if (countEl) countEl.innerText = data.likes;
+
+                        if (data.liked) {
+                            likeBtn.classList.remove('btn-outline-primary');
+                            likeBtn.classList.add('btn-primary');
+                        } else {
+                            likeBtn.classList.remove('btn-primary');
+                            likeBtn.classList.add('btn-outline-primary');
+                        }
+
+                        likeBtn.style.transform = 'scale(1.1)';
+                        setTimeout(() => likeBtn.style.transform = 'scale(1)', 150);
                     })
                     .catch(() => {});
-                return;
-            }
+                    return;
+                }
 
-            // ===== FAVORITE (persistant DB) =====
-            const favBtn = e.target.closest('.btn-favorite');
-            if (favBtn) {
-                const id = favBtn.dataset.id;
+                const shareBtn = e.target.closest('.btn-share');
+                if (shareBtn) {
+                    clearShareFeedback();
 
-                fetch(`/resource/${id}/favorite`, {
-                    method: 'POST',
-                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
-                })
-                .then(res => res.json())
-                .then(data => {
-                    if (!data || data.error) return;
+                    currentShare = {
+                        id: shareBtn.dataset.id,
+                        url: shareBtn.dataset.url || '',
+                        title: shareBtn.dataset.title || 'Ressource',
+                        button: shareBtn,
+                        counted: false
+                    };
 
-                    if (data.favorited) {
-                        favBtn.classList.remove('btn-outline-warning');
-                        favBtn.classList.add('btn-warning');
-                    } else {
-                        favBtn.classList.remove('btn-warning');
-                        favBtn.classList.add('btn-outline-warning');
+                    if (shareLinkInput) {
+                        shareLinkInput.value = currentShare.url;
                     }
-                })
-                .catch(() => {});
-                return;
+
+                    const encodedUrl = encodeURIComponent(currentShare.url);
+                    const encodedText = encodeURIComponent(currentShare.title + ' - ' + currentShare.url);
+
+                    if (shareXBtn) {
+                        shareXBtn.href = `https://twitter.com/intent/tweet?text=${encodedText}`;
+                    }
+
+                    if (shareWhatsappBtn) {
+                        shareWhatsappBtn.href = `https://wa.me/?text=${encodedText}`;
+                    }
+
+                    if (shareFacebookBtn) {
+                        shareFacebookBtn.href = `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`;
+                    }
+
+                    if (shareMailBtn) {
+                        const mailSubject = encodeURIComponent(`Partage de ressource : ${currentShare.title}`);
+                        const mailBody = encodeURIComponent(
+                            `Bonjour,\n\n` +
+                            `Je te partage cette ressource :\n` +
+                            `${currentShare.title}\n\n` +
+                            `${currentShare.url}\n`
+                        );
+
+                        shareMailBtn.href = `mailto:?subject=${mailSubject}&body=${mailBody}`;
+                    }
+
+                    if (nativeShareBtn) {
+                        if (navigator.share) {
+                            nativeShareBtn.classList.remove('d-none');
+                            nativeShareBtn.disabled = false;
+                        } else {
+                            nativeShareBtn.classList.add('d-none');
+                        }
+                    }
+
+                    if (shareModal) {
+                        shareModal.show();
+                    } else {
+                        if (currentShare.url && navigator.clipboard) {
+                            navigator.clipboard.writeText(currentShare.url)
+                                .then(() => {
+                                    showShareFeedback('Lien copié dans le presse-papiers.');
+                                    registerShare();
+                                })
+                                .catch(() => {});
+                        }
+                    }
+
+                    return;
+                }
+
+                const favBtn = e.target.closest('.btn-favorite');
+                if (favBtn) {
+                    const id = favBtn.dataset.id;
+
+                    fetch(`/resource/${id}/favorite`, {
+                        method: 'POST',
+                        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                    })
+                    .then(async res => {
+                        const data = await res.json().catch(() => null);
+
+                        if (res.status === 403 || (data && data.error)) {
+                            window.location.href = "{{ path('app_login') }}";
+                            return null;
+                        }
+
+                        return data;
+                    })
+                    .then(data => {
+                        if (!data) return;
+
+                        if (data.favorited) {
+                            favBtn.classList.remove('btn-outline-warning');
+                            favBtn.classList.add('btn-warning');
+                            favBtn.innerHTML = '<i class="fa-regular fa-bookmark me-1"></i>Enregistré';
+                        } else {
+                            favBtn.classList.remove('btn-warning');
+                            favBtn.classList.add('btn-outline-warning');
+                            favBtn.innerHTML = '<i class="fa-regular fa-bookmark me-1"></i>Sauvegarder';
+                        }
+                    })
+                    .catch(() => {});
+                    return;
+                }
+            });
+
+            if (copyShareLinkBtn) {
+                copyShareLinkBtn.addEventListener('click', async function () {
+                    if (!currentShare.url) return;
+
+                    try {
+                        await navigator.clipboard.writeText(currentShare.url);
+                        showShareFeedback('Lien copié dans le presse-papiers.');
+                        registerShare();
+                    } catch (e) {
+                        showShareFeedback('Impossible de copier automatiquement le lien.');
+                    }
+                });
             }
 
+            if (nativeShareBtn) {
+                nativeShareBtn.addEventListener('click', async function () {
+                    if (!navigator.share || !currentShare.url) return;
+
+                    try {
+                        await navigator.share({
+                            title: currentShare.title,
+                            text: currentShare.title,
+                            url: currentShare.url
+                        });
+
+                        showShareFeedback('Partage effectué.');
+                        registerShare();
+                    } catch (e) {
+                    }
+                });
+            }
+
+            [shareXBtn, shareWhatsappBtn, shareFacebookBtn, shareMailBtn].forEach(link => {
+                if (!link) return;
+
+                link.addEventListener('click', function () {
+                    registerShare();
+                });
+            });
         });
         </script>
     {% endblock %}

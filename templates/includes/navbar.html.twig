@@ -10,10 +10,8 @@
 			<span class="navbar-toggler-icon"></span>
 		</button>
 
-		<div
-			class="collapse navbar-collapse" id="mainNavbar">
+		<div class="collapse navbar-collapse" id="mainNavbar">
 
-			{# ✅ La recherche prend toute la place dispo #}
 			<form class="nav-search d-flex flex-grow-1 mx-lg-4 my-3 my-lg-0" role="search" method="get" action="{{ path('app_home') }}">
 				<div class="input-group nav-search__group w-100">
 					<span class="input-group-text nav-search__icon">
@@ -23,7 +21,6 @@
 					<input
 					class="form-control nav-search__input" type="search" name="q" value="{{ app.request.query.get('q') }}" placeholder="Rechercher une ressource (ex: santé, aide, démarches...)" aria-label="Search">
 
-					{# Optionnel mais très pro sur desktop #}
 					<button class="btn btn-primary nav-search__btn d-none d-lg-inline-flex" type="submit">
 						Rechercher
 					</button>
@@ -32,6 +29,11 @@
 
 			<div class="d-flex align-items-center gap-2 ms-lg-2">
 				{% if app.user %}
+					<a class="btn btn-outline-primary" href="{{ path('app_profile_saved') }}">
+						<i class="fa-regular fa-bookmark me-2"></i>
+						Enregistrés
+					</a>
+
 					<a class="btn btn-primary" href="{{ path('app_profile') }}">
 						<i class="fa-solid fa-user me-2"></i>
 						Profil
@@ -55,7 +57,6 @@
 
 				{% if is_granted('ROLE_ADMIN') %}
 					<a href="{{ path('admin') }}" class="btn btn-outline-primary btn-sm d-flex align-items-center gap-2 px-3 rounded-pill shadow-sm">
-
 						<i class="fa-solid fa-shield-halved"></i>
 						<span>Admin</span>
 					</a>
