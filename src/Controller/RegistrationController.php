@@ -91,7 +91,7 @@ class RegistrationController extends AbstractController
         /** @var User $user */
         $user = $this->getUser();
 
-        if ($user->isVerified()) {
+        if ($user->getIsVerified()) {
             $this->addFlash('info', 'Votre email est déjà vérifié.');
             return $this->redirectToRoute('app_profile');
         }

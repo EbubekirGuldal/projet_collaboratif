@@ -75,14 +75,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $firstName = null;
 
     #[ORM\Column(options: ["default" => false])]
-    #[Groups(['user:read'])]
-    private ?bool $isVerified = false;
+    #[Groups(['user:read', 'resource:read'])]
+    private bool $isVerified = false;
 
     #[ORM\Column(options: ["default" => true])]
     private ?bool $isActive = true;
 
     #[ORM\Column]
-    #[Groups(['user:read'])]
+    #[Groups(['user:read', 'resource:read'])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(nullable: true)]
@@ -233,7 +233,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function isVerified(): ?bool
+    public function getIsVerified(): bool
     {
         return $this->isVerified;
     }

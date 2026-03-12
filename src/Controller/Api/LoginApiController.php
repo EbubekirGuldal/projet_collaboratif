@@ -54,7 +54,17 @@ final class LoginApiController extends AbstractController
 
                 return new JsonResponse([
                     'status' => 200,
-                    'token' => $token
+                    'token' => $token,
+                    'user' => [
+                        'id' => $user->getId(),
+                        'email' => $user->getEmail(),
+                        'username' => $user->getUsername(),
+                        'lastName' => $user->getLastName(),
+                        'firstName' => $user->getFirstName(),
+                        'isVerified' => $user->getIsVerified(),
+                        'createdAt' => $user->getCreatedAt()->format(DATE_ATOM),
+                        'updatedAt' => $user->getUpdatedAt()?->format(DATE_ATOM),
+                    ]
                 ]);
             } else {
                 return new JsonResponse([
