@@ -64,7 +64,7 @@ class DashboardController extends AbstractDashboardController
         yield MenuItem::linkToCrud('Utilisateur', 'fas fa-user', User::class);
         yield MenuItem::linkToCrud('Commentaire', 'fas fa-comment', Comment::class);
         yield MenuItem::linkToCrud('Ressource', 'fas fa-image', Resource::class);
-        yield MenuItem::linkToCrud('Moderation', 'fas fa-user-tie', ModerationLog::class);
+        yield MenuItem::linkToCrud('Modération', 'fas fa-user-tie', ModerationLog::class);
         yield MenuItem::section();
         yield MenuItem::linkToRoute('Quitter', 'fas fa-right-from-bracket', 'app_home');
     }

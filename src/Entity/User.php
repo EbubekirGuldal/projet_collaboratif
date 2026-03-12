@@ -89,12 +89,24 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: Comment::class, mappedBy: 'user')]
     private Collection $comments;
 
+    /**
+     * @var Collection<int, ModerationLog>
+     */
+    #[ORM\OneToMany(targetEntity: ModerationLog::class, mappedBy: 'user')]
+    private Collection $moderationLogs;
+
     public function __construct()
     {
         $this->createdAt = new \DateTimeImmutable();
         $this->resources = new ArrayCollection();
         $this->favorites = new ArrayCollection();
         $this->comments = new ArrayCollection();
+        $this->moderationLogs = new ArrayCollection();
+    }
+
+    public function __toString(): string
+    {
+        return $this->username ?: (string) $this->email;
     }
 
     #[ORM\PreUpdate]
@@ -352,6 +364,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function getImageFile(): ?File
     {
         return $this->imageFile;
+    }
+
+    /**
+     * @return Collection<int, ModerationLog>
+     */
+    public function getModerationLogs(): Collection
+    {
+        return $this->moderationLogs;
+    }
+
+    public function addModerationLog(ModerationLog $moderationLog): static
+    {
+        if (!$this->moderationLogs->contains($moderationLog)) {
+            $this->moderationLogs->add($moderationLog);
+            $moderationLog->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeModerationLog(ModerationLog $moderationLog): static
+    {
+        if ($this->moderationLogs->removeElement($moderationLog)) {
+            // set the owning side to null (unless already changed)
+            if ($moderationLog->getUser() === $this) {
+                $moderationLog->setUser(null);
+            }
+        }
+
+        return $this;
     }
 }
 

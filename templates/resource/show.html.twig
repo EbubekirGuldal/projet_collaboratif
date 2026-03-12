@@ -5,12 +5,11 @@
 {% block body %}
 <div class="container py-4">
 
-    {# Flash messages #}
     {% for label, messages in app.flashes %}
         {% for message in messages %}
             <div class="alert alert-{{ label }} alert-dismissible fade show" role="alert">
                 {{ message }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
             </div>
         {% endfor %}
     {% endfor %}
@@ -18,11 +17,10 @@
     <div class="row g-4">
         <div class="col-12 col-lg-8">
 
-            {# Ressource #}
             <article class="card border-0 shadow-sm mb-3">
                 <div class="card-body">
                     <a class="text-decoration-none small" href="{{ path('app_home') }}">
-                        ← Retour au fil
+                        &larr; Retour au fil
                     </a>
 
                     <h1 class="h4 mt-2 mb-2">{{ resource.title }}</h1>
@@ -48,15 +46,23 @@
                         {{ resource.content|raw }}
                     </div>
 
-                    {% if resource.externalUrl %}
-                        <a class="btn btn-outline-primary btn-sm" href="{{ resource.externalUrl }}" target="_blank" rel="noopener">
-                            Ouvrir la ressource externe
-                        </a>
-                    {% endif %}
+                    <div class="d-flex flex-wrap gap-2">
+                        {% if resource.externalUrl %}
+                            <a class="btn btn-outline-primary btn-sm" href="{{ resource.externalUrl }}" target="_blank" rel="noopener">
+                                Ouvrir la ressource externe
+                            </a>
+                        {% endif %}
+
+                        {% if app.user %}
+                            <button type="button" class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#reportResourceModal">
+                                <i class="fa-regular fa-flag me-2"></i>
+                                Signaler cette ressource
+                            </button>
+                        {% endif %}
+                    </div>
                 </div>
             </article>
 
-            {# Ajout commentaire #}
             <div class="card border-0 shadow-sm mb-3">
                 <div class="card-body">
                     <h2 class="h6 mb-3">Ajouter un commentaire</h2>
@@ -64,20 +70,19 @@
                     {% if app.user %}
                         <form method="post">
                             <div class="mb-2">
-                                <textarea class="form-control" name="content" rows="3" placeholder="Écrire un commentaire..."></textarea>
+                                <textarea class="form-control" name="content" rows="3" placeholder="&Eacute;crire un commentaire..."></textarea>
                             </div>
                             <button class="btn btn-primary btn-sm" type="submit">Publier</button>
                         </form>
                     {% else %}
                         <p class="text-muted small mb-0">
-                            Connecte-toi pour commenter.
+                            Connectez-vous pour commenter.
                             <a href="{{ path('app_login') }}">Connexion</a>
                         </p>
                     {% endif %}
                 </div>
             </div>
 
-            {# Liste commentaires #}
             <div class="card border-0 shadow-sm">
                 <div class="card-body">
                     <h2 class="h6 mb-3">Commentaires ({{ comments|length }})</h2>
@@ -119,6 +124,9 @@
                     <div class="d-grid gap-2">
                         <a class="btn btn-outline-primary" href="{{ path('app_home') }}">Retour fil</a>
                         {% if app.user %}
+                            <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#reportResourceModal">
+                                Signaler la ressource
+                            </button>
                             <a class="btn btn-primary" href="{{ path('admin') }}">Admin</a>
                         {% endif %}
                     </div>
@@ -128,4 +136,45 @@
 
     </div>
 </div>
+
+{% if app.user %}
+    <div class="modal fade" id="reportResourceModal" tabindex="-1" aria-labelledby="reportResourceModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header border-0">
+                    <h5 class="modal-title" id="reportResourceModalLabel">Signaler cette ressource</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                </div>
+
+                <form method="post" action="{{ path('resource_report', { id: resource.id }) }}">
+                    <div class="modal-body">
+                        <input type="hidden" name="_token" value="{{ csrf_token('report_resource_' ~ resource.id) }}">
+
+                        <div class="mb-3">
+                            <label class="form-label" for="reportCategory">Motif</label>
+                            <select class="form-select" id="reportCategory" name="category" required>
+                                <option value="">Choisir un motif</option>
+                                <option value="information_incorrecte">Information incorrecte</option>
+                                <option value="contenu_inapproprie">Contenu inappropri&eacute;</option>
+                                <option value="lien_indisponible">Lien indisponible</option>
+                                <option value="ressource_obsolete">Ressource obsol&egrave;te</option>
+                                <option value="autre">Autre</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-0">
+                            <label class="form-label" for="reportDetails">D&eacute;tails</label>
+                            <textarea class="form-control" id="reportDetails" name="details" rows="4" placeholder="Expliquez bri&egrave;vement le probl&egrave;me constat&eacute;."></textarea>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer border-0">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Annuler</button>
+                        <button type="submit" class="btn btn-danger">Envoyer le signalement</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endif %}
 {% endblock %}
