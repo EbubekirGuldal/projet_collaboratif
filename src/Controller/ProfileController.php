@@ -4,7 +4,6 @@ namespace App\Controller;
 
 use App\Entity\Resource;
 use App\Entity\User;
-use App\Repository\ResourceRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
