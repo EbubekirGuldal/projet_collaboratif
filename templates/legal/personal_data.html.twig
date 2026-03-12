@@ -1,0 +1,48 @@
+{% extends 'legal/_page.html.twig' %}
+
+{% set title = 'Gestion des données personnelles' %}
+{% set subtitle = 'Vous disposez de plusieurs droits sur vos données personnelles. Cette page vous indique comment les exercer sur Ressources relationnelles.' %}
+{% set sections = [
+    {
+        title: 'Vos droits',
+        paragraphs: [
+            'Conformément à la réglementation applicable, vous pouvez demander l’accès aux données personnelles vous concernant, leur rectification, leur mise à jour, leur suppression ou, lorsque cela est pertinent, la limitation de leur traitement.',
+            'Vous pouvez également demander des précisions sur la manière dont vos données sont utilisées sur la plateforme, notamment lorsqu’elles sont liées à votre compte, à vos publications, à vos commentaires ou à vos interactions.'
+        ]
+    },
+    {
+        title: 'Données que vous pouvez déjà gérer',
+        paragraphs: [
+            'Certaines informations peuvent être modifiées directement depuis votre espace utilisateur, notamment des éléments de profil tels que votre nom d’utilisateur, votre prénom, votre nom, votre adresse e-mail ou votre photo de profil.',
+            'La plateforme prévoit également des fonctionnalités liées à la sécurité du compte, comme la mise à jour du mot de passe, la vérification de l’adresse e-mail et, selon les cas, la suppression du compte.'
+        ]
+    },
+    {
+        title: 'Comment exercer une demande',
+        paragraphs: [
+            'Pour toute demande concernant vos données personnelles, vous pouvez contacter l’équipe responsable du projet via le canal de contact prévu pour la plateforme. Il est recommandé d’indiquer clairement l’objet de votre demande et l’adresse e-mail associée à votre compte.',
+            'Afin de protéger vos informations, une vérification raisonnable de votre identité peut être demandée avant le traitement de certaines demandes sensibles, notamment lorsqu’elles concernent l’accès à des données, la suppression du compte ou des rectifications importantes.'
+        ]
+    },
+    {
+        title: 'Délais de traitement',
+        paragraphs: [
+            'Les demandes sont examinées dans un délai raisonnable, compatible avec la nature de la demande, le volume d’informations concernées et les obligations applicables au responsable du traitement.',
+            'Lorsque la demande ne peut pas être satisfaite immédiatement, l’utilisateur reçoit autant que possible une information sur l’état de traitement de sa requête.'
+        ]
+    },
+    {
+        title: 'Suppression et conservation résiduelle',
+        paragraphs: [
+            'La suppression de certaines données peut entraîner la désactivation du compte ou limiter l’accès à certaines fonctionnalités lorsque ces données sont nécessaires au fonctionnement du service.',
+            'Certaines informations peuvent néanmoins être conservées pour une durée limitée lorsqu’une obligation légale, une contrainte de sécurité ou un besoin de traçabilité le justifie, notamment en matière de modération ou de prévention des abus.'
+        ]
+    },
+    {
+        title: 'Réclamation',
+        paragraphs: [
+            'Si vous estimez que le traitement de vos données personnelles n’est pas conforme à la réglementation applicable, vous pouvez adresser une réclamation auprès de l’autorité compétente en matière de protection des données.',
+            'Avant cette étape, il est recommandé de contacter l’équipe projet afin de permettre un traitement rapide et amiable de votre demande.'
+        ]
+    }
+] %}

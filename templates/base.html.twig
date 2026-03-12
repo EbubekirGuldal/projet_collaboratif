@@ -26,6 +26,7 @@
 
     {% block body %}{% endblock %}
 
+    {% include "includes/footer.html.twig" %}
     {% block javascripts %}
         {# Si vous utilisez Webpack Encore #}
         {{ encore_entry_script_tags('app') }}
