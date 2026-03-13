@@ -11,7 +11,6 @@ class DashboardStatsQueryRepository
     public function __construct(
         private readonly ResourceRepository $resourceRepository,
         private readonly UserRepository $userRepository,
-        private readonly UserResourceStateRepository $userResourceStateRepository,
         private readonly ShareRepository $shareRepository,
         private readonly CommentRepository $commentRepository,
         private readonly EntityManagerInterface $entityManager,
@@ -36,30 +35,6 @@ class DashboardStatsQueryRepository
             ->setParameter('active', true);
 
         return $this->countWithStartAt($qb, $startAt, 'u.createdAt');
-    }
-
-    // Compte les ressources marquees comme exploitees.
-    public function countExploitedResources(?\DateTimeImmutable $startAt): int
-    {
-        $qb = $this->userResourceStateRepository
-            ->createQueryBuilder('urs')
-            ->select('COUNT(urs.id)')
-            ->andWhere('urs.isExploited = :isExploited')
-            ->setParameter('isExploited', true);
-
-        return $this->countWithStartAt($qb, $startAt, 'COALESCE(urs.lastInteractionAt, urs.startedAt)');
-    }
-
-    // Compte les favoris sur la periode.
-    public function countFavorites(?\DateTimeImmutable $startAt): int
-    {
-        $qb = $this->userResourceStateRepository
-            ->createQueryBuilder('urs')
-            ->select('COUNT(urs.id)')
-            ->andWhere('urs.isFavorite = :isFavorite')
-            ->setParameter('isFavorite', true);
-
-        return $this->countWithStartAt($qb, $startAt, 'COALESCE(urs.lastInteractionAt, urs.startedAt)');
     }
 
     // Compte les partages sur la periode.

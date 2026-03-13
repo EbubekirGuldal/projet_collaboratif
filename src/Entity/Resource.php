@@ -19,6 +19,7 @@ use Vich\UploaderBundle\Mapping\Attribute as Vich;
 #[ApiResource(
     paginationItemsPerPage: 10,
     paginationPartial: true,
+    order: ['id' => 'DESC'],
     operations: [
         new GetCollection(
             normalizationContext: ['groups' => ['resource:read']],
@@ -111,6 +112,12 @@ class Resource
     #[ORM\Column(enumType: ResourceStatus::class)]
     private ResourceStatus $resourceStatus = ResourceStatus::PUBLIC;
 
+    /**
+     * @var Collection<int, UserLiked>
+     */
+    #[ORM\OneToMany(targetEntity: UserLiked::class, mappedBy: 'resource')]
+    private Collection $userLikeds;
+
     public function __toString()
     {
         return $this->id." - ".$this->title;
@@ -118,9 +125,11 @@ class Resource
 
     public function __construct()
     {
+        $this->publishedAt = new \DateTimeImmutable();
         $this->createdAt = new \DateTimeImmutable();
         $this->comments = new ArrayCollection();
         $this->moderationLogs = new ArrayCollection();
+        $this->userLikeds = new ArrayCollection();
     }
 
     #[ORM\PreUpdate]
@@ -348,6 +357,36 @@ class Resource
     public function setResourceStatus(ResourceStatus $resourceStatus): static
     {
         $this->resourceStatus = $resourceStatus;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, UserLiked>
+     */
+    public function getUserLikeds(): Collection
+    {
+        return $this->userLikeds;
+    }
+
+    public function addUserLiked(UserLiked $userLiked): static
+    {
+        if (!$this->userLikeds->contains($userLiked)) {
+            $this->userLikeds->add($userLiked);
+            $userLiked->setResource($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUserLiked(UserLiked $userLiked): static
+    {
+        if ($this->userLikeds->removeElement($userLiked)) {
+            // set the owning side to null (unless already changed)
+            if ($userLiked->getResource() === $this) {
+                $userLiked->setResource(null);
+            }
+        }
 
         return $this;
     }

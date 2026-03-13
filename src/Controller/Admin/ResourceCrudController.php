@@ -7,6 +7,8 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
+use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\FormField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
@@ -28,7 +30,7 @@ class ResourceCrudController extends AbstractCrudController
     public function configureCrud(Crud $crud): Crud
     {
         return $crud
-            ->setSearchFields(['id', 'title', 'content', 'resourceStatus', 'visibilityStatus'])
+            ->setSearchFields(['id', 'title', 'content', 'resourceStatus', 'user.email', 'user.username'])
             ->setEntityLabelInSingular('Ressource')
             ->setEntityLabelInPlural('Ressources')
             ->setAutofocusSearch()
@@ -84,6 +86,10 @@ class ResourceCrudController extends AbstractCrudController
                 ])
                 ->setHelp('Formats conseillés : JPG/PNG/WebP'),
 
+            FormField::addColumn(6),
+            FormField::addPanel('Utilisateur')->setIcon('fa fa-user'),
+            AssociationField::new('user'),
+
             // =========================
             // TAB 2 : MÉTADONNÉES
             // =========================
@@ -92,8 +98,7 @@ class ResourceCrudController extends AbstractCrudController
             FormField::addColumn(6),
             FormField::addPanel('Statuts')->setIcon('fa fa-tags'),
 
-            TextField::new('resourceStatus', 'Statut ressource'),
-            TextField::new('visibilityStatus', 'Visibilité'),
+            ChoiceField::new('resourceStatus', 'Statut ressource'),
 
             FormField::addColumn(6),
             IntegerField::new('sharesCount', 'Partages'),

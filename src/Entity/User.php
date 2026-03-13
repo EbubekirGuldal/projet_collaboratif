@@ -120,6 +120,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: ModerationLog::class, mappedBy: 'user')]
     private Collection $moderationLogs;
 
+    /**
+     * @var Collection<int, UserLiked>
+     */
+    #[ORM\OneToMany(targetEntity: UserLiked::class, mappedBy: 'user')]
+    private Collection $userLikeds;
+
     public function __construct()
     {
         $this->createdAt = new \DateTimeImmutable();
@@ -127,6 +133,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->favorites = new ArrayCollection();
         $this->comments = new ArrayCollection();
         $this->moderationLogs = new ArrayCollection();
+        $this->userLikeds = new ArrayCollection();
     }
 
     public function __toString(): string
@@ -413,6 +420,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             // set the owning side to null (unless already changed)
             if ($moderationLog->getUser() === $this) {
                 $moderationLog->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, UserLiked>
+     */
+    public function getUserLikeds(): Collection
+    {
+        return $this->userLikeds;
+    }
+
+    public function addUserLiked(UserLiked $userLiked): static
+    {
+        if (!$this->userLikeds->contains($userLiked)) {
+            $this->userLikeds->add($userLiked);
+            $userLiked->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUserLiked(UserLiked $userLiked): static
+    {
+        if ($this->userLikeds->removeElement($userLiked)) {
+            // set the owning side to null (unless already changed)
+            if ($userLiked->getUser() === $this) {
+                $userLiked->setUser(null);
             }
         }
 
