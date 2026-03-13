@@ -4,7 +4,9 @@ namespace App\Controller;
 
 use App\Entity\ModerationLog;
 use App\Entity\Resource;
+use App\Entity\ResourceLike;
 use App\Entity\User;
+use App\Repository\ResourceLikeRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -15,8 +17,11 @@ use Symfony\Component\Routing\Attribute\Route;
 class ResourceInteractionController extends AbstractController
 {
     #[Route('/resource/{id}/like', name: 'resource_like', methods: ['POST'])]
-    public function toggleLike(Resource $resource, EntityManagerInterface $em): JsonResponse
-    {
+    public function toggleLike(
+        Resource $resource,
+        EntityManagerInterface $em,
+        ResourceLikeRepository $resourceLikeRepository
+    ): JsonResponse {
         /** @var User|null $user */
         $user = $this->getUser();
 
@@ -24,21 +29,28 @@ class ResourceInteractionController extends AbstractController
             return new JsonResponse(['error' => 'Unauthorized'], 403);
         }
 
-        $current = $resource->getLikesCount() ?? 0;
+        $existingLike = $resourceLikeRepository->findOneByUserAndResource($user, $resource);
 
-        // Prototype simple de toggle (0 -> 1, 1 -> 0).
-        if ($current > 0) {
-            $resource->setLikesCount($current - 1);
+        if ($existingLike) {
+            $em->remove($existingLike);
             $liked = false;
         } else {
-            $resource->setLikesCount($current + 1);
+            $like = new ResourceLike();
+            $like->setUser($user);
+            $like->setResource($resource);
+
+            $em->persist($like);
             $liked = true;
         }
 
         $em->flush();
 
+        $likesCount = $resourceLikeRepository->countForResource($resource);
+        $resource->setLikesCount($likesCount);
+        $em->flush();
+
         return new JsonResponse([
-            'likes' => $resource->getLikesCount(),
+            'likes' => $likesCount,
             'liked' => $liked,
         ]);
     }
@@ -46,7 +58,6 @@ class ResourceInteractionController extends AbstractController
     #[Route('/resource/{id}/share', name: 'resource_share', methods: ['POST'])]
     public function share(Resource $resource, EntityManagerInterface $em, Request $request): JsonResponse
     {
-        // Anti-autoclicker simple : un incrément par session et par ressource.
         $session = $request->getSession();
         $key = 'shared_resource_' . $resource->getId();
 
@@ -82,7 +93,6 @@ class ResourceInteractionController extends AbstractController
             return new JsonResponse(['error' => 'Unauthorized'], 403);
         }
 
-        // Favoris persistés en base via la relation ManyToMany (User::favorites).
         if ($user->isFavorite($resource)) {
             $user->removeFavorite($resource);
             $favorited = false;
