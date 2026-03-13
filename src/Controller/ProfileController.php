@@ -17,8 +17,7 @@ final class ProfileController extends AbstractController
     public function __construct(
         private readonly EntityManagerInterface $em,
         private UserPasswordHasherInterface $passwordHasher
-    ) {
-    }
+    ) {}
 
     #[Route('/profile', name: 'app_profile')]
     public function index(): Response
@@ -45,7 +44,7 @@ final class ProfileController extends AbstractController
         ['resources' => $resources, 'query' => $query, 'sort' => $sort] = $this->buildResourceListing($resources, $request);
 
         $savedItems = array_map(
-            static fn (Resource $resource): array => [
+            static fn(Resource $resource): array => [
                 'resource' => $resource,
                 'commentsCount' => $resource->getComments()->count(),
             ],
@@ -74,7 +73,7 @@ final class ProfileController extends AbstractController
         ['resources' => $resources, 'query' => $query, 'sort' => $sort] = $this->buildResourceListing($resources, $request);
 
         $createdItems = array_map(
-            static fn (Resource $resource): array => [
+            static fn(Resource $resource): array => [
                 'resource' => $resource,
                 'commentsCount' => $resource->getComments()->count(),
             ],
@@ -87,6 +86,35 @@ final class ProfileController extends AbstractController
             'sort' => $sort,
             'createdCount' => count($resources),
             'totalCreatedCount' => $user->getResources()->count(),
+        ]);
+    }
+
+    #[Route('/profile/saved-resources', name: 'app_profile_saved_resources', methods: ['GET'])]
+    public function savedResources(Request $request): Response
+    {
+        /** @var User|null $user */
+        $user = $this->getUser();
+        if (!$user) {
+            return $this->redirectToRoute('app_login');
+        }
+
+        $resources = $user->getFavorites()->toArray();
+        ['resources' => $resources, 'query' => $query, 'sort' => $sort] = $this->buildResourceListing($resources, $request);
+
+        $savedItems = array_map(
+            static fn(Resource $resource): array => [
+                'resource' => $resource,
+                'commentsCount' => $resource->getComments()->count(),
+            ],
+            $resources
+        );
+
+        return $this->render('profile/saved_resources.html.twig', [
+            'savedItems' => $savedItems,
+            'q' => $query,
+            'sort' => $sort,
+            'savedCount' => count($resources),
+            'totalSavedCount' => $user->getFavorites()->count(),
         ]);
     }
 

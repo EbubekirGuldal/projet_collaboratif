@@ -70,7 +70,7 @@
                         </a>
                     </div>
 
-                    <div class="small text-muted mt-3 d-none" id="shareFeedback"></div>
+                    <div class="small mt-3 d-none" id="shareFeedback"></div>
                 </div>
             </div>
         </div>
@@ -109,6 +109,7 @@
             function showShareFeedback(message) {
                 if (!shareFeedback) return;
                 shareFeedback.textContent = message;
+                shareFeedback.style.color = "white";
                 shareFeedback.classList.remove('d-none');
             }
 

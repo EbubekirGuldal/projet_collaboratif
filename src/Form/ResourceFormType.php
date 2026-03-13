@@ -4,7 +4,6 @@ namespace App\Form;
 
 use App\Entity\Resource;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\UrlType;
@@ -48,22 +47,6 @@ class ResourceFormType extends AbstractType
                     'class' => 'form-control',
                     'placeholder' => 'Lien ou référence vidéo',
                 ],
-            ])
-            ->add('resourceStatus', ChoiceType::class, [
-                'label' => 'Statut de la ressource',
-                'choices' => [
-                    'Publiée' => 'Publiee',
-                    'Brouillon' => 'Brouillon',
-                ],
-                'attr' => ['class' => 'form-select'],
-            ])
-            ->add('visibilityStatus', ChoiceType::class, [
-                'label' => 'Visibilité',
-                'choices' => [
-                    'Public' => 'Public',
-                    'Privé' => 'Prive',
-                ],
-                'attr' => ['class' => 'form-select'],
             ])
             ->add('imageFile', VichImageType::class, [
                 'label' => 'Illustration',

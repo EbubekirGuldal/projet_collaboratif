@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Comment;
 use App\Entity\Resource;
+use App\Form\ResourceFormType;
 use App\Form\ResourceType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -77,6 +78,41 @@ class ResourceController extends AbstractController
         return $this->render('resource/show.html.twig', [
             'resource' => $resource,
             'comments' => $comments,
+        ]);
+    }
+
+    #[Route('/resource/{id}/edit', name: 'resource_edit', methods: ['GET', 'POST'])]
+    public function edit(Resource $resource, Request $request, EntityManagerInterface $em): Response
+    {
+        $this->denyAccessUnlessGranted('ROLE_USER');
+
+        $user = $this->getUser();
+        if ($resource->getUser() !== $user && !$this->isGranted('ROLE_ADMIN')) {
+            throw $this->createAccessDeniedException('Vous ne pouvez modifier que vos propres ressources.');
+        }
+
+        $form = $this->createForm(ResourceFormType::class, $resource);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            if ($resource->getResourceStatus() === 'Publiee' && $resource->getPublishedAt() === null) {
+                $resource->setPublishedAt(new \DateTimeImmutable());
+            }
+
+            if ($resource->getResourceStatus() !== 'Publiee') {
+                $resource->setPublishedAt(null);
+            }
+
+            $em->flush();
+
+            $this->addFlash('success', 'La ressource a été mise à jour avec succès.');
+
+            return $this->redirectToRoute('resource_show', ['id' => $resource->getId()]);
+        }
+
+        return $this->render('resource/edit.html.twig', [
+            'resource' => $resource,
+            'form' => $form->createView(),
         ]);
     }
 }
