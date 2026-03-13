@@ -54,6 +54,17 @@
                 </div>
 
                 <footer class="feed-card__footer">
+                    {% if editPath is defined and editPath %}
+                        <a
+                            class="btn btn-sm feed-action btn-outline-dark"
+                            href="{{ editPath }}"
+                            title="Modifier la ressource"
+                        >
+                            <i class="fa-regular fa-pen-to-square"></i>
+                            <span>Modifier</span>
+                        </a>
+                    {% endif %}
+
                     <a
                         class="feed-action feed-action--link"
                         href="{{ path('resource_show', { id: resource.id }) }}"

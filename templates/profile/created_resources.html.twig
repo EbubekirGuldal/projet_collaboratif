@@ -1,0 +1,122 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    Mes ressources créées |
+    {{ parent() }}
+{% endblock %}
+
+{% block body %}
+    {% set proposeResourcePath = is_granted('ROLE_ADMIN') ? path('admin') : path('app_home') %}
+
+    <div class="container py-4 py-lg-5 feed-page">
+        {% for label, messages in app.flashes %}
+            {% for message in messages %}
+                <div class="alert alert-{{ label }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
+                </div>
+            {% endfor %}
+        {% endfor %}
+
+        <div class="feed-shell">
+            <div class="feed-main">
+                <section class="feed-hero card border-0 shadow-sm">
+                    <div class="card-body p-4 p-lg-5">
+                        <div class="feed-hero-row">
+                            <div class="feed-hero-copy">
+                                <span class="feed-eyebrow">Mon espace</span>
+                                <h1 class="feed-title mb-2">Mes ressources créées</h1>
+                                <p class="feed-subtitle mb-0">
+                                    Retrouvez toutes les ressources que vous avez publiées et suivez leur visibilité sur la plateforme.
+                                </p>
+                            </div>
+
+                            <div class="d-flex flex-wrap gap-2">
+                                <a class="btn btn-outline-dark" href="{{ path('app_profile') }}">
+                                    <i class="fa-regular fa-user me-2"></i>
+                                    Retour au profil
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="feed-search-state">
+                            <span class="feed-search-pill">
+                                <i class="fa-regular fa-folder-open"></i>
+                                {{ createdCount }} ressource{{ createdCount > 1 ? 's' : '' }} publiée{{ createdCount > 1 ? 's' : '' }}
+                            </span>
+                        </div>
+                    </div>
+                </section>
+
+                <div class="feed-list mt-4">
+                    {% if createdItems is empty %}
+                        <section class="card border-0 shadow-sm feed-empty-state feed-empty-state--created">
+                            <div class="card-body p-4 p-lg-5">
+                                <div class="feed-empty-icon feed-empty-icon--created">
+                                    <i class="fa-regular fa-folder-open"></i>
+                                </div>
+
+                                <h2 class="feed-empty-title mt-4 mb-2">Vous n’avez pas encore publié de ressource</h2>
+                                <p class="feed-empty-copy text-body-secondary mb-0">
+                                    Les ressources que vous partagez apparaîtront ici.
+                                    Vous pouvez commencer par explorer celles de la communauté
+                                    ou proposer votre première ressource.
+                                </p>
+
+                                <div class="feed-empty-actions mt-4">
+                                    <a href="{{ proposeResourcePath }}" class="btn btn-dark">
+                                        <i class="fa-solid fa-plus me-2"></i>
+                                        Proposer une ressource
+                                    </a>
+                                    <a href="{{ path('app_home') }}" class="btn btn-outline-dark">
+                                        <i class="fa-solid fa-compass me-2"></i>
+                                        Explorer le fil d’actualité
+                                    </a>
+                                </div>
+                            </div>
+                        </section>
+                    {% endif %}
+
+                    {% for item in createdItems %}
+                        {% include 'resource/_card.html.twig' with {
+                            resource: item.resource,
+                            commentsCount: item.commentsCount,
+                            isFavorite: app.user ? app.user.isFavorite(item.resource) : false,
+                            editPath: path('resource_edit', { id: item.resource.id })
+                        } only %}
+                    {% endfor %}
+                </div>
+            </div>
+
+            <aside class="feed-sidebar">
+                <div class="feed-sidebar__inner">
+                    <section class="card border-0 shadow-sm feed-side-card">
+                        <div class="card-body p-4">
+                            <div class="feed-side-head">
+                                <span class="feed-side-icon">
+                                    <i class="fa-solid fa-circle-info"></i>
+                                </span>
+                                <div>
+                                    <h2 class="h6 mb-1">Comment ça marche</h2>
+                                    <p class="feed-side-subtitle mb-0">Suivi de vos publications</p>
+                                </div>
+                            </div>
+
+                            <p class="feed-side-copy mb-0">
+                                Les ressources que vous publiez peuvent être :
+                            </p>
+                            <ul class="feed-side-list">
+                                <li>commentées par la communauté</li>
+                                <li>partagées</li>
+                                <li>évaluées selon leur utilité</li>
+                            </ul>
+                            <p class="feed-side-note mb-0">
+                                Total actuel : {{ totalCreatedCount }} ressource{{ totalCreatedCount > 1 ? 's' : '' }}.
+                            </p>
+                        </div>
+                    </section>
+                </div>
+            </aside>
+        </div>
+    </div>
+{% endblock %}

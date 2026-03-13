@@ -147,7 +147,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             'email' => $this->email,
             'roles' => $this->roles,
             'username' => $this->username,
-            'password' => $this->password ? hash('crc32c', $this->password) : null,
+            'password' => $this->password,
         ];
     }
 
@@ -157,9 +157,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->email = $data['email'] ?? null;
         $this->roles = $data['roles'] ?? [];
         $this->username = $data['username'] ?? null;
-
-        // on ne peut pas reconstruire le vrai hash depuis crc32c -> donc on laisse null
-        $this->password = null;
+        $this->password = $data['password'] ?? null;
     }
 
     public function getId(): ?int
