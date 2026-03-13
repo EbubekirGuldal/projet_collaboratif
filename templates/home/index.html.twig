@@ -20,23 +20,33 @@
                     <div class="feed-hero-row">
                         <div class="feed-hero-copy">
                             <span class="feed-eyebrow">Ressources relationnelles</span>
-                            <h1 class="feed-title mb-2">Fil d&apos;actualit&eacute;</h1>
+                            <h1 class="feed-title mb-2">Fil d’actualité</h1>
                             <p class="feed-subtitle mb-0">
-                                Un espace clair pour trouver, partager et suivre les ressources utiles de la communaut&eacute;.
+                                Un espace clair pour trouver, partager et suivre les ressources utiles de la communauté.
                             </p>
                         </div>
 
                         <div class="feed-sort" role="group" aria-label="Tri du fil">
                             <a
                                 class="feed-sort__btn {{ sort == 'new' ? 'is-active' : '' }}"
-                                href="{{ path('app_home', { q: q, sort: 'new' }) }}"
+                                href="{{ path('app_home', {
+                                    q: q,
+                                    sort: 'new',
+                                    resourceType: resourceTypeId,
+                                    relationKind: relationKindId
+                                }) }}"
                             >
                                 <i class="fa-regular fa-clock"></i>
-                                <span>R&eacute;cent</span>
+                                <span>Récent</span>
                             </a>
                             <a
                                 class="feed-sort__btn {{ sort == 'top' ? 'is-active' : '' }}"
-                                href="{{ path('app_home', { q: q, sort: 'top' }) }}"
+                                href="{{ path('app_home', {
+                                    q: q,
+                                    sort: 'top',
+                                    resourceType: resourceTypeId,
+                                    relationKind: relationKindId
+                                }) }}"
                             >
                                 <i class="fa-solid fa-arrow-trend-up"></i>
                                 <span>Populaire</span>
@@ -44,11 +54,59 @@
                         </div>
                     </div>
 
-                    {% if q %}
-                        <div class="feed-search-state">
+                    <form method="get" action="{{ path('app_home') }}" class="row g-3 mt-3">
+                        <input type="hidden" name="sort" value="{{ sort }}">
+
+                        <div class="col-12 col-lg-4">
+                            <label class="form-label fw-semibold">Recherche</label>
+                            <input
+                                type="text"
+                                name="q"
+                                value="{{ q }}"
+                                class="form-control"
+                                placeholder="Titre, contenu, lien..."
+                            >
+                        </div>
+
+                        <div class="col-12 col-lg-3">
+                            <label class="form-label fw-semibold">Type de ressource</label>
+                            <select name="resourceType" class="form-select">
+                                <option value="">Tous les types</option>
+                                {% for type in resourceTypes %}
+                                    <option value="{{ type.id }}" {{ resourceTypeId == type.id ? 'selected' : '' }}>
+                                        {{ type.label }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="col-12 col-lg-3">
+                            <label class="form-label fw-semibold">Public concerné</label>
+                            <select name="relationKind" class="form-select">
+                                <option value="">Tous les publics</option>
+                                {% for public in relationKinds %}
+                                    <option value="{{ public.id }}" {{ relationKindId == public.id ? 'selected' : '' }}>
+                                        {{ public.name }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="col-12 col-lg-2 d-flex align-items-end gap-2">
+                            <button type="submit" class="btn btn-primary w-100">
+                                Filtrer
+                            </button>
+                            <a href="{{ path('app_home') }}" class="btn btn-outline-secondary">
+                                Reset
+                            </a>
+                        </div>
+                    </form>
+
+                    {% if q or resourceTypeId or relationKindId %}
+                        <div class="feed-search-state mt-3">
                             <span class="feed-search-pill">
-                                <i class="fa-solid fa-magnifying-glass"></i>
-                                R&eacute;sultats pour : "{{ q }}"
+                                <i class="fa-solid fa-filter"></i>
+                                Filtres actifs
                             </span>
                             <a class="feed-search-reset" href="{{ path('app_home') }}">Effacer</a>
                         </div>
@@ -63,9 +121,9 @@
                             <div class="feed-empty-icon">
                                 <i class="fa-regular fa-folder-open"></i>
                             </div>
-                            <h2 class="h5 mt-3 mb-2">Aucune ressource &agrave; afficher</h2>
+                            <h2 class="h5 mt-3 mb-2">Aucune ressource à afficher</h2>
                             <p class="text-body-secondary mb-0">
-                                Essayez une autre recherche ou revenez plus tard pour voir les prochaines publications.
+                                Essaie un autre filtre ou reviens plus tard pour voir les prochaines publications.
                             </p>
                         </div>
                     </section>
@@ -90,14 +148,14 @@
                                 <i class="fa-solid fa-circle-info"></i>
                             </span>
                             <div>
-                                <h2 class="h6 mb-1">&Agrave; propos</h2>
+                                <h2 class="h6 mb-1">À propos</h2>
                                 <p class="feed-side-subtitle mb-0">Le projet en bref</p>
                             </div>
                         </div>
 
                         <p class="feed-side-copy mb-0">
-                            Ressources relationnelles rassemble des contenus utiles, des rep&egrave;res fiables et des pistes concr&egrave;tes
-                            pour renforcer les liens sociaux et l&apos;entraide.
+                            Ressources relationnelles rassemble des contenus utiles, des repères fiables et des pistes concrètes
+                            pour renforcer les liens sociaux et l’entraide.
                         </p>
                     </div>
                 </section>
@@ -110,7 +168,7 @@
                             </span>
                             <div>
                                 <h2 class="h6 mb-1">Actions rapides</h2>
-                                <p class="feed-side-subtitle mb-0">Acc&egrave;s directs</p>
+                                <p class="feed-side-subtitle mb-0">Accès directs</p>
                             </div>
                         </div>
 
@@ -130,11 +188,11 @@
                                 </a>
                             </div>
                             <p class="feed-side-note mb-0 mt-3">
-                                Tu peux maintenant publier une ressource directement depuis l’interface utilisateur.
+                                Tu peux maintenant filtrer le fil par type de ressource et par public concerné.
                             </p>
                         {% else %}
                             <p class="feed-side-copy mt-3">
-                                Connectez-vous pour commenter, sauvegarder et proposer des ressources.
+                                Connecte-toi pour commenter, sauvegarder et proposer des ressources.
                             </p>
                             <div class="d-grid gap-2">
                                 <a class="btn btn-dark" href="{{ path('app_login') }}">Connexion</a>

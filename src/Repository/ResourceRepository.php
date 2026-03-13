@@ -6,9 +6,6 @@ use App\Entity\Resource;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
-/**
- * @extends ServiceEntityRepository<Resource>
- */
 class ResourceRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
@@ -16,26 +13,41 @@ class ResourceRepository extends ServiceEntityRepository
         parent::__construct($registry, Resource::class);
     }
 
-    public function findFeed(?string $q, string $sort = 'new', int $limit = 20): array
-    {
+    public function findFeed(
+        ?string $q,
+        string $sort = 'new',
+        int $limit = 20,
+        ?int $resourceTypeId = null,
+        ?int $relationKindId = null
+    ): array {
         $qb = $this->createQueryBuilder('r')
             ->leftJoin('r.comments', 'c')
+            ->leftJoin('r.ressourceType', 'rt')
+            ->leftJoin('r.relationKind', 'rk')
             ->addSelect('COUNT(c.id) AS commentsCount')
-            ->groupBy('r.id')
+            ->groupBy('r.id, rt.id, rk.id')
             ->setMaxResults($limit);
 
         if ($q) {
             $qb->andWhere('LOWER(r.title) LIKE :q OR LOWER(r.content) LIKE :q OR LOWER(r.externalUrl) LIKE :q')
-            ->setParameter('q', '%' . mb_strtolower($q) . '%');
+                ->setParameter('q', '%' . mb_strtolower($q) . '%');
+        }
+
+        if ($resourceTypeId) {
+            $qb->andWhere('rt.id = :resourceTypeId')
+                ->setParameter('resourceTypeId', $resourceTypeId);
+        }
+
+        if ($relationKindId) {
+            $qb->andWhere('rk.id = :relationKindId')
+                ->setParameter('relationKindId', $relationKindId);
         }
 
         if ($sort === 'top') {
-            // "Top" = + de likes + de commentaires
             $qb->orderBy('r.likesCount', 'DESC')
-            ->addOrderBy('commentsCount', 'DESC')
-            ->addOrderBy('r.createdAt', 'DESC');
+                ->addOrderBy('commentsCount', 'DESC')
+                ->addOrderBy('r.createdAt', 'DESC');
         } else {
-            // "New" = plus récent
             $qb->orderBy('r.createdAt', 'DESC');
         }
 

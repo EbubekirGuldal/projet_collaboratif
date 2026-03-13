@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Comment;
 use App\Entity\Resource;
+use App\Enum\ResourceStatus;
 use App\Form\ResourceFormType;
 use App\Form\ResourceType;
 use Doctrine\ORM\EntityManagerInterface;
@@ -24,12 +25,17 @@ class ResourceController extends AbstractController
         $resource->setPublishedAt(new \DateTimeImmutable());
         $resource->setSharesCount(0);
         $resource->setLikesCount(0);
+        $resource->setResourceStatus(ResourceStatus::PUBLIC);
 
         $form = $this->createForm(ResourceType::class, $resource);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             if (!$resource->getPublishedAt()) {
+                $resource->setPublishedAt(new \DateTimeImmutable());
+            }
+
+            if ($resource->getResourceStatus() === ResourceStatus::PUBLIC && $resource->getPublishedAt() === null) {
                 $resource->setPublishedAt(new \DateTimeImmutable());
             }
 
@@ -95,11 +101,11 @@ class ResourceController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            if ($resource->getResourceStatus() === 'Publiee' && $resource->getPublishedAt() === null) {
+            if ($resource->getResourceStatus() === ResourceStatus::PUBLIC && $resource->getPublishedAt() === null) {
                 $resource->setPublishedAt(new \DateTimeImmutable());
             }
 
-            if ($resource->getResourceStatus() !== 'Publiee') {
+            if ($resource->getResourceStatus() !== ResourceStatus::PUBLIC) {
                 $resource->setPublishedAt(null);
             }
 

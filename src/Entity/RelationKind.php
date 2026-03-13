@@ -16,6 +16,11 @@ class RelationKind
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $name = null;
 
+    public function __toString(): string
+    {
+        return $this->name ?? 'Public';
+    }
+
     public function getId(): ?int
     {
         return $this->id;

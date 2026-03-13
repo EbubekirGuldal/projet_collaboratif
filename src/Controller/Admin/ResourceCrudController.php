@@ -3,10 +3,13 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Resource;
+use App\Enum\ResourceStatus;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
+use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\FormField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
@@ -28,89 +31,72 @@ class ResourceCrudController extends AbstractCrudController
     public function configureCrud(Crud $crud): Crud
     {
         return $crud
-            ->setSearchFields(['id', 'title', 'content', 'resourceStatus', 'visibilityStatus'])
+            ->setSearchFields([
+                'id',
+                'title',
+                'content',
+                'resourceStatus',
+                'ressourceType.label',
+                'relationKind.name'
+            ])
             ->setEntityLabelInSingular('Ressource')
             ->setEntityLabelInPlural('Ressources')
-            ->setAutofocusSearch()
-            ->hideNullValues()
             ->setDefaultSort(['id' => 'DESC']);
     }
 
-     public function configureActions(Actions $actions): Actions
+    public function configureActions(Actions $actions): Actions
     {
         return $actions
             ->add(Crud::PAGE_INDEX, Action::DETAIL)
-            ->update(Crud::PAGE_INDEX, Action::NEW, fn(Action $action): Action => $action->setIcon('fa-regular fa-image')->setLabel('Créer une ressource'))
+            ->update(Crud::PAGE_INDEX, Action::NEW, fn(Action $action): Action => $action->setLabel('Créer une ressource'))
             ->update(Crud::PAGE_INDEX, Action::EDIT, fn(Action $action): Action => $action->setIcon('fa fa-edit'))
             ->update(Crud::PAGE_INDEX, Action::DETAIL, fn(Action $action): Action => $action->setIcon('fa fa-eye'))
-            ->update(Crud::PAGE_INDEX, Action::DELETE, fn(Action $action): Action => $action->setIcon('fa fa-trash'))
-            ;
+            ->update(Crud::PAGE_INDEX, Action::DELETE, fn(Action $action): Action => $action->setIcon('fa fa-trash'));
     }
-    
+
     public function configureFields(string $pageName): iterable
     {
         return [
-            // =========================
-            // TAB 1 : GÉNÉRAL
-            // =========================
-            FormField::addTab('Général')->setIcon('fa fa-sliders-h'),
+            FormField::addTab('Général'),
 
             FormField::addColumn(6),
-            FormField::addPanel('Informations')->setIcon('fa fa-info-circle'),
             IdField::new('id')->hideOnForm(),
-
             TextField::new('title', 'Titre'),
             TextareaField::new('content', 'Contenu'),
+            AssociationField::new('ressourceType', 'Type de ressource'),
+            AssociationField::new('relationKind', 'Public concerné'),
 
             FormField::addColumn(6),
-            FormField::addPanel('Liens & médias')->setIcon('fa fa-photo-video'),
+            TextField::new('externalUrl', 'URL externe')->hideOnIndex(),
+            TextField::new('video', 'Vidéo')->hideOnIndex(),
 
-            TextField::new('externalUrl', 'URL externe'),
-            TextField::new('video', 'Vidéo'),
-
-            // Affichage de l'image sur index/detail
             ImageField::new('image', 'Image')
                 ->setBasePath('/images/resources')
                 ->onlyOnIndex(),
 
-            // VRAI input upload (Vich) sur les formulaires
             TextField::new('imageFile', 'Uploader une image')
                 ->setFormType(VichImageType::class)
                 ->onlyOnForms()
                 ->setFormTypeOptions([
-                    'required'      => false,
-                    'allow_delete'  => true,
-                    'download_uri'  => true,
-                ])
-                ->setHelp('Formats conseillés : JPG/PNG/WebP'),
+                    'required' => false,
+                    'allow_delete' => true,
+                    'download_uri' => true,
+                ]),
 
-            // =========================
-            // TAB 2 : MÉTADONNÉES
-            // =========================
-            FormField::addTab('Métadonnées')->setIcon('fa fa-database'),
+            FormField::addTab('Métadonnées'),
 
-            FormField::addColumn(6),
-            FormField::addPanel('Statuts')->setIcon('fa fa-tags'),
+            ChoiceField::new('resourceStatus', 'Statut')
+                ->setChoices([
+                    'Publique' => ResourceStatus::PUBLIC,
+                    'En revue' => ResourceStatus::UNDER_REVIEW,
+                ]),
 
-            TextField::new('resourceStatus', 'Statut ressource'),
-            TextField::new('visibilityStatus', 'Visibilité'),
+            IntegerField::new('likesCount', 'Likes')->hideOnForm(),
+            IntegerField::new('sharesCount', 'Partages')->hideOnForm(),
 
-            FormField::addColumn(6),
-            IntegerField::new('sharesCount', 'Partages'),
-
-            FormField::addPanel('Dates')->setIcon('fa fa-clock'),
-            DateTimeField::new('publishedAt', 'Publié le')
-                ->hideWhenCreating()
-                ->setFormTypeOption('disabled', true),
-
-            DateTimeField::new('createdAt', 'Créé le')
-                ->hideWhenCreating()
-                ->setFormTypeOption('disabled', true),
-
-            DateTimeField::new('updatedAt', 'Mis à jour le')
-                ->hideWhenCreating()
-                ->setFormTypeOption('disabled', true),
+            DateTimeField::new('publishedAt', 'Publié le')->hideWhenCreating(),
+            DateTimeField::new('createdAt', 'Créé le')->hideWhenCreating(),
+            DateTimeField::new('updatedAt', 'Mis à jour le')->hideWhenCreating(),
         ];
     }
-    
 }

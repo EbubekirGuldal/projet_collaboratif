@@ -36,6 +36,18 @@
                             {{ form_errors(form.content) }}
                         </div>
 
+                        <div class="col-12 col-md-6">
+                            {{ form_label(form.ressourceType, null, {'label_attr': {'class': 'form-label fw-semibold'}}) }}
+                            {{ form_widget(form.ressourceType, {'attr': {'class': 'form-select'}}) }}
+                            {{ form_errors(form.ressourceType) }}
+                        </div>
+
+                        <div class="col-12 col-md-6">
+                            {{ form_label(form.relationKind, null, {'label_attr': {'class': 'form-label fw-semibold'}}) }}
+                            {{ form_widget(form.relationKind, {'attr': {'class': 'form-select'}}) }}
+                            {{ form_errors(form.relationKind) }}
+                        </div>
+
                         <div class="col-12">
                             {{ form_label(form.externalUrl, null, {'label_attr': {'class': 'form-label fw-semibold'}}) }}
                             {{ form_widget(form.externalUrl, {'attr': {'class': 'form-control'}}) }}
