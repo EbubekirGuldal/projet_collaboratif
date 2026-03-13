@@ -2,8 +2,8 @@
 
 namespace App\Controller;
 
-use App\Entity\Resource;
 use App\Entity\User;
+use App\Repository\ResourceRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -25,16 +25,18 @@ final class ProfileController extends AbstractController
     {
         if (!$this->getUser()) {
             return $this->redirectToRoute('app_login');
+            return $this->redirectToRoute('app_login');
         }
 
         return $this->render('profile/index.html.twig');
     }
 
-    #[Route('/profile/saved-resources', name: 'app_profile_saved_resources', methods: ['GET'])]
-    public function savedResources(Request $request): Response
+    #[Route('/profile/saved', name: 'app_profile_saved', methods: ['GET'])]
+    public function saved(ResourceRepository $resourceRepository): Response
     {
         /** @var User|null $user */
         $user = $this->getUser();
+
         if (!$user) {
             return $this->redirectToRoute('app_login');
         }

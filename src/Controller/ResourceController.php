@@ -2,9 +2,9 @@
 
 namespace App\Controller;
 
-use App\Entity\Resource;
 use App\Entity\Comment;
-use App\Form\ResourceFormType;
+use App\Entity\Resource;
+use App\Form\ResourceType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -13,37 +13,45 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class ResourceController extends AbstractController
 {
-    #[Route('/resource/{id}/edit', name: 'resource_edit', methods: ['GET', 'POST'])]
-    public function edit(Resource $resource, Request $request, EntityManagerInterface $em): Response
+    #[Route('/resource/new', name: 'resource_new', methods: ['GET', 'POST'])]
+    public function new(Request $request, EntityManagerInterface $em): Response
     {
         $this->denyAccessUnlessGranted('ROLE_USER');
 
-        $user = $this->getUser();
-        if ($resource->getUser() !== $user && !$this->isGranted('ROLE_ADMIN')) {
-            throw $this->createAccessDeniedException('Vous ne pouvez modifier que vos propres ressources.');
-        }
+        $resource = new Resource();
+        $resource->setUser($this->getUser());
+        $resource->setResourceStatus('Publié');
+        $resource->setVisibilityStatus('public');
+        $resource->setPublishedAt(new \DateTimeImmutable());
+        $resource->setSharesCount(0);
+        $resource->setLikesCount(0);
 
-        $form = $this->createForm(ResourceFormType::class, $resource);
+        $form = $this->createForm(ResourceType::class, $resource);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            if ($resource->getResourceStatus() === 'Publiee' && $resource->getPublishedAt() === null) {
+            if (!$resource->getPublishedAt()) {
                 $resource->setPublishedAt(new \DateTimeImmutable());
             }
 
-            if ($resource->getResourceStatus() !== 'Publiee') {
-                $resource->setPublishedAt(null);
+            if (!$resource->getResourceStatus()) {
+                $resource->setResourceStatus('Publié');
             }
 
+            if (!$resource->getVisibilityStatus()) {
+                $resource->setVisibilityStatus('public');
+            }
+
+            $resource->setUser($this->getUser());
+
+            $em->persist($resource);
             $em->flush();
 
-            $this->addFlash('success', 'La ressource a été mise à jour avec succès.');
-
+            $this->addFlash('success', 'Ta ressource a bien été publiée.');
             return $this->redirectToRoute('resource_show', ['id' => $resource->getId()]);
         }
 
-        return $this->render('resource/edit.html.twig', [
-            'resource' => $resource,
+        return $this->render('resource/new.html.twig', [
             'form' => $form->createView(),
         ]);
     }
@@ -51,7 +59,6 @@ class ResourceController extends AbstractController
     #[Route('/resource/{id}', name: 'resource_show', methods: ['GET', 'POST'])]
     public function show(Resource $resource, Request $request, EntityManagerInterface $em): Response
     {
-        // Ajout commentaire (simple et efficace pour le prototype)
         if ($request->isMethod('POST')) {
             $this->denyAccessUnlessGranted('ROLE_USER');
 
@@ -75,7 +82,6 @@ class ResourceController extends AbstractController
             return $this->redirectToRoute('resource_show', ['id' => $resource->getId()]);
         }
 
-        // Affichage page détail
         $comments = $resource->getComments();
 
         return $this->render('resource/show.html.twig', [

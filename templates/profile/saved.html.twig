@@ -31,7 +31,8 @@
         {% for item in feedItems %}
             {% include 'resource/_card.html.twig' with {
                 resource: item.resource,
-                commentsCount: item.commentsCount
+                commentsCount: item.commentsCount,
+                isFavorite: true
             } only %}
         {% endfor %}
     {% endif %}
