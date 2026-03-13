@@ -8,6 +8,7 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use App\Enum\ResourceStatus;
 use App\Repository\ResourceRepository;
+use App\State\ResourceCollectionProvider;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -23,7 +24,8 @@ use Vich\UploaderBundle\Mapping\Attribute as Vich;
     operations: [
         new GetCollection(
             normalizationContext: ['groups' => ['resource:read']],
-            security: "true"
+            security: "true",
+            provider: ResourceCollectionProvider::class
         ),
         new Get(
             normalizationContext: ['groups' => ['resource:read']],
@@ -123,6 +125,9 @@ class Resource
      */
     #[ORM\OneToMany(targetEntity: UserLiked::class, mappedBy: 'resource')]
     private Collection $userLikeds;
+
+    #[Groups(['resource:read'])]
+    private ?bool $isLiked = null;
 
     public function __toString()
     {
@@ -402,6 +407,17 @@ class Resource
     public function setRelationKind(?RelationKind $relationKind): static
     {
         $this->relationKind = $relationKind;
+        return $this;
+    }
+
+    public function getIsLiked(): ?bool
+    {
+        return $this->isLiked;
+    }
+
+    public function setIsLiked(?bool $isLiked): static
+    {
+        $this->isLiked = $isLiked;
         return $this;
     }
 }

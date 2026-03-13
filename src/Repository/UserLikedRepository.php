@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\User;
 use App\Entity\UserLiked;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -16,28 +17,23 @@ class UserLikedRepository extends ServiceEntityRepository
         parent::__construct($registry, UserLiked::class);
     }
 
-//    /**
-//     * @return UserLiked[] Returns an array of UserLiked objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('u')
-//            ->andWhere('u.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('u.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
+    public function findLikedResourceIdsByUserAndResources(User $user, array $resources): array
+    {
+        if (empty($resources)) {
+            return [];
+        }
 
-//    public function findOneBySomeField($value): ?UserLiked
-//    {
-//        return $this->createQueryBuilder('u')
-//            ->andWhere('u.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+        $resourceIds = array_map(fn($resource) => $resource->getId(), $resources);
+
+        $rows = $this->createQueryBuilder('ul')
+            ->select('IDENTITY(ul.resource) as resourceId')
+            ->andWhere('ul.user = :user')
+            ->andWhere('ul.resource IN (:resourceIds)')
+            ->setParameter('user', $user)
+            ->setParameter('resourceIds', $resourceIds)
+            ->getQuery()
+            ->getArrayResult();
+
+        return array_map(fn($row) => (int) $row['resourceId'], $rows);
+    }
 }
