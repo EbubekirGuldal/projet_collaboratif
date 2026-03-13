@@ -34,6 +34,22 @@
                             {{ resource.title }}
                         </a>
                     </h2>
+
+                    {% if resource.ressourceType or resource.relationKind %}
+                        <div class="d-flex flex-wrap gap-2 mt-3">
+                            {% if resource.ressourceType %}
+                                <span class="badge text-bg-light">
+                                    Type : {{ resource.ressourceType.label }}
+                                </span>
+                            {% endif %}
+
+                            {% if resource.relationKind %}
+                                <span class="badge text-bg-secondary">
+                                    Public : {{ resource.relationKind.name }}
+                                </span>
+                            {% endif %}
+                        </div>
+                    {% endif %}
                 </header>
 
                 <div class="feed-card__body">
@@ -100,8 +116,8 @@
                     <button
                         class="btn btn-sm feed-action feed-action--bookmark btn-favorite {{ isFavorited ? 'btn-warning' : 'btn-outline-warning' }}"
                         data-id="{{ resource.id }}"
-                        title="Sauvegarder"
-                        aria-label="Sauvegarder"
+                        title="{{ isFavorited ? 'Retirer des enregistrements' : 'Sauvegarder' }}"
+                        aria-label="{{ isFavorited ? 'Retirer des enregistrements' : 'Sauvegarder' }}"
                         type="button"
                     >
                         <i class="fa-regular fa-bookmark"></i>

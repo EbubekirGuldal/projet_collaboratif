@@ -16,6 +16,11 @@ class RessourceType
     #[ORM\Column(length: 255)]
     private ?string $label = null;
 
+    public function __toString(): string
+    {
+        return $this->label ?? 'Type';
+    }
+
     public function getId(): ?int
     {
         return $this->id;

@@ -89,19 +89,21 @@ class Resource
     #[ORM\OneToMany(targetEntity: Comment::class, mappedBy: 'resource', orphanRemoval: true)]
     private Collection $comments;
 
-    /**
-     * NOTE: This is not a mapped field of entity metadata, just a simple property.
-     */
     #[Vich\UploadableField(mapping: 'products', fileNameProperty: 'image')]
     private ?File $imageFile = null;
 
-    #[ORM\ManyToOne(inversedBy: 'resources')]
+    #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: true)]
     #[Groups(['resource:read'])]
     private ?User $user = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['resource:read'])]
     private ?int $likesCount = 0;
+
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: true)]
+    private ?RessourceType $ressourceType = null;
 
     /**
      * @var Collection<int, ModerationLog>
@@ -120,7 +122,7 @@ class Resource
 
     public function __toString()
     {
-        return $this->id." - ".$this->title;
+        return $this->id . ' - ' . ($this->title ?? 'Ressource');
     }
 
     public function __construct()
@@ -136,7 +138,7 @@ class Resource
     public function onUpdated(): void
     {
         $this->updatedAt = new \DateTimeImmutable();
-    } 
+    }
 
     public function getLikesCount(): ?int
     {
@@ -162,7 +164,6 @@ class Resource
     public function setTitle(string $title): static
     {
         $this->title = $title;
-
         return $this;
     }
 
@@ -174,7 +175,6 @@ class Resource
     public function setContent(string $content): static
     {
         $this->content = $content;
-
         return $this;
     }
 
@@ -186,7 +186,6 @@ class Resource
     public function setExternalUrl(?string $externalUrl): static
     {
         $this->externalUrl = $externalUrl;
-
         return $this;
     }
 
@@ -198,7 +197,6 @@ class Resource
     public function setPublishedAt(?\DateTimeImmutable $publishedAt): static
     {
         $this->publishedAt = $publishedAt;
-
         return $this;
     }
 
@@ -210,7 +208,6 @@ class Resource
     public function setCreatedAt(?\DateTimeImmutable $createdAt): static
     {
         $this->createdAt = $createdAt;
-
         return $this;
     }
 
@@ -222,7 +219,6 @@ class Resource
     public function setUpdatedAt(?\DateTimeImmutable $updatedAt): static
     {
         $this->updatedAt = $updatedAt;
-
         return $this;
     }
 
@@ -234,7 +230,6 @@ class Resource
     public function setImage(?string $image): static
     {
         $this->image = $image;
-
         return $this;
     }
 
@@ -246,7 +241,6 @@ class Resource
     public function setVideo(?string $video): static
     {
         $this->video = $video;
-
         return $this;
     }
 
@@ -258,7 +252,6 @@ class Resource
     public function setSharesCount(int $sharesCount): static
     {
         $this->sharesCount = $sharesCount;
-
         return $this;
     }
 
@@ -283,7 +276,6 @@ class Resource
     public function removeComment(Comment $comment): static
     {
         if ($this->comments->removeElement($comment)) {
-            // set the owning side to null (unless already changed)
             if ($comment->getResource() === $this) {
                 $comment->setResource(null);
             }
@@ -297,7 +289,6 @@ class Resource
         $this->imageFile = $imageFile;
 
         if (null !== $imageFile) {
-            // Important : force update pour déclencher l’upload
             $this->updatedAt = new \DateTimeImmutable();
         }
     }
@@ -315,7 +306,6 @@ class Resource
     public function setUser(?User $user): static
     {
         $this->user = $user;
-
         return $this;
     }
 
@@ -340,7 +330,6 @@ class Resource
     public function removeModerationLog(ModerationLog $moderationLog): static
     {
         if ($this->moderationLogs->removeElement($moderationLog)) {
-            // set the owning side to null (unless already changed)
             if ($moderationLog->getResource() === $this) {
                 $moderationLog->setResource(null);
             }
@@ -357,7 +346,17 @@ class Resource
     public function setResourceStatus(ResourceStatus $resourceStatus): static
     {
         $this->resourceStatus = $resourceStatus;
+        return $this;
+    }
 
+    public function getRessourceType(): ?RessourceType
+    {
+        return $this->ressourceType;
+    }
+
+    public function setRessourceType(?RessourceType $ressourceType): static
+    {
+        $this->ressourceType = $ressourceType;
         return $this;
     }
 
@@ -388,6 +387,17 @@ class Resource
             }
         }
 
+        return $this;
+    }
+
+    public function getRelationKind(): ?RelationKind
+    {
+        return $this->relationKind;
+    }
+
+    public function setRelationKind(?RelationKind $relationKind): static
+    {
+        $this->relationKind = $relationKind;
         return $this;
     }
 

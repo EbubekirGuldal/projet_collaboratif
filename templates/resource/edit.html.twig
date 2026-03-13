@@ -1,8 +1,7 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}
-    Modifier la ressource |
-    {{ parent() }}
+    Modifier la ressource | {{ parent() }}
 {% endblock %}
 
 {% block body %}
@@ -27,7 +26,7 @@
                                 </a>
                                 <h1 class="h3 mt-2 mb-1">Modifier ma ressource</h1>
                                 <p class="text-body-secondary mb-0">
-                                    Mettez à jour le contenu, la visibilité et la présentation de votre ressource.
+                                    Mets à jour le contenu et les informations de ciblage de ta ressource.
                                 </p>
                             </div>
 
@@ -65,6 +64,18 @@
                                             <h2 class="h6 mb-3">Paramètres</h2>
 
                                             <div class="mb-3">
+                                                {{ form_label(form.ressourceType) }}
+                                                {{ form_widget(form.ressourceType) }}
+                                                {{ form_errors(form.ressourceType) }}
+                                            </div>
+
+                                            <div class="mb-3">
+                                                {{ form_label(form.relationKind) }}
+                                                {{ form_widget(form.relationKind) }}
+                                                {{ form_errors(form.relationKind) }}
+                                            </div>
+
+                                            <div class="mb-3">
                                                 {{ form_label(form.externalUrl) }}
                                                 {{ form_widget(form.externalUrl) }}
                                                 {{ form_errors(form.externalUrl) }}
@@ -80,6 +91,7 @@
                                                 {{ form_label(form.imageFile) }}
                                                 {{ form_widget(form.imageFile) }}
                                                 {{ form_errors(form.imageFile) }}
+
                                                 {% if resource.image %}
                                                     <div class="mt-3">
                                                         <p class="small text-body-secondary mb-2">Illustration actuelle</p>

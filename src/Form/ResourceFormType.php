@@ -2,7 +2,10 @@
 
 namespace App\Form;
 
+use App\Entity\RelationKind;
 use App\Entity\Resource;
+use App\Entity\RessourceType;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -30,6 +33,22 @@ class ResourceFormType extends AbstractType
                     'rows' => 8,
                     'placeholder' => 'Décrivez la ressource, son utilité et son contexte.',
                 ],
+            ])
+            ->add('ressourceType', EntityType::class, [
+                'class' => RessourceType::class,
+                'choice_label' => 'label',
+                'label' => 'Type de ressource',
+                'required' => false,
+                'placeholder' => 'Choisir un type',
+                'attr' => ['class' => 'form-select'],
+            ])
+            ->add('relationKind', EntityType::class, [
+                'class' => RelationKind::class,
+                'choice_label' => 'name',
+                'label' => 'Public concerné',
+                'required' => false,
+                'placeholder' => 'Choisir un public',
+                'attr' => ['class' => 'form-select'],
             ])
             ->add('externalUrl', UrlType::class, [
                 'label' => 'Lien externe',

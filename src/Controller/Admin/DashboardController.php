@@ -4,7 +4,9 @@ namespace App\Controller\Admin;
 
 use App\Entity\Comment;
 use App\Entity\ModerationLog;
+use App\Entity\RelationKind;
 use App\Entity\Resource;
+use App\Entity\RessourceType;
 use App\Entity\User;
 use App\Repository\DashboardStatsRepository;
 use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminDashboard;
@@ -20,12 +22,12 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[AdminDashboard(routePath: '/admin', routeName: 'admin')]
 class DashboardController extends AbstractDashboardController
 {
-    public function __construct( 
+    public function __construct(
         private readonly DashboardStatsRepository $dashboardStatsRepository,
         private readonly RequestStack $requestStack
-        
     ) {
     }
+
     public function index(): Response
     {
         $request = $this->requestStack->getMainRequest() ?? $this->requestStack->getCurrentRequest();
@@ -42,7 +44,6 @@ class DashboardController extends AbstractDashboardController
             'isShared' => $stats['sharesCount'],
         ]);
     }
-
 
     public function configureAssets(): Assets
     {
@@ -64,6 +65,8 @@ class DashboardController extends AbstractDashboardController
         yield MenuItem::linkToCrud('Utilisateur', 'fas fa-user', User::class);
         yield MenuItem::linkToCrud('Commentaire', 'fas fa-comment', Comment::class);
         yield MenuItem::linkToCrud('Ressource', 'fas fa-image', Resource::class);
+        yield MenuItem::linkToCrud('Types de ressource', 'fas fa-tags', RessourceType::class);
+        yield MenuItem::linkToCrud('Publics concernés', 'fas fa-users', RelationKind::class);
         yield MenuItem::linkToCrud('Modération', 'fas fa-user-tie', ModerationLog::class);
         yield MenuItem::section();
         yield MenuItem::linkToRoute('Quitter', 'fas fa-right-from-bracket', 'app_home');
