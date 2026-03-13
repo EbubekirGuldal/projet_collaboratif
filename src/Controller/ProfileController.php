@@ -2,8 +2,8 @@
 
 namespace App\Controller;
 
+use App\Entity\Resource;
 use App\Entity\User;
-use App\Repository\ResourceRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -32,7 +32,7 @@ final class ProfileController extends AbstractController
     }
 
     #[Route('/profile/saved', name: 'app_profile_saved', methods: ['GET'])]
-    public function saved(ResourceRepository $resourceRepository): Response
+    public function saved(Request $request): Response
     {
         /** @var User|null $user */
         $user = $this->getUser();

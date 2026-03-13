@@ -20,8 +20,6 @@ class ResourceController extends AbstractController
 
         $resource = new Resource();
         $resource->setUser($this->getUser());
-        $resource->setResourceStatus('Publié');
-        $resource->setVisibilityStatus('public');
         $resource->setPublishedAt(new \DateTimeImmutable());
         $resource->setSharesCount(0);
         $resource->setLikesCount(0);
@@ -32,14 +30,6 @@ class ResourceController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             if (!$resource->getPublishedAt()) {
                 $resource->setPublishedAt(new \DateTimeImmutable());
-            }
-
-            if (!$resource->getResourceStatus()) {
-                $resource->setResourceStatus('Publié');
-            }
-
-            if (!$resource->getVisibilityStatus()) {
-                $resource->setVisibilityStatus('public');
             }
 
             $resource->setUser($this->getUser());
