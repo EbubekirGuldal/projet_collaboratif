@@ -114,6 +114,10 @@ class Resource
     #[ORM\Column(enumType: ResourceStatus::class)]
     private ResourceStatus $resourceStatus = ResourceStatus::PUBLIC;
 
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: true)]
+    private ?RelationKind $relationKind = null;
+
     /**
      * @var Collection<int, UserLiked>
      */
@@ -400,5 +404,4 @@ class Resource
         $this->relationKind = $relationKind;
         return $this;
     }
-
 }
