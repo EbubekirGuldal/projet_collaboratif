@@ -244,6 +244,21 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->firstName;
     }
 
+    public function isAdmin(): bool
+    {
+        return in_array('ROLE_ADMIN', $this->roles);
+    }
+
+    public function isModerator(): bool
+    {
+        return in_array('ROLE_MODERATOR', $this->roles);
+    }
+
+    public function isSuperAdmin(): bool
+    {
+        return in_array('ROLE_SUPER_ADMIN', $this->roles);
+    }
+
     public function setFirstName(string $firstName): static
     {
         $this->firstName = $firstName;

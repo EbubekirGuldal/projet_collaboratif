@@ -1,0 +1,17 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<div class="container py-4">
+    <h2>Mon activité</h2>
+
+    <h4>Favoris</h4>
+    {% for s in states if s.isSaved %}
+        <p>{{ s.resource.title }}</p>
+    {% endfor %}
+
+    <h4>Exploité</h4>
+    {% for s in states if s.isExploited %}
+        <p>{{ s.resource.title }}</p>
+    {% endfor %}
+</div>
+{% endblock %}

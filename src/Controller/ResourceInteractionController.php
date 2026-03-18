@@ -2,157 +2,82 @@
 
 namespace App\Controller;
 
-use App\Entity\ModerationLog;
 use App\Entity\Resource;
-use App\Entity\ResourceLike;
 use App\Entity\User;
-use App\Repository\ResourceLikeRepository;
+use App\Entity\UserResourceState;
+use App\Repository\UserResourceStateRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
 class ResourceInteractionController extends AbstractController
 {
+    private function getState(User $user, Resource $resource, UserResourceStateRepository $repo, EntityManagerInterface $em): UserResourceState
+    {
+        $state = $repo->findOne($user, $resource);
+
+        if (!$state) {
+            $state = new UserResourceState();
+            $state->setUser($user);
+            $state->setResource($resource);
+            $em->persist($state);
+        }
+
+        return $state;
+    }
+
     #[Route('/resource/{id}/like', name: 'resource_like', methods: ['POST'])]
-    public function toggleLike(
-        Resource $resource,
-        EntityManagerInterface $em,
-        ResourceLikeRepository $resourceLikeRepository
-    ): JsonResponse {
-        /** @var User|null $user */
-        $user = $this->getUser();
-
-        if (!$user) {
-            return new JsonResponse(['error' => 'Unauthorized'], 403);
-        }
-
-        $existingLike = $resourceLikeRepository->findOneByUserAndResource($user, $resource);
-
-        if ($existingLike) {
-            $em->remove($existingLike);
-            $liked = false;
-        } else {
-            $like = new ResourceLike();
-            $like->setUser($user);
-            $like->setResource($resource);
-
-            $em->persist($like);
-            $liked = true;
-        }
-
-        $em->flush();
-
-        $likesCount = $resourceLikeRepository->countForResource($resource);
-        $resource->setLikesCount($likesCount);
-        $em->flush();
-
-        return new JsonResponse([
-            'likes' => $likesCount,
-            'liked' => $liked,
-        ]);
-    }
-
-    #[Route('/resource/{id}/share', name: 'resource_share', methods: ['POST'])]
-    public function share(Resource $resource, EntityManagerInterface $em, Request $request): JsonResponse
+    public function like(Resource $resource, EntityManagerInterface $em, UserResourceStateRepository $repo): JsonResponse
     {
-        $session = $request->getSession();
-        $key = 'shared_resource_' . $resource->getId();
+        $user = $this->getUser();
+        if (!$user) return new JsonResponse(['error' => 'Unauthorized'], 403);
 
-        if ($session && $session->has($key)) {
-            return new JsonResponse([
-                'shares' => $resource->getSharesCount() ?? 0,
-                'shared' => false,
-                'message' => 'Déjà partagé dans cette session.',
-            ]);
-        }
+        $state = $this->getState($user, $resource, $repo, $em);
 
-        $resource->setSharesCount(($resource->getSharesCount() ?? 0) + 1);
+        $state->setIsLiked(!$state->isLiked());
 
-        if ($session) {
-            $session->set($key, true);
-        }
+        $resource->setLikesCount(
+            $state->isLiked()
+                ? $resource->getLikesCount() + 1
+                : max(0, $resource->getLikesCount() - 1)
+        );
 
         $em->flush();
 
         return new JsonResponse([
-            'shares' => $resource->getSharesCount(),
-            'shared' => true,
+            'liked' => $state->isLiked(),
+            'likes' => $resource->getLikesCount()
         ]);
     }
 
-    #[Route('/resource/{id}/favorite', name: 'resource_favorite', methods: ['POST'])]
-    public function toggleFavorite(Resource $resource, EntityManagerInterface $em): JsonResponse
+    #[Route('/resource/{id}/save', name: 'resource_save', methods: ['POST'])]
+    public function save(Resource $resource, EntityManagerInterface $em, UserResourceStateRepository $repo): JsonResponse
     {
-        /** @var User|null $user */
         $user = $this->getUser();
+        if (!$user) return new JsonResponse(['error' => 'Unauthorized'], 403);
 
-        if (!$user) {
-            return new JsonResponse(['error' => 'Unauthorized'], 403);
-        }
+        $state = $this->getState($user, $resource, $repo, $em);
 
-        if ($user->isFavorite($resource)) {
-            $user->removeFavorite($resource);
-            $favorited = false;
-        } else {
-            $user->addFavorite($resource);
-            $favorited = true;
-        }
+        $state->setIsSaved(!$state->isSaved());
 
         $em->flush();
 
-        return new JsonResponse([
-            'favorited' => $favorited,
-        ]);
+        return new JsonResponse(['saved' => $state->isSaved()]);
     }
 
-    #[Route('/resource/{id}/report', name: 'resource_report', methods: ['POST'])]
-    public function report(Resource $resource, Request $request, EntityManagerInterface $em): Response
+    #[Route('/resource/{id}/exploit', name: 'resource_exploit', methods: ['POST'])]
+    public function exploit(Resource $resource, EntityManagerInterface $em, UserResourceStateRepository $repo): JsonResponse
     {
-        /** @var User|null $user */
         $user = $this->getUser();
+        if (!$user) return new JsonResponse(['error' => 'Unauthorized'], 403);
 
-        if (!$user) {
-            $this->addFlash('warning', 'Connectez-vous pour signaler une ressource.');
+        $state = $this->getState($user, $resource, $repo, $em);
 
-            return $this->redirectToRoute('app_login');
-        }
+        $state->setIsExploited(!$state->isExploited());
 
-        if (!$this->isCsrfTokenValid('report_resource_' . $resource->getId(), (string) $request->request->get('_token'))) {
-            $this->addFlash('danger', 'La demande de signalement est invalide.');
-
-            return $this->redirectToRoute('resource_show', ['id' => $resource->getId()]);
-        }
-
-        $category = trim((string) $request->request->get('category', ''));
-        $details = trim((string) $request->request->get('details', ''));
-
-        if ($category === '') {
-            $this->addFlash('warning', 'Choisissez un motif de signalement.');
-
-            return $this->redirectToRoute('resource_show', ['id' => $resource->getId()]);
-        }
-
-        $reason = sprintf('Catégorie : %s', $category);
-        if ($details !== '') {
-            $reason .= sprintf("\nDétails : %s", $details);
-        }
-
-        $log = new ModerationLog();
-        $log
-            ->setTargetType('resource')
-            ->setUser($user)
-            ->setAction('report')
-            ->setResource($resource)
-            ->setReason($reason);
-
-        $em->persist($log);
         $em->flush();
 
-        $this->addFlash('success', 'Le signalement a bien été transmis à l’équipe de modération.');
-
-        return $this->redirectToRoute('resource_show', ['id' => $resource->getId()]);
+        return new JsonResponse(['exploited' => $state->isExploited()]);
     }
 }
