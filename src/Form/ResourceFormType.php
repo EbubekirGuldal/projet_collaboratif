@@ -2,7 +2,9 @@
 
 namespace App\Form;
 
+use App\Entity\Category;
 use App\Entity\Resource;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -38,6 +40,16 @@ class ResourceFormType extends AbstractType
                 'attr' => [
                     'class' => 'form-control',
                     'placeholder' => 'https://...',
+                ],
+            ])
+            ->add('category', EntityType::class, [
+                'class' => Category::class,
+                'choice_label' => 'name',
+                'label' => 'Categorie',
+                'required' => false,
+                'placeholder' => 'Selectionner une categorie',
+                'attr' => [
+                    'class' => 'form-select',
                 ],
             ])
             ->add('video', TextType::class, [
