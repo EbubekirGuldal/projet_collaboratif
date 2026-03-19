@@ -6,6 +6,7 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
+use App\Entity\Category;
 use App\Enum\ResourceStatus;
 use App\Repository\ResourceRepository;
 use App\State\ResourceCollectionProvider;
@@ -29,7 +30,7 @@ use Vich\UploaderBundle\Mapping\Attribute as Vich;
         ),
         new Get(
             normalizationContext: ['groups' => ['resource:read']],
-            security: "true"
+            security: "object.getResourceStatus().value == 'public' or (user and (object.getUser() == user or object.getResourceStatus().value == 'shared' or is_granted('ROLE_MODERATOR') or is_granted('ROLE_ADMIN')))"
         ),
         new Patch(
             normalizationContext: ['groups' => ['resource:read']],
@@ -94,7 +95,7 @@ class Resource
     #[Vich\UploadableField(mapping: 'products', fileNameProperty: 'image')]
     private ?File $imageFile = null;
 
-    #[ORM\ManyToOne]
+    #[ORM\ManyToOne(inversedBy: 'resources')]
     #[ORM\JoinColumn(nullable: true)]
     #[Groups(['resource:read'])]
     private ?User $user = null;
@@ -119,6 +120,10 @@ class Resource
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: true)]
     private ?RelationKind $relationKind = null;
+
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: true)]
+    private ?Category $category = null;
 
     /**
      * @var Collection<int, UserLiked>
@@ -410,6 +415,18 @@ class Resource
         return $this;
     }
 
+    public function getCategory(): ?Category
+    {
+        return $this->category;
+    }
+
+    public function setCategory(?Category $category): static
+    {
+        $this->category = $category;
+
+        return $this;
+    }
+
     public function getIsLiked(): ?bool
     {
         return $this->isLiked;
@@ -419,5 +436,25 @@ class Resource
     {
         $this->isLiked = $isLiked;
         return $this;
+    }
+
+    public function isPrivate(): bool
+    {
+        return $this->resourceStatus === ResourceStatus::PRIVATE;
+    }
+
+    public function isShared(): bool
+    {
+        return $this->resourceStatus === ResourceStatus::SHARED;
+    }
+
+    public function isPubliclyVisible(): bool
+    {
+        return $this->resourceStatus === ResourceStatus::PUBLIC;
+    }
+
+    public function isUnderReview(): bool
+    {
+        return $this->resourceStatus === ResourceStatus::UNDER_REVIEW;
     }
 }

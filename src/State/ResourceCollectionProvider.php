@@ -6,7 +6,8 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
 use App\Entity\Resource;
 use App\Entity\User;
-use App\Repository\UserLikedRepository;
+use App\Repository\ResourceLikeRepository;
+use App\Security\ResourceAccessResolver;
 use Symfony\Bundle\SecurityBundle\Security;
 
 final class ResourceCollectionProvider implements ProviderInterface
@@ -15,7 +16,8 @@ final class ResourceCollectionProvider implements ProviderInterface
         #[\Symfony\Component\DependencyInjection\Attribute\Autowire(service: 'api_platform.doctrine.orm.state.collection_provider')]
         private ProviderInterface $collectionProvider,
         private Security $security,
-        private UserLikedRepository $userLikedRepository,
+        private ResourceLikeRepository $resourceLikeRepository,
+        private ResourceAccessResolver $resourceAccessResolver,
     ) {}
 
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): iterable
@@ -23,31 +25,35 @@ final class ResourceCollectionProvider implements ProviderInterface
         $resources = $this->collectionProvider->provide($operation, $uriVariables, $context);
 
         $user = $this->security->getUser();
-
-        if (!$user instanceof User) {
-            foreach ($resources as $resource) {
-                if ($resource instanceof Resource) {
-                    $resource->setIsLiked(false);
-                }
-            }
-
-            return $resources;
-        }
-
         $resourceArray = [];
+
         foreach ($resources as $resource) {
-            if ($resource instanceof Resource) {
+            if ($resource instanceof Resource && $this->resourceAccessResolver->canView($user instanceof User ? $user : null, $resource)) {
                 $resourceArray[] = $resource;
             }
         }
 
-        $likedIds = $this->userLikedRepository->findLikedResourceIdsByUserAndResources($user, $resourceArray);
+        if (!$user instanceof User) {
+            foreach ($resourceArray as $resource) {
+                $resource->setIsLiked(false);
+            }
+
+            return $resourceArray;
+        }
+
+        $likedIds = array_map(
+            static fn (Resource $resource): int => $resource->getId(),
+            array_filter(
+                $resourceArray,
+                fn (Resource $resource): bool => $this->resourceLikeRepository->hasUserLiked($user, $resource)
+            )
+        );
         $likedIdsMap = array_flip($likedIds);
 
         foreach ($resourceArray as $resource) {
             $resource->setIsLiked(isset($likedIdsMap[$resource->getId()]));
         }
 
-        return $resources;
+        return $resourceArray;
     }
 }

@@ -2,11 +2,14 @@
 
 namespace App\Form;
 
+use App\Entity\Category;
 use App\Entity\RelationKind;
 use App\Entity\Resource;
 use App\Entity\RessourceType;
+use App\Enum\ResourceStatus;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\UrlType;
@@ -22,14 +25,14 @@ class ResourceType extends AbstractType
             ->add('title', TextType::class, [
                 'label' => 'Titre',
                 'attr' => [
-                    'placeholder' => 'Ex. Guide d’entraide étudiante',
+                    'placeholder' => 'Ex. Guide d entraide etudiante',
                     'maxlength' => 255,
                 ],
             ])
             ->add('content', TextareaType::class, [
                 'label' => 'Description',
                 'attr' => [
-                    'placeholder' => 'Explique clairement en quoi consiste la ressource, à qui elle sert et comment y accéder.',
+                    'placeholder' => 'Explique clairement la ressource, son utilite et son public.',
                     'rows' => 8,
                 ],
             ])
@@ -40,12 +43,27 @@ class ResourceType extends AbstractType
                 'required' => false,
                 'placeholder' => 'Choisir un type',
             ])
+            ->add('category', EntityType::class, [
+                'class' => Category::class,
+                'choice_label' => 'name',
+                'label' => 'Categorie',
+                'required' => false,
+                'placeholder' => 'Choisir une categorie',
+            ])
             ->add('relationKind', EntityType::class, [
                 'class' => RelationKind::class,
                 'choice_label' => 'name',
-                'label' => 'Public concerné',
+                'label' => 'Public concerne',
                 'required' => false,
                 'placeholder' => 'Choisir un public',
+            ])
+            ->add('resourceStatus', ChoiceType::class, [
+                'label' => 'Visibilite',
+                'choices' => [
+                    'Privee' => ResourceStatus::PRIVATE,
+                    'Partagee' => ResourceStatus::SHARED,
+                    'Publique' => ResourceStatus::PUBLIC,
+                ],
             ])
             ->add('externalUrl', UrlType::class, [
                 'label' => 'Lien externe',
@@ -61,7 +79,7 @@ class ResourceType extends AbstractType
                 'allow_delete' => false,
                 'download_uri' => false,
                 'asset_helper' => true,
-                'help' => 'Optionnel. Formats conseillés : JPG, PNG, WebP.',
+                'help' => 'Optionnel. Formats conseilles : JPG, PNG, WebP.',
             ]);
     }
 

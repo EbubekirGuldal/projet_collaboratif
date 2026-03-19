@@ -2,16 +2,27 @@
 
 {% block body %}
 <div class="container py-4">
-    <h2>Mon activité</h2>
+    <h2>Mon activite</h2>
+
+    {% set savedStates = states|filter(state => state.isSaved) %}
+    {% set exploitedStates = states|filter(state => state.isExploited) %}
 
     <h4>Favoris</h4>
-    {% for s in states if s.isSaved %}
-        <p>{{ s.resource.title }}</p>
-    {% endfor %}
+    {% if savedStates is empty %}
+        <p class="text-muted">Aucune ressource sauvegardee.</p>
+    {% else %}
+        {% for state in savedStates %}
+            <p>{{ state.resource.title }}</p>
+        {% endfor %}
+    {% endif %}
 
-    <h4>Exploité</h4>
-    {% for s in states if s.isExploited %}
-        <p>{{ s.resource.title }}</p>
-    {% endfor %}
+    <h4>Exploite</h4>
+    {% if exploitedStates is empty %}
+        <p class="text-muted">Aucune ressource exploitee.</p>
+    {% else %}
+        {% for state in exploitedStates %}
+            <p>{{ state.resource.title }}</p>
+        {% endfor %}
+    {% endif %}
 </div>
 {% endblock %}

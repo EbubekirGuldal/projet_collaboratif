@@ -4,7 +4,6 @@
 
 {% block body %}
 <div class="container py-4">
-
     {% for label, messages in app.flashes %}
         {% for message in messages %}
             <div class="alert alert-{{ label }} alert-dismissible fade show" role="alert">
@@ -16,7 +15,6 @@
 
     <div class="row g-4">
         <div class="col-12 col-lg-8">
-
             <article class="card border-0 shadow-sm mb-3">
                 <div class="card-body">
                     <a class="text-decoration-none small" href="{{ path('app_home') }}">
@@ -24,6 +22,19 @@
                     </a>
 
                     <h1 class="h4 mt-2 mb-2">{{ resource.title }}</h1>
+
+                    <div class="d-flex flex-wrap gap-2 mb-3">
+                        {% if resource.category %}
+                            <span class="badge text-bg-light">Categorie : {{ resource.category.name }}</span>
+                        {% endif %}
+                        {% if resource.ressourceType %}
+                            <span class="badge text-bg-light">Type : {{ resource.ressourceType.label }}</span>
+                        {% endif %}
+                        {% if resource.relationKind %}
+                            <span class="badge text-bg-secondary">Public : {{ resource.relationKind.name }}</span>
+                        {% endif %}
+                        <span class="badge text-bg-dark">Statut : {{ resource.resourceStatus.value }}</span>
+                    </div>
 
                     <div class="text-muted small mb-3">
                         {% if resource.publishedAt %}
@@ -46,18 +57,24 @@
                         {{ resource.content|raw }}
                     </div>
 
+                    {% if resource.externalUrl %}
+                        <p class="mb-3">
+                            <a href="{{ resource.externalUrl }}" target="_blank" rel="noopener">
+                                Consulter le lien externe
+                            </a>
+                        </p>
+                    {% endif %}
+
                     <div class="d-flex flex-wrap gap-2">
-                        {% if app.user %}
-                        {% if resource.user == app.user or is_granted('ROLE_ADMIN') %}
+                        {% if app.user and (resource.user == app.user or is_granted('ROLE_ADMIN')) %}
                             <a class="btn btn-dark" href="{{ path('resource_edit', { id: resource.id }) }}">
                                 Modifier la ressource
                             </a>
                         {% endif %}
 
-                        {% if is_granted('ROLE_ADMIN') %}
-                            <a class="btn btn-primary" href="{{ path('admin') }}">Admin</a>
+                        {% if is_granted('ROLE_MODERATOR') %}
+                            <a class="btn btn-primary" href="{{ path('admin') }}">Administration</a>
                         {% endif %}
-                    {% endif %}
 
                         {% if app.user %}
                             <button type="button" class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#reportResourceModal">
@@ -74,12 +91,19 @@
                     <h2 class="h6 mb-3">Ajouter un commentaire</h2>
 
                     {% if app.user %}
-                        <form method="post">
-                            <div class="mb-2">
-                                <textarea class="form-control" name="content" rows="3" placeholder="&Eacute;crire un commentaire..."></textarea>
-                            </div>
-                            <button class="btn btn-primary btn-sm" type="submit">Publier</button>
-                        </form>
+                        {% if app.user.isVerified %}
+                            <form method="post">
+                                <div class="mb-2">
+                                    <textarea class="form-control" name="content" rows="3" placeholder="Ecrire un commentaire..."></textarea>
+                                </div>
+                                <button class="btn btn-primary btn-sm" type="submit">Publier</button>
+                                <p class="text-muted small mt-2 mb-0">Les commentaires des citoyens sont moderes avant publication.</p>
+                            </form>
+                        {% else %}
+                            <p class="text-muted small mb-0">
+                                Verifiez votre adresse email pour commenter.
+                            </p>
+                        {% endif %}
                     {% else %}
                         <p class="text-muted small mb-0">
                             Connectez-vous pour commenter.
@@ -94,7 +118,7 @@
                     <h2 class="h6 mb-3">Commentaires ({{ comments|length }})</h2>
 
                     {% if comments is empty %}
-                        <p class="text-muted small mb-0">Aucun commentaire pour le moment.</p>
+                        <p class="text-muted small mb-0">Aucun commentaire visible pour le moment.</p>
                     {% else %}
                         <div class="d-flex flex-column gap-3">
                             {% for comment in comments %}
@@ -113,53 +137,49 @@
                                             {% endif %}
                                         </span>
                                     </div>
-                                    <div>{{ comment.content }}</div>
+                                    <div class="mb-2">{{ comment.content }}</div>
+                                    {% if comment.status.value != 'approved' %}
+                                        <span class="badge text-bg-warning">Statut : {{ comment.status.value }}</span>
+                                    {% endif %}
                                 </div>
                             {% endfor %}
                         </div>
                     {% endif %}
                 </div>
             </div>
-
         </div>
 
         <div class="col-12 col-lg-4">
             <div class="card border-0 shadow-sm">
                 <div class="card-body">
-                    <h2 class="h6">Actions</h2>
-                    <div class="card border-0 shadow-sm">
-    <div class="card-body">
-        <h2 class="h5 mb-3">Actions</h2>
+                    <h2 class="h5 mb-3">Actions</h2>
 
-        <div class="d-grid gap-2">
-            <a class="btn btn-outline-primary" href="{{ path('app_home') }}">
-                Retour fil
-            </a>
+                    <div class="d-grid gap-2">
+                        <a class="btn btn-outline-primary" href="{{ path('app_home') }}">
+                            Retour au fil
+                        </a>
 
-                            {% if app.user and (resource.user == app.user or is_granted('ROLE_ADMIN')) %}
-                                <a class="btn btn-dark" href="{{ path('resource_edit', { id: resource.id }) }}">
-                                    Modifier la ressource
-                                </a>
-                            {% endif %}
+                        {% if app.user and (resource.user == app.user or is_granted('ROLE_ADMIN')) %}
+                            <a class="btn btn-dark" href="{{ path('resource_edit', { id: resource.id }) }}">
+                                Modifier la ressource
+                            </a>
+                        {% endif %}
 
-                            {% if app.user %}
-                                <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#reportResourceModal">
-                                    Signaler la ressource
-                                </button>
-                            {% endif %}
+                        {% if app.user %}
+                            <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#reportResourceModal">
+                                Signaler la ressource
+                            </button>
+                        {% endif %}
 
-                            {% if is_granted('ROLE_ADMIN') %}
-                                <a class="btn btn-primary" href="{{ path('admin') }}">
-                                    Admin
-                                </a>
-                            {% endif %}
-                        </div>
+                        {% if is_granted('ROLE_MODERATOR') %}
+                            <a class="btn btn-primary" href="{{ path('admin') }}">
+                                Administration
+                            </a>
+                        {% endif %}
                     </div>
-                </div>
                 </div>
             </div>
         </div>
-
     </div>
 </div>
 
@@ -181,16 +201,16 @@
                             <select class="form-select" id="reportCategory" name="category" required>
                                 <option value="">Choisir un motif</option>
                                 <option value="information_incorrecte">Information incorrecte</option>
-                                <option value="contenu_inapproprie">Contenu inappropri&eacute;</option>
+                                <option value="contenu_inapproprie">Contenu inapproprie</option>
                                 <option value="lien_indisponible">Lien indisponible</option>
-                                <option value="ressource_obsolete">Ressource obsol&egrave;te</option>
+                                <option value="ressource_obsolete">Ressource obsolete</option>
                                 <option value="autre">Autre</option>
                             </select>
                         </div>
 
                         <div class="mb-0">
-                            <label class="form-label" for="reportDetails">D&eacute;tails</label>
-                            <textarea class="form-control" id="reportDetails" name="details" rows="4" placeholder="Expliquez bri&egrave;vement le probl&egrave;me constat&eacute;."></textarea>
+                            <label class="form-label" for="reportDetails">Details</label>
+                            <textarea class="form-control" id="reportDetails" name="details" rows="4" placeholder="Expliquez brievement le probleme constate."></textarea>
                         </div>
                     </div>
 

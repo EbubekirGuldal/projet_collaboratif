@@ -35,8 +35,14 @@
                         </a>
                     </h2>
 
-                    {% if resource.ressourceType or resource.relationKind %}
+                    {% if resource.category or resource.ressourceType or resource.relationKind %}
                         <div class="d-flex flex-wrap gap-2 mt-3">
+                            {% if resource.category %}
+                                <span class="badge text-bg-light">
+                                    Categorie : {{ resource.category.name }}
+                                </span>
+                            {% endif %}
+
                             {% if resource.ressourceType %}
                                 <span class="badge text-bg-light">
                                     Type : {{ resource.ressourceType.label }}
@@ -46,6 +52,12 @@
                             {% if resource.relationKind %}
                                 <span class="badge text-bg-secondary">
                                     Public : {{ resource.relationKind.name }}
+                                </span>
+                            {% endif %}
+
+                            {% if resource.resourceStatus.value != 'public' %}
+                                <span class="badge text-bg-dark">
+                                    {{ resource.resourceStatus.value }}
                                 </span>
                             {% endif %}
                         </div>

@@ -20,14 +20,11 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Vich\UploaderBundle\Form\Type\VichImageType;
 
-#[IsGranted('ROLE_ADMIN')]
+#[IsGranted('ROLE_SUPER_ADMIN')]
 class UserCrudController extends AbstractCrudController
 {
-    private UserPasswordHasherInterface $passwordHasher;
-
-    public function __construct(UserPasswordHasherInterface $passwordHasher)
+    public function __construct(private readonly UserPasswordHasherInterface $passwordHasher)
     {
-        $this->passwordHasher = $passwordHasher;
     }
 
     public static function getEntityFqcn(): string
@@ -50,10 +47,10 @@ class UserCrudController extends AbstractCrudController
     {
         return $actions
             ->add(Crud::PAGE_INDEX, Action::DETAIL)
-            ->update(Crud::PAGE_INDEX, Action::NEW, fn(Action $action): Action => $action->setIcon('fa fa-user')->setLabel('Créer un utilisateur'))
-            ->update(Crud::PAGE_INDEX, Action::EDIT, fn(Action $action): Action => $action->setIcon('fa fa-edit'))
-            ->update(Crud::PAGE_INDEX, Action::DETAIL, fn(Action $action): Action => $action->setIcon('fa fa-eye'))
-            ->update(Crud::PAGE_INDEX, Action::DELETE, fn(Action $action): Action => $action->setIcon('fa fa-trash'));
+            ->update(Crud::PAGE_INDEX, Action::NEW, fn (Action $action): Action => $action->setIcon('fa fa-user')->setLabel('Creer un utilisateur'))
+            ->update(Crud::PAGE_INDEX, Action::EDIT, fn (Action $action): Action => $action->setIcon('fa fa-edit'))
+            ->update(Crud::PAGE_INDEX, Action::DETAIL, fn (Action $action): Action => $action->setIcon('fa fa-eye'))
+            ->update(Crud::PAGE_INDEX, Action::DELETE, fn (Action $action): Action => $action->setIcon('fa fa-trash'));
     }
 
     public function configureFields(string $pageName): iterable
@@ -62,11 +59,11 @@ class UserCrudController extends AbstractCrudController
             FormField::addTab('Profil')->setIcon('fa fa-user'),
 
             FormField::addColumn(6),
-            FormField::addPanel('Identité')->setIcon('fa fa-id-card'),
+            FormField::addPanel('Identite')->setIcon('fa fa-id-card'),
             IdField::new('id')->hideOnForm(),
-            TextField::new('username', 'Nom d\'utilisateur'),
+            TextField::new('username', 'Nom d utilisateur'),
             EmailField::new('email', 'Email'),
-            TextField::new('firstName', 'Prénom'),
+            TextField::new('firstName', 'Prenom'),
             TextField::new('lastName', 'Nom'),
             TextField::new('password', 'Mot de passe')->hideOnIndex(),
 
@@ -83,31 +80,33 @@ class UserCrudController extends AbstractCrudController
                     'allow_delete' => true,
                     'download_uri' => true,
                 ])
-                ->setHelp('Formats conseillés : JPG/PNG/WebP'),
+                ->setHelp('Formats conseilles : JPG/PNG/WebP'),
 
             FormField::addTab('Statut')->setIcon('fa fa-shield-alt'),
 
             FormField::addColumn(6),
-            FormField::addPanel('Accès & validation')->setIcon('fa fa-user-check'),
-            BooleanField::new('isVerified', 'Compte vérifié'),
+            FormField::addPanel('Acces et validation')->setIcon('fa fa-user-check'),
+            BooleanField::new('isVerified', 'Compte verifie'),
             BooleanField::new('isActive', 'Compte actif'),
-            ChoiceField::new('roles', 'Rôles')
+            ChoiceField::new('roles', 'Roles')
                 ->setChoices([
                     'Utilisateur' => 'ROLE_USER',
+                    'Moderateur' => 'ROLE_MODERATOR',
                     'Administrateur' => 'ROLE_ADMIN',
+                    'Super administrateur' => 'ROLE_SUPER_ADMIN',
                 ])
                 ->allowMultipleChoices()
                 ->onlyOnForms(),
 
             FormField::addColumn(6),
             FormField::addPanel('Dates')->setIcon('fa fa-clock'),
-            DateTimeField::new('lastConnexion', 'Dernière connexion')
+            DateTimeField::new('lastConnexion', 'Derniere connexion')
                 ->hideWhenCreating()
                 ->setFormTypeOption('disabled', true),
-            DateTimeField::new('createdAt', 'Créé le')
+            DateTimeField::new('createdAt', 'Cree le')
                 ->hideWhenCreating()
                 ->setFormTypeOption('disabled', true),
-            DateTimeField::new('updatedAt', 'Mis à jour le')
+            DateTimeField::new('updatedAt', 'Mis a jour le')
                 ->hideWhenCreating()
                 ->setFormTypeOption('disabled', true),
         ];
@@ -135,7 +134,7 @@ class UserCrudController extends AbstractCrudController
 
         $original = $em->getUnitOfWork()->getOriginalEntityData($entityInstance);
 
-        if ($original['password'] != $entityInstance->getPassword()) {
+        if (($original['password'] ?? null) !== $entityInstance->getPassword()) {
             $hashedPassword = $this->passwordHasher->hashPassword($entityInstance, $entityInstance->getPassword());
             $entityInstance->setPassword($hashedPassword);
         }

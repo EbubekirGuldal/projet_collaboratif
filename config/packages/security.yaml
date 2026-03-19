@@ -29,6 +29,7 @@ security:
             lazy: true
             provider: app_user_provider
             custom_authenticator: App\Security\AppAuthenticator
+            user_checker: App\Security\ApiUserChecker
 
             logout:
                 path: app_logout
@@ -39,6 +40,6 @@ security:
                 path: /
 
     access_control:
-        - { path: ^/admin, roles: ROLE_ADMIN }
+        - { path: ^/admin, roles: ROLE_MODERATOR }
         - { path: ^/api/resources, roles: PUBLIC_ACCESS }
         - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }
