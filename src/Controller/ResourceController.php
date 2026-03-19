@@ -37,9 +37,29 @@ class ResourceController extends AbstractController
         return $user;
     }
 
+    private function redirectUnverifiedUser(string $fallbackRoute, array $fallbackParameters = []): ?Response
+    {
+        $this->denyAccessUnlessGranted('ROLE_USER');
+
+        /** @var User $user */
+        $user = $this->getUser();
+
+        if ($user->getIsVerified()) {
+            return null;
+        }
+
+        $this->addFlash('warning', 'Verifiez votre adresse email avant d utiliser cette fonctionnalite.');
+
+        return $this->redirectToRoute($fallbackRoute, $fallbackParameters);
+    }
+
     #[Route('/resource/new', name: 'resource_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $em): Response
     {
+        if ($response = $this->redirectUnverifiedUser('app_profile')) {
+            return $response;
+        }
+
         $user = $this->requireVerifiedUser();
 
         $resource = new Resource();
@@ -87,6 +107,10 @@ class ResourceController extends AbstractController
         $canModerate = $this->resourceAccessResolver->canModerate($user);
 
         if ($request->isMethod('POST')) {
+            if ($response = $this->redirectUnverifiedUser('resource_show', ['id' => $resource->getId()])) {
+                return $response;
+            }
+
             $user = $this->requireVerifiedUser();
 
             if (!$this->resourceAccessResolver->canInteract($user, $resource)) {
@@ -178,6 +202,10 @@ class ResourceController extends AbstractController
     #[Route('/resource/{id}/report', name: 'resource_report', methods: ['POST'])]
     public function report(Resource $resource, Request $request, EntityManagerInterface $em): Response
     {
+        if ($response = $this->redirectUnverifiedUser('resource_show', ['id' => $resource->getId()])) {
+            return $response;
+        }
+
         $user = $this->requireVerifiedUser();
 
         if (!$this->resourceAccessResolver->canView($user, $resource)) {
