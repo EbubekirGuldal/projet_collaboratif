@@ -6,8 +6,10 @@ use App\Entity\Category;
 use App\Entity\RelationKind;
 use App\Entity\Resource;
 use App\Entity\RessourceType;
+use App\Enum\ResourceStatus;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\UrlType;
@@ -24,7 +26,7 @@ class ResourceFormType extends AbstractType
                 'label' => 'Titre',
                 'attr' => [
                     'class' => 'form-control',
-                    'placeholder' => 'Donnez un titre clair à votre ressource',
+                    'placeholder' => 'Donnez un titre clair a votre ressource',
                 ],
             ])
             ->add('content', TextareaType::class, [
@@ -32,7 +34,7 @@ class ResourceFormType extends AbstractType
                 'attr' => [
                     'class' => 'form-control',
                     'rows' => 8,
-                    'placeholder' => 'Décrivez la ressource, son utilité et son contexte.',
+                    'placeholder' => 'Decrivez la ressource, son utilite et son contexte.',
                 ],
             ])
             ->add('ressourceType', EntityType::class, [
@@ -43,12 +45,30 @@ class ResourceFormType extends AbstractType
                 'placeholder' => 'Choisir un type',
                 'attr' => ['class' => 'form-select'],
             ])
+            ->add('category', EntityType::class, [
+                'class' => Category::class,
+                'choice_label' => 'name',
+                'label' => 'Categorie',
+                'required' => false,
+                'placeholder' => 'Choisir une categorie',
+                'attr' => ['class' => 'form-select'],
+            ])
             ->add('relationKind', EntityType::class, [
                 'class' => RelationKind::class,
                 'choice_label' => 'name',
-                'label' => 'Public concerné',
+                'label' => 'Public concerne',
                 'required' => false,
                 'placeholder' => 'Choisir un public',
+                'attr' => ['class' => 'form-select'],
+            ])
+            ->add('resourceStatus', ChoiceType::class, [
+                'label' => 'Visibilite',
+                'choices' => [
+                    'Privee' => ResourceStatus::PRIVATE,
+                    'Partagee' => ResourceStatus::SHARED,
+                    'Publique' => ResourceStatus::PUBLIC,
+                    'En revue' => ResourceStatus::UNDER_REVIEW,
+                ],
                 'attr' => ['class' => 'form-select'],
             ])
             ->add('externalUrl', UrlType::class, [
@@ -71,11 +91,11 @@ class ResourceFormType extends AbstractType
                 ],
             ])
             ->add('video', TextType::class, [
-                'label' => 'Vidéo',
+                'label' => 'Video',
                 'required' => false,
                 'attr' => [
                     'class' => 'form-control',
-                    'placeholder' => 'Lien ou référence vidéo',
+                    'placeholder' => 'Lien ou reference video',
                 ],
             ])
             ->add('imageFile', VichImageType::class, [
@@ -85,7 +105,7 @@ class ResourceFormType extends AbstractType
                 'download_uri' => false,
                 'image_uri' => false,
                 'attr' => ['class' => 'form-control'],
-                'help' => 'Formats conseillés : JPG, PNG, WebP.',
+                'help' => 'Formats conseilles : JPG, PNG, WebP.',
             ]);
     }
 

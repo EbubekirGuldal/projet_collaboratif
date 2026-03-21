@@ -26,11 +26,11 @@ class ModerationLog
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
 
-    #[ORM\ManyToOne]
+    #[ORM\ManyToOne(inversedBy: 'moderationLogs')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Resource $resource = null;
 
-    #[ORM\ManyToOne]
+    #[ORM\ManyToOne(inversedBy: 'moderationLogs')]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $user = null;
 

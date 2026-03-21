@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Resource;
 use App\Entity\User;
+use App\Repository\UserResourceStateRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -352,5 +353,16 @@ final class ProfileController extends AbstractController
             'query' => $query,
             'sort' => $sort,
         ];
+    }
+    #[Route('/profile/dashboard', name: 'app_profile_dashboard')]
+    public function dashboard(UserResourceStateRepository $repo): Response
+    {
+        $user = $this->getUser();
+
+        $states = $repo->findBy(['user' => $user]);
+
+        return $this->render('profile/dashboard.html.twig', [
+            'states' => $states
+        ]);
     }
 }

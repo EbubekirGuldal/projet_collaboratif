@@ -1,0 +1,39 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Aide{% endblock %}
+
+{% block body %}
+<section class="legal-page">
+    <div class="container legal-page__wrap">
+        <article class="legal-page__card">
+            <header class="legal-page__header">
+                <span class="legal-page__eyebrow">Aide</span>
+                <h1 class="legal-page__title">Utiliser la plateforme</h1>
+                <p class="legal-page__subtitle">Guide rapide pour consulter, publier, suivre et signaler des ressources relationnelles.</p>
+            </header>
+
+            <div class="legal-page__body">
+                <section class="legal-page__section">
+                    <h2>Consulter les ressources</h2>
+                    <p>Le fil d accueil permet de filtrer les ressources par type et par public concerne. Les ressources publiques sont visibles par tous, les ressources partagees necessitent une connexion et les ressources privees restent reservees a leur auteur et a l equipe de moderation.</p>
+                </section>
+
+                <section class="legal-page__section">
+                    <h2>Publier une ressource</h2>
+                    <p>Un compte verifie peut creer une ressource, choisir sa categorie, son type, son public concerne et sa visibilite.</p>
+                </section>
+
+                <section class="legal-page__section">
+                    <h2>Commentaires et moderation</h2>
+                    <p>Les commentaires des citoyens verifies sont soumis a moderation avant publication. Tout utilisateur verifie peut aussi signaler une ressource pour aider l equipe de moderation.</p>
+                </section>
+
+                <section class="legal-page__section">
+                    <h2>Suivi personnel</h2>
+                    <p>Depuis le profil, vous pouvez retrouver vos ressources sauvegardees, vos publications et votre tableau de bord personnel.</p>
+                </section>
+            </div>
+        </article>
+    </div>
+</section>
+{% endblock %}

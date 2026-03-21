@@ -1,0 +1,12 @@
+{
+  "expo": {
+    "name": "Ressources relationnelles",
+    "slug": "ressources-relationnelles",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "assetBundlePatterns": [
+      "**/*"
+    ]
+  }
+}

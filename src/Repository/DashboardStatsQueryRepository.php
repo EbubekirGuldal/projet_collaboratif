@@ -2,236 +2,218 @@
 
 namespace App\Repository;
 
+use App\Entity\Comment;
 use App\Entity\Resource;
-use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\QueryBuilder;
+use App\Entity\ResourceLike;
+use App\Entity\User;
+use App\Entity\UserResourceState;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 
-class DashboardStatsQueryRepository
+class DashboardStatsQueryRepository extends ServiceEntityRepository
 {
-    public function __construct(
-        private readonly ResourceRepository $resourceRepository,
-        private readonly UserRepository $userRepository,
-        private readonly ShareRepository $shareRepository,
-        private readonly CommentRepository $commentRepository,
-        private readonly EntityManagerInterface $entityManager,
-    ) {
+    public function __construct(ManagerRegistry $registry)
+    {
+        parent::__construct($registry, Resource::class);
     }
 
-    // Compte les ressources, avec filtre de debut optionnel.
-    public function countResources(?\DateTimeImmutable $startAt): int
+    public function countResources(?\DateTimeInterface $since = null): int
     {
-        $qb = $this->resourceRepository->createQueryBuilder('r')->select('COUNT(r.id)');
+        $qb = $this->getEntityManager()->createQueryBuilder()
+            ->select('COUNT(r.id)')
+            ->from(Resource::class, 'r');
 
-        return $this->countWithStartAt($qb, $startAt, 'r.createdAt');
-    }
-
-    // Compte les utilisateurs actifs sur la periode.
-    public function countActiveUsers(?\DateTimeImmutable $startAt): int
-    {
-        $qb = $this->userRepository
-            ->createQueryBuilder('u')
-            ->select('COUNT(u.id)')
-            ->andWhere('u.isActive = :active')
-            ->setParameter('active', true);
-
-        return $this->countWithStartAt($qb, $startAt, 'u.createdAt');
-    }
-
-    // Compte les partages sur la periode.
-    public function countShares(?\DateTimeImmutable $startAt): int
-    {
-        $qb = $this->shareRepository->createQueryBuilder('s')->select('COUNT(s.id)');
-
-        return $this->countWithStartAt($qb, $startAt, 's.createdAt');
-    }
-
-    // Compte les commentaires sur la periode.
-    public function countComments(?\DateTimeImmutable $startAt): int
-    {
-        $qb = $this->commentRepository->createQueryBuilder('c')->select('COUNT(c.id)');
-
-        return $this->countWithStartAt($qb, $startAt, 'c.createdAt');
-    }
-
-    /**
-     * Retourne la repartition par categorie, sinon fallback sur resourceStatus.
-     * @return array{items:list<array{label:string,total:int}>,source:string}
-     */
-    public function getCategoryDistribution(?\DateTimeImmutable $startAt): array
-    {
-        $resourceMetadata = $this->entityManager->getClassMetadata(Resource::class);
-
-        foreach (['category', 'categories'] as $association) {
-            if (!$resourceMetadata->hasAssociation($association)) {
-                continue;
-            }
-
-            $qb = $this->resourceRepository->createQueryBuilder('r')
-                ->select('COALESCE(c.name, :uncategorized) AS label')
-                ->addSelect('COUNT(DISTINCT r.id) AS total')
-                ->leftJoin('r.'.$association, 'c')
-                ->setParameter('uncategorized', 'Non categorisee')
-                ->groupBy('label')
-                ->orderBy('total', 'DESC');
-
-            $this->applyStartAtFilter($qb, $startAt, 'r.createdAt');
-
-            return [
-                'items' => $this->normalizeDistributionRows($qb->getQuery()->getArrayResult()),
-                'source' => 'category',
-            ];
+        if ($since) {
+            $qb->andWhere('r.createdAt >= :since')
+                ->setParameter('since', $since);
         }
-
-        $qb = $this->resourceRepository->createQueryBuilder('r')
-            ->select('COALESCE(r.resourceStatus, :unknown) AS label')
-            ->addSelect('COUNT(r.id) AS total')
-            ->setParameter('unknown', 'Inconnu')
-            ->groupBy('label')
-            ->orderBy('total', 'DESC');
-
-        $this->applyStartAtFilter($qb, $startAt, 'r.createdAt');
-
-        return [
-            'items' => $this->normalizeDistributionRows($qb->getQuery()->getArrayResult()),
-            'source' => 'resource_status',
-        ];
-    }
-
-    /**
-     * Retourne les ressources les plus engageantes (partages + commentaires).
-     * @return list<array{id:int,title:string,shares:int,comments:int,engagementScore:int}>
-     */
-    public function getTopEngagedResources(?\DateTimeImmutable $startAt, int $limit = 5): array
-    {
-        $qb = $this->resourceRepository
-            ->createQueryBuilder('r')
-            ->select('r.id AS id')
-            ->addSelect('r.title AS title')
-            ->addSelect('r.sharesCount AS shares')
-            ->addSelect('COUNT(c.id) AS comments')
-            ->addSelect('(r.sharesCount + COUNT(c.id)) AS HIDDEN engagementSort')
-            ->groupBy('r.id')
-            ->addGroupBy('r.title')
-            ->addGroupBy('r.sharesCount')
-            ->having('engagementSort > 0')
-            ->addOrderBy('engagementSort', 'DESC')
-            ->addOrderBy('r.sharesCount', 'DESC')
-            ->addOrderBy('comments', 'DESC')
-            ->setMaxResults($limit);
-
-        if ($startAt !== null) {
-            $qb
-                ->leftJoin('r.comments', 'c', 'WITH', 'c.createdAt >= :commentsStart')
-                ->setParameter('commentsStart', $startAt);
-        } else {
-            $qb->leftJoin('r.comments', 'c');
-        }
-
-        return $this->mapTopResourceRows($qb->getQuery()->getArrayResult());
-    }
-
-    // Compte les lignes dans une fenetre [start, end] incluse.
-    public function countRowsInDateWindow(
-        string $table,
-        string $dateColumn,
-        \DateTimeImmutable $windowStart,
-        \DateTimeImmutable $windowEnd
-    ): int {
-        $connection = $this->entityManager->getConnection();
-        $bounds = $this->buildSqlDateBounds($windowStart, $windowEnd);
-
-        $sql = sprintf(
-            'SELECT COUNT(*) AS total
-             FROM `%s`
-             WHERE `%s` IS NOT NULL
-               AND `%s` >= :startAt
-               AND `%s` < :endAt',
-            $table,
-            $dateColumn,
-            $dateColumn,
-            $dateColumn
-        );
-
-        return (int) $connection->fetchOne($sql, $bounds);
-    }
-
-    // Execute un COUNT avec filtre startAt commun.
-    private function countWithStartAt(QueryBuilder $qb, ?\DateTimeImmutable $startAt, string $dateExpression): int
-    {
-        $this->applyStartAtFilter($qb, $startAt, $dateExpression);
 
         return (int) $qb->getQuery()->getSingleScalarResult();
     }
 
-    // Ajoute le filtre de date de debut si fourni.
-    private function applyStartAtFilter(QueryBuilder $qb, ?\DateTimeImmutable $startAt, string $dateExpression): void
+    public function countActiveUsers(?\DateTimeInterface $since = null): int
     {
-        if ($startAt === null) {
-            return;
+        $qb = $this->getEntityManager()->createQueryBuilder()
+            ->select('COUNT(u.id)')
+            ->from(User::class, 'u');
+
+        if ($since) {
+            $qb->andWhere('u.createdAt >= :since')
+                ->setParameter('since', $since);
         }
 
-        $qb
-            ->andWhere(sprintf('%s >= :startAt', $dateExpression))
-            ->setParameter('startAt', $startAt);
+        return (int) $qb->getQuery()->getSingleScalarResult();
     }
 
-    /**
-     * @param array<int,array{label:mixed,total:mixed}> $rows
-     *
-     * Normalise les lignes de repartition en types stables.
-     * @return list<array{label:string,total:int}>
-     */
-    private function normalizeDistributionRows(array $rows): array
+    public function countComments(?\DateTimeInterface $since = null): int
     {
-        $items = [];
+        $qb = $this->getEntityManager()->createQueryBuilder()
+            ->select('COUNT(c.id)')
+            ->from(Comment::class, 'c');
 
-        foreach ($rows as $row) {
-            $items[] = [
-                'label' => (string) ($row['label'] ?? 'Inconnu'),
-                'total' => (int) ($row['total'] ?? 0),
+        if ($since) {
+            $qb->andWhere('c.createdAt >= :since')
+                ->setParameter('since', $since);
+        }
+
+        return (int) $qb->getQuery()->getSingleScalarResult();
+    }
+
+    public function countFavorites(?\DateTimeInterface $since = null): int
+    {
+        $qb = $this->getEntityManager()->createQueryBuilder()
+            ->select('COUNT(s.id)')
+            ->from(UserResourceState::class, 's')
+            ->andWhere('s.isSaved = :saved')
+            ->setParameter('saved', true);
+
+        return (int) $qb->getQuery()->getSingleScalarResult();
+    }
+
+    public function countShares(?\DateTimeInterface $since = null): int
+    {
+        $qb = $this->getEntityManager()->createQueryBuilder()
+            ->select('COALESCE(SUM(r.sharesCount), 0)')
+            ->from(Resource::class, 'r');
+
+        if ($since) {
+            $qb->andWhere('r.createdAt >= :since')
+                ->setParameter('since', $since);
+        }
+
+        return (int) $qb->getQuery()->getSingleScalarResult();
+    }
+
+    public function countLikes(?\DateTimeInterface $since = null): int
+    {
+        $qb = $this->getEntityManager()->createQueryBuilder()
+            ->select('COUNT(l.id)')
+            ->from(ResourceLike::class, 'l');
+
+        if ($since) {
+            $qb->andWhere('l.createdAt >= :since')
+                ->setParameter('since', $since);
+        }
+
+        return (int) $qb->getQuery()->getSingleScalarResult();
+    }
+
+    public function countExploitedResources(?\DateTimeInterface $since = null): int
+    {
+        $qb = $this->getEntityManager()->createQueryBuilder()
+            ->select('COUNT(s.id)')
+            ->from(UserResourceState::class, 's')
+            ->andWhere('s.isExploited = :exploited')
+            ->setParameter('exploited', true);
+
+        return (int) $qb->getQuery()->getSingleScalarResult();
+    }
+
+    public function getCategoryDistribution(?\DateTimeInterface $since = null): array
+    {
+        $conn = $this->getEntityManager()->getConnection();
+
+        $sql = '
+            SELECT
+                COALESCE(c.name, \'Sans catégorie\') AS label,
+                COUNT(r.id) AS total
+            FROM resource r
+            LEFT JOIN category c ON c.id = r.category_id
+        ';
+
+        $params = [];
+
+        if ($since) {
+            $sql .= ' WHERE r.created_at >= :since';
+            $params['since'] = $since->format('Y-m-d H:i:s');
+        }
+
+        $sql .= '
+            GROUP BY c.id, c.name
+            ORDER BY total DESC, label ASC
+        ';
+
+        try {
+            $rows = $conn->executeQuery($sql, $params)->fetchAllAssociative();
+
+            return [
+                'items' => array_map(static function (array $row): array {
+                    return [
+                        'label' => (string) $row['label'],
+                        'total' => (int) $row['total'],
+                    ];
+                }, $rows),
+                'source' => 'category',
+            ];
+        } catch (\Throwable) {
+            return [
+                'items' => [],
+                'source' => 'category',
             ];
         }
-
-        return $items;
     }
 
-    /**
-     * @param list<array{id:mixed,title:mixed,shares:mixed,comments:mixed}> $rows
-     *
-     * Convertit les lignes SQL du top en structure typed pour le dashboard.
-     * @return list<array{id:int,title:string,shares:int,comments:int,engagementScore:int}>
-     */
-    private function mapTopResourceRows(array $rows): array
+    public function getTopEngagedResources(?\DateTimeInterface $since = null, int $limit = 5): array
     {
-        $items = [];
+        $qb = $this->getEntityManager()->createQueryBuilder()
+            ->select('r.id, r.title, r.likesCount, r.sharesCount, COUNT(c.id) AS commentsCount')
+            ->addSelect('(COALESCE(r.likesCount, 0) + COALESCE(r.sharesCount, 0) + COUNT(c.id)) AS HIDDEN engagementScore')
+            ->from(Resource::class, 'r')
+            ->leftJoin(Comment::class, 'c', 'WITH', 'c.resource = r')
+            ->groupBy('r.id, r.title, r.likesCount, r.sharesCount')
+            ->setMaxResults($limit);
 
-        foreach ($rows as $row) {
-            $shares = (int) ($row['shares'] ?? 0);
-            $comments = (int) ($row['comments'] ?? 0);
+        if ($since) {
+            $qb->andWhere('r.createdAt >= :since')
+                ->setParameter('since', $since);
+        }
 
-            $items[] = [
-                'id' => (int) ($row['id'] ?? 0),
-                'title' => (string) ($row['title'] ?? 'Ressource'),
+        $qb->orderBy('engagementScore', 'DESC')
+            ->addOrderBy('r.createdAt', 'DESC');
+
+        $rows = $qb->getQuery()->getArrayResult();
+
+        return array_map(static function (array $row): array {
+            $likes = (int) ($row['likesCount'] ?? 0);
+            $shares = (int) ($row['sharesCount'] ?? 0);
+            $comments = (int) ($row['commentsCount'] ?? 0);
+
+            return [
+                'id' => (int) $row['id'],
+                'title' => (string) $row['title'],
+                'likes' => $likes,
                 'shares' => $shares,
                 'comments' => $comments,
-                'engagementScore' => ($shares * 2) + $comments,
+                'engagementScore' => $likes + $shares + $comments,
             ];
-        }
-
-        return $items;
+        }, $rows);
     }
 
-    /**
-     * Prepare les bornes SQL start/end (end exclusif).
-     * @return array{startAt:string,endAt:string}
-     */
-    private function buildSqlDateBounds(\DateTimeImmutable $startAt, \DateTimeImmutable $endAt): array
-    {
-        $endExclusive = $endAt->modify('+1 day');
+    public function countRowsInDateWindow(
+        string $table,
+        string $dateColumn,
+        \DateTimeInterface $start,
+        \DateTimeInterface $end
+    ): int {
+        $allowedTables = ['share', 'comment'];
+        $allowedColumns = ['created_at'];
 
-        return [
-            'startAt' => $startAt->format('Y-m-d 00:00:00'),
-            'endAt' => $endExclusive->format('Y-m-d 00:00:00'),
-        ];
+        if (!in_array($table, $allowedTables, true) || !in_array($dateColumn, $allowedColumns, true)) {
+            throw new \InvalidArgumentException('Table ou colonne non autorisée pour les statistiques.');
+        }
+
+        $conn = $this->getEntityManager()->getConnection();
+
+        $sql = sprintf(
+            'SELECT COUNT(*) AS total FROM %s WHERE %s >= :start AND %s <= :end',
+            $table,
+            $dateColumn,
+            $dateColumn
+        );
+
+        return (int) $conn->executeQuery($sql, [
+            'start' => $start->format('Y-m-d 00:00:00'),
+            'end' => $end->format('Y-m-d 23:59:59'),
+        ])->fetchOne();
     }
 }

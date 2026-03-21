@@ -9,6 +9,7 @@ use App\Entity\Resource;
 use App\Entity\RessourceType;
 use App\Entity\User;
 use App\Repository\DashboardStatsRepository;
+use App\Security\ResourceAccessResolver;
 use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminDashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Assets;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
@@ -20,13 +21,14 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-#[IsGranted('ROLE_ADMIN')]
+#[IsGranted('ROLE_MODERATOR')]
 #[AdminDashboard(routePath: '/admin', routeName: 'admin')]
 class DashboardController extends AbstractDashboardController
 {
     public function __construct(
         private readonly DashboardStatsRepository $dashboardStatsRepository,
-        private readonly RequestStack $requestStack
+        private readonly RequestStack $requestStack,
+        private readonly ResourceAccessResolver $resourceAccessResolver,
     ) {
     }
 
@@ -165,13 +167,26 @@ class DashboardController extends AbstractDashboardController
 
     public function configureMenuItems(): iterable
     {
+        /** @var User|null $user */
+        $user = $this->getUser();
+
         yield MenuItem::linkToDashboard('Dashboard', 'fa fa-home');
-        yield MenuItem::linkToCrud('Utilisateur', 'fas fa-user', User::class);
-        yield MenuItem::linkToCrud('Commentaire', 'fas fa-comment', Comment::class);
-        yield MenuItem::linkToCrud('Ressource', 'fas fa-image', Resource::class);
-        yield MenuItem::linkToCrud('Types de ressource', 'fas fa-tags', RessourceType::class);
-        yield MenuItem::linkToCrud('Publics concernés', 'fas fa-users', RelationKind::class);
-        yield MenuItem::linkToCrud('Modération', 'fas fa-user-tie', ModerationLog::class);
+        yield MenuItem::linkToCrud('Commentaires', 'fas fa-comment', Comment::class);
+        yield MenuItem::linkToCrud('Moderation', 'fas fa-user-tie', ModerationLog::class);
+
+        if ($this->resourceAccessResolver->canManageCatalog($user)) {
+            yield MenuItem::section('Catalogue');
+            yield MenuItem::linkToCrud('Ressources', 'fas fa-image', Resource::class);
+            yield MenuItem::linkToCrud('Types de ressource', 'fas fa-tags', RessourceType::class);
+            yield MenuItem::linkToCrud('Publics concernes', 'fas fa-users', RelationKind::class);
+            yield MenuItem::linkToCrud('Categories', 'fas fa-layer-group', \App\Entity\Category::class);
+        }
+
+        if ($this->resourceAccessResolver->canManageUsers($user)) {
+            yield MenuItem::section('Gouvernance');
+            yield MenuItem::linkToCrud('Utilisateurs', 'fas fa-user', User::class);
+        }
+
         yield MenuItem::section();
         yield MenuItem::linkToRoute('Quitter', 'fas fa-right-from-bracket', 'app_home');
     }

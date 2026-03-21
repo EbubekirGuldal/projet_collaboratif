@@ -36,9 +36,11 @@ class ResourceCrudController extends AbstractCrudController
                 'title',
                 'content',
                 'resourceStatus',
+                'category.name',
                 'ressourceType.label',
                 'relationKind.name',
-                'user.email', 'user.username'
+                'user.email',
+                'user.username',
             ])
             ->setEntityLabelInSingular('Ressource')
             ->setEntityLabelInPlural('Ressources')
@@ -50,28 +52,29 @@ class ResourceCrudController extends AbstractCrudController
     {
         return $actions
             ->add(Crud::PAGE_INDEX, Action::DETAIL)
-            ->update(Crud::PAGE_INDEX, Action::NEW, fn(Action $action): Action => $action->setLabel('Créer une ressource'))
-            ->update(Crud::PAGE_INDEX, Action::EDIT, fn(Action $action): Action => $action->setIcon('fa fa-edit'))
-            ->update(Crud::PAGE_INDEX, Action::DETAIL, fn(Action $action): Action => $action->setIcon('fa fa-eye'))
-            ->update(Crud::PAGE_INDEX, Action::DELETE, fn(Action $action): Action => $action->setIcon('fa fa-trash'));
+            ->update(Crud::PAGE_INDEX, Action::NEW, fn (Action $action): Action => $action->setLabel('Creer une ressource'))
+            ->update(Crud::PAGE_INDEX, Action::EDIT, fn (Action $action): Action => $action->setIcon('fa fa-edit'))
+            ->update(Crud::PAGE_INDEX, Action::DETAIL, fn (Action $action): Action => $action->setIcon('fa fa-eye'))
+            ->update(Crud::PAGE_INDEX, Action::DELETE, fn (Action $action): Action => $action->setIcon('fa fa-trash'));
     }
 
 
     public function configureFields(string $pageName): iterable
     {
         return [
-            FormField::addTab('Général'),
+            FormField::addTab('General'),
 
             FormField::addColumn(6),
             IdField::new('id')->hideOnForm(),
             TextField::new('title', 'Titre'),
             TextareaField::new('content', 'Contenu'),
+            AssociationField::new('category', 'Categorie'),
             AssociationField::new('ressourceType', 'Type de ressource'),
-            AssociationField::new('relationKind', 'Public concerné'),
+            AssociationField::new('relationKind', 'Public concerne'),
 
             FormField::addColumn(6),
             TextField::new('externalUrl', 'URL externe')->hideOnIndex(),
-            TextField::new('video', 'Vidéo')->hideOnIndex(),
+            TextField::new('video', 'Video')->hideOnIndex(),
 
             ImageField::new('image', 'Image')
                 ->setBasePath('/images/resources')
@@ -85,15 +88,17 @@ class ResourceCrudController extends AbstractCrudController
                     'allow_delete' => true,
                     'download_uri' => true,
                 ]),
-            
+
             FormField::addColumn(6),
             FormField::addPanel('Utilisateur')->setIcon('fa fa-user'),
             AssociationField::new('user'),
 
-            FormField::addTab('Métadonnées'),
+            FormField::addTab('Metadonnees'),
 
             ChoiceField::new('resourceStatus', 'Statut')
                 ->setChoices([
+                    'Privee' => ResourceStatus::PRIVATE,
+                    'Partagee' => ResourceStatus::SHARED,
                     'Publique' => ResourceStatus::PUBLIC,
                     'En revue' => ResourceStatus::UNDER_REVIEW,
                 ]),
@@ -101,9 +106,9 @@ class ResourceCrudController extends AbstractCrudController
             IntegerField::new('likesCount', 'Likes')->hideOnForm(),
             IntegerField::new('sharesCount', 'Partages')->hideOnForm(),
 
-            DateTimeField::new('publishedAt', 'Publié le')->hideWhenCreating(),
-            DateTimeField::new('createdAt', 'Créé le')->hideWhenCreating(),
-            DateTimeField::new('updatedAt', 'Mis à jour le')->hideWhenCreating(),
+            DateTimeField::new('publishedAt', 'Publie le')->hideWhenCreating(),
+            DateTimeField::new('createdAt', 'Cree le')->hideWhenCreating(),
+            DateTimeField::new('updatedAt', 'Mis a jour le')->hideWhenCreating(),
         ];
     }
 }
