@@ -2,6 +2,7 @@
 
 namespace App\Form;
 
+use App\Entity\Category;
 use App\Entity\RelationKind;
 use App\Entity\Resource;
 use App\Entity\RessourceType;
