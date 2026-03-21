@@ -115,7 +115,6 @@ class Resource
 
     #[ORM\Column(nullable: true)]
     #[Groups(['resource:read'])]
-    #[Groups(['resource:read'])]
     private ?int $likesCount = 0;
 
     #[ORM\ManyToOne]
