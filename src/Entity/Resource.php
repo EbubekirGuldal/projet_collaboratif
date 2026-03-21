@@ -11,6 +11,7 @@ use App\Entity\Category;
 use App\Enum\ResourceStatus;
 use App\Repository\ResourceRepository;
 use App\State\ResourceCollectionProvider;
+use App\State\ResourcePostProcessor;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -134,10 +135,6 @@ class Resource
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: true)]
     private ?RelationKind $relationKind = null;
-
-    #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: true)]
-    private ?Category $category = null;
 
     /**
      * @var Collection<int, UserLiked>
@@ -438,18 +435,6 @@ class Resource
     public function setRelationKind(?RelationKind $relationKind): static
     {
         $this->relationKind = $relationKind;
-        return $this;
-    }
-
-    public function getCategory(): ?Category
-    {
-        return $this->category;
-    }
-
-    public function setCategory(?Category $category): static
-    {
-        $this->category = $category;
-
         return $this;
     }
 
