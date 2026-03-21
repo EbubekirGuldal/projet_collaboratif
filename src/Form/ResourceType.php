@@ -55,6 +55,13 @@ class ResourceType extends AbstractType
                     'placeholder' => 'https://...',
                 ],
             ])
+            ->add('category', EntityType::class, [
+                'class' => Category::class,
+                'choice_label' => 'name',
+                'label' => 'Categorie',
+                'placeholder' => 'Selectionner une categorie',
+                'required' => false,
+            ])
             ->add('imageFile', VichImageType::class, [
                 'label' => 'Image',
                 'required' => false,

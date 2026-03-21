@@ -46,6 +46,7 @@ class ResourceCrudController extends AbstractCrudController
     }
 
     public function configureActions(Actions $actions): Actions
+    public function configureActions(Actions $actions): Actions
     {
         return $actions
             ->add(Crud::PAGE_INDEX, Action::DETAIL)
@@ -54,6 +55,7 @@ class ResourceCrudController extends AbstractCrudController
             ->update(Crud::PAGE_INDEX, Action::DETAIL, fn(Action $action): Action => $action->setIcon('fa fa-eye'))
             ->update(Crud::PAGE_INDEX, Action::DELETE, fn(Action $action): Action => $action->setIcon('fa fa-trash'));
     }
+
 
     public function configureFields(string $pageName): iterable
     {

@@ -6,6 +6,8 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
+use App\Entity\Category;
 use App\Enum\ResourceStatus;
 use App\Repository\ResourceRepository;
 use App\State\ResourceCollectionProvider;
@@ -31,6 +33,12 @@ use Vich\UploaderBundle\Mapping\Attribute as Vich;
             normalizationContext: ['groups' => ['resource:read']],
             security: "true"
         ),
+        new Post(
+            normalizationContext: ['groups' => ['resource:read']],
+            denormalizationContext: ['groups' => ['resource:create']],
+            security: "is_granted('ROLE_USER')",
+            processor: ResourcePostProcessor::class
+        ),
         new Patch(
             normalizationContext: ['groups' => ['resource:read']],
             denormalizationContext: ['groups' => ['resource:update']],
@@ -50,19 +58,19 @@ class Resource
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['resource:read'])]
+    #[Groups(['resource:read', 'resource:create', 'resource:update'])]
     private ?string $title = null;
 
     #[ORM\Column(type: Types::TEXT)]
-    #[Groups(['resource:read'])]
+    #[Groups(['resource:read', 'resource:create', 'resource:update'])]
     private ?string $content = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['resource:read'])]
+    #[Groups(['resource:read', 'resource:create', 'resource:update'])]
     private ?string $externalUrl = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['resource:read'])]
+    #[Groups(['resource:read', 'resource:create', 'resource:update'])]
     private ?\DateTimeImmutable $publishedAt = null;
 
     #[ORM\Column(nullable: true)]
@@ -74,11 +82,11 @@ class Resource
     private ?\DateTimeImmutable $updatedAt = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['resource:read'])]
+    #[Groups(['resource:read', 'resource:create', 'resource:update'])]
     private ?string $image = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['resource:read'])]
+    #[Groups(['resource:read', 'resource:create', 'resource:update'])]
     private ?string $video = null;
 
     #[ORM\Column(options: ["default" => 0])]
@@ -99,7 +107,13 @@ class Resource
     #[Groups(['resource:read'])]
     private ?User $user = null;
 
+    #[ORM\ManyToOne(inversedBy: 'resources')]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
+    #[Groups(['resource:read', 'resource:create', 'resource:update'])]
+    private ?Category $category = null;
+
     #[ORM\Column(nullable: true)]
+    #[Groups(['resource:read'])]
     #[Groups(['resource:read'])]
     private ?int $likesCount = 0;
 
@@ -114,6 +128,7 @@ class Resource
     private Collection $moderationLogs;
 
     #[ORM\Column(enumType: ResourceStatus::class)]
+    #[Groups(['resource:read', 'resource:create', 'resource:update'])]
     private ResourceStatus $resourceStatus = ResourceStatus::PUBLIC;
 
     #[ORM\ManyToOne]
@@ -315,6 +330,18 @@ class Resource
     public function setUser(?User $user): static
     {
         $this->user = $user;
+        return $this;
+    }
+
+    public function getCategory(): ?Category
+    {
+        return $this->category;
+    }
+
+    public function setCategory(?Category $category): static
+    {
+        $this->category = $category;
+
         return $this;
     }
 

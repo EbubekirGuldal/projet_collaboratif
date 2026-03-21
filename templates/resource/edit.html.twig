@@ -82,6 +82,12 @@
                                             </div>
 
                                             <div class="mb-3">
+                                                {{ form_label(form.category) }}
+                                                {{ form_widget(form.category) }}
+                                                {{ form_errors(form.category) }}
+                                            </div>
+
+                                            <div class="mb-3">
                                                 {{ form_label(form.video) }}
                                                 {{ form_widget(form.video) }}
                                                 {{ form_errors(form.video) }}

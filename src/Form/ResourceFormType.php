@@ -59,6 +59,16 @@ class ResourceFormType extends AbstractType
                     'placeholder' => 'https://...',
                 ],
             ])
+            ->add('category', EntityType::class, [
+                'class' => Category::class,
+                'choice_label' => 'name',
+                'label' => 'Categorie',
+                'required' => false,
+                'placeholder' => 'Selectionner une categorie',
+                'attr' => [
+                    'class' => 'form-select',
+                ],
+            ])
             ->add('video', TextType::class, [
                 'label' => 'Vidéo',
                 'required' => false,

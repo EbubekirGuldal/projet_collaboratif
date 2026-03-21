@@ -18,7 +18,13 @@
                 </a>
             {% endfor %}
         </div>
-        <p class="admin-period-hint">Periode active: <strong>{{ stats.selectedPeriodLabel }}</strong></p>
+        <div class="admin-toolbar-actions">
+            <p class="admin-period-hint">Periode active: <strong>{{ stats.selectedPeriodLabel }}</strong></p>
+            <a href="{{ path('admin_stats_report_export', { period: stats.selectedPeriod }) }}" class="admin-export-btn is-primary">
+                <i class="fa fa-file-lines" aria-hidden="true"></i>
+                <span>Rapport lisible</span>
+            </a>
+        </div>
     </section>
 
     <section class="admin-insights-row">
@@ -116,12 +122,14 @@
 
     <div class="admin-stats-columns">
         <section class="admin-stats-section">
-            <h2 class="admin-stats-subtitle">Repartition par categorie</h2>
+            <h2 class="admin-stats-subtitle">
+                {{ stats.categoryDistributionSource == 'category' ? 'Repartition par categorie' : 'Repartition par statut' }}
+            </h2>
 
             {% if stats.categoryDistributionSource == 'resource_status' %}
                 <p class="admin-stats-note">
-                    Affichage provisoire base sur <code>resourceStatus</code>.
-                    On doit relier <code>Resource</code> a <code>Category</code> pour la vraie repartition.
+                    Affichage provisoire base sur le champ <code>resourceStatus</code>.
+                    La ressource n'etait pas encore reliee a une categorie metier.
                 </p>
             {% endif %}
 
