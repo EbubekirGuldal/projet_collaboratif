@@ -138,7 +138,12 @@ class Resource
     /**
      * @var Collection<int, UserLiked>
      */
-    #[ORM\OneToMany(targetEntity: UserLiked::class, mappedBy: 'resource')]
+    #[ORM\OneToMany(
+        targetEntity: UserLiked::class,
+        mappedBy: 'resource',
+        cascade: ['remove'],
+        orphanRemoval: true
+    )]
     private Collection $userLikeds;
 
     #[Groups(['resource:read'])]

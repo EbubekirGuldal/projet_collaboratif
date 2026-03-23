@@ -90,7 +90,8 @@ class ResourceCrudController extends AbstractCrudController
 
             FormField::addColumn(12),
             FormField::addPanel('Utilisateur')->setIcon('fa fa-user'),
-            AssociationField::new('user', false)->setFormTypeOption('disabled', true),
+            // AssociationField::new('user', false)->setFormTypeOption('disabled', true),
+            AssociationField::new('user', "Utilisateur"),
 
             FormField::addTab('Metadonnees')->setIcon('fa fa-database'),
 

@@ -1,8 +1,10 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Plateforme collaborative de partage de ressources éducatives, relationnelles et pratiques pour différents publics.">
+    <meta name="robots" content="index, follow">
     <title>{% block title %}Ressources Relationnelles{% endblock %}</title>
 
     <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
@@ -22,8 +24,9 @@
 
 <body>
     {% include "includes/navbar.html.twig" %}
-
-    {% block body %}{% endblock %}
+    <main>
+        {% block body %}{% endblock %}
+    </main>
 
     <div class="modal fade" id="shareModal" tabindex="-1" aria-labelledby="shareModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">

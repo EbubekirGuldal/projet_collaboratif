@@ -20,9 +20,9 @@
                     <div class="feed-hero-row">
                         <div class="feed-hero-copy">
                             <span class="feed-eyebrow">Ressources relationnelles</span>
-                            <h1 class="feed-title mb-2">Fil d actualite</h1>
+                            <h1 class="feed-title mb-2">Fil d'actualité</h1>
                             <p class="feed-subtitle mb-0">
-                                Un espace clair pour trouver, partager et suivre les ressources utiles de la communaute.
+                                Un espace clair pour trouver, partager et suivre les ressources utiles de la communauté.
                             </p>
                         </div>
 
@@ -59,7 +59,7 @@
                     <form method="get" action="{{ path('app_home') }}" class="row g-3 mt-3">
                         <input type="hidden" name="sort" value="{{ sort }}">
 
-                        <div class="col-12 col-lg-3">
+                        <div class="col-12">
                             <label class="form-label fw-semibold">Recherche</label>
                             <input
                                 type="text"
@@ -70,10 +70,10 @@
                             >
                         </div>
 
-                        <div class="col-12 col-lg-3">
-                            <label class="form-label fw-semibold">Categorie</label>
-                            <select name="category" class="form-select">
-                                <option value="">Toutes les categories</option>
+                        <div class="col-12 col-md-4">
+                            <label for="category" class="form-label fw-semibold">Catégorie</label>
+                            <select id="category" name="category" class="form-select">
+                                <option value="">Toutes les catégories</option>
                                 {% for category in categories %}
                                     <option value="{{ category.id }}" {{ categoryId == category.id ? 'selected' : '' }}>
                                         {{ category.name }}
@@ -82,9 +82,9 @@
                             </select>
                         </div>
 
-                        <div class="col-12 col-lg-2">
-                            <label class="form-label fw-semibold">Type de ressource</label>
-                            <select name="resourceType" class="form-select">
+                        <div class="col-12 col-md-4">
+                            <label for="resourceType" class="form-label fw-semibold">Type de ressource</label>
+                            <select id="resourceType" name="resourceType" class="form-select">
                                 <option value="">Tous les types</option>
                                 {% for type in resourceTypes %}
                                     <option value="{{ type.id }}" {{ resourceTypeId == type.id ? 'selected' : '' }}>
@@ -94,9 +94,9 @@
                             </select>
                         </div>
 
-                        <div class="col-12 col-lg-2">
-                            <label class="form-label fw-semibold">Public concerne</label>
-                            <select name="relationKind" class="form-select">
+                        <div class="col-12 col-md-4">
+                            <label for="relationKind" class="form-label fw-semibold">Public concerné</label>
+                            <select id="relationKind" name="relationKind" class="form-select">
                                 <option value="">Tous les publics</option>
                                 {% for public in relationKinds %}
                                     <option value="{{ public.id }}" {{ relationKindId == public.id ? 'selected' : '' }}>
@@ -106,7 +106,7 @@
                             </select>
                         </div>
 
-                        <div class="col-12 col-lg-2 d-flex align-items-end gap-2">
+                        <div class="col-12 d-flex align-items-end gap-2">
                             <button type="submit" class="btn btn-primary w-100">
                                 Filtrer
                             </button>
@@ -168,8 +168,7 @@
                         </div>
 
                         <p class="feed-side-copy mb-0">
-                            Ressources relationnelles rassemble des contenus utiles, des reperes fiables et des pistes concretes
-                            pour renforcer les liens sociaux et l entraide.
+                            Ressources relationnelles rassemble des contenus utiles, des repères fiables et des pistes concrètes pour renforcer les liens sociaux et l’entraide.
                         </p>
                     </div>
                 </section>
@@ -182,7 +181,7 @@
                             </span>
                             <div>
                                 <h2 class="h6 mb-1">Actions rapides</h2>
-                                <p class="feed-side-subtitle mb-0">Acces directs</p>
+                                <p class="feed-side-subtitle mb-0">Accès directs</p>
                             </div>
                         </div>
 
@@ -202,11 +201,11 @@
                                 </a>
                                 <a class="btn btn-outline-dark" href="{{ path('app_help') }}">
                                     <i class="fa-regular fa-circle-question me-2"></i>
-                                    Ouvrir l aide
+                                    Ouvrir l'aide
                                 </a>
                             </div>
                             <p class="feed-side-note mb-0 mt-3">
-                                Vous pouvez maintenant filtrer le fil par categorie, type de ressource et public concerne.
+                                Vous pouvez maintenant filtrer le fil par catégorie, type de ressource et public concerné.
                             </p>
                         {% else %}
                             <p class="feed-side-copy mt-3">
