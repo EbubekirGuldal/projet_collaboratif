@@ -90,6 +90,17 @@ jobs:
       - name: Installation des dependances PHP
         run: composer install --no-interaction --prefer-dist --no-progress
 
+      - name: Installation de Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Build des assets front (Webpack Encore)
+        run: |
+          npm ci
+          npm run build
+
       - name: Generation des cles JWT (test)
         run: php bin/console lexik:jwt:generate-keypair --skip-if-exists --env=test || true
 
