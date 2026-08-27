@@ -1,3 +1,5 @@
+# Fichiers generes par macOS
+.DS_Store
 
 # Secrets ephemeres generes par le job deploy-check de la CI
 /.env.ci
