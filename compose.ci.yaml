@@ -1,0 +1,16 @@
+# Surcharge utilisee uniquement par le job "deploy-check" de la CI.
+#
+# compose.yaml reference l'image publiee sur GHCR ; en integration continue on
+# veut valider l'image telle qu'elle vient d'etre construite a partir du code
+# de la branche, pas la derniere image publiee. Cette surcharge remplace donc
+# la reference par un build local.
+#
+# Usage : docker compose -f compose.yaml -f compose.ci.yaml up -d --build
+# (ne pas inclure compose.override.yaml, qui porte l'outillage de dev)
+
+services:
+  app:
+    build:
+      context: .
+    ports:
+      - "8080:80"
