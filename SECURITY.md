@@ -72,7 +72,7 @@ La securite ne repose pas seulement sur les signalements exterieurs :
 | `npm audit` | Vulnerabilites connues des dependances front | Job `security` du pipeline |
 | PHPStan | Defauts de typage et chemins d'erreur dans `src/` | Job `security` du pipeline |
 | PHP_CodeSniffer | Ecarts aux conventions PSR-12 | Job `security` du pipeline |
-| CodeQL | Motifs de vulnerabilite dans le code du projet | [`codeql.yml`](.github/workflows/codeql.yml) |
+| CodeQL | Motifs de vulnerabilite dans le front, le mobile et les workflows | [`codeql.yml`](.github/workflows/codeql.yml) |
 | Dependabot | Propositions de mise a jour hebdomadaires | [`dependabot.yml`](.github/dependabot.yml) |
 
 Le pipeline echoue sur toute vulnerabilite **haute ou critique**. Les severites

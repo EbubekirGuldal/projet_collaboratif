@@ -32,10 +32,17 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # Les deux langages reellement presents dans le depot : PHP pour
-        # l'application Symfony (src/), JavaScript pour les assets front
-        # (assets/) et l'application mobile (mobile/).
-        language: [php, javascript-typescript]
+        # CodeQL ne prend pas en charge PHP : l'initialisation echoue avec
+        # "Did not recognize the following languages: php". Le code Symfony de
+        # src/ est donc couvert autrement, par PHPStan et composer audit dans le
+        # job `security` du pipeline principal.
+        #
+        # - javascript-typescript : assets front (assets/) et application
+        #   mobile (mobile/) ;
+        # - actions : les workflows eux-memes, qui s'executent avec les droits
+        #   du depot et dont les actions ne sont pas epinglees a un condensat
+        #   (voir VUL-10 du plan de securisation).
+        language: [javascript-typescript, actions]
 
     steps:
       - name: Checkout du code
