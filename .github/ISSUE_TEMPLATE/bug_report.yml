@@ -1,0 +1,77 @@
+name: Anomalie
+description: Signaler un dysfonctionnement de l'application
+title: "[BUG] "
+labels: ["type:anomalie", "statut:a-qualifier"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Merci de renseigner les champs ci-dessous. Une anomalie sans etapes de
+        reproduction ne peut pas etre qualifiee et sera renvoyee a son auteur.
+
+  - type: input
+    id: environnement
+    attributes:
+      label: Environnement
+      description: Ou l'anomalie a-t-elle ete constatee ?
+      placeholder: "Production / recette / local — navigateur et version, ou application mobile"
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Etapes de reproduction
+      description: Une etape par ligne, en partant d'un etat connu.
+      placeholder: |
+        1. Se connecter avec un compte citoyen
+        2. Ouvrir une ressource publiee
+        3. Cliquer sur "Partager"
+    validations:
+      required: true
+
+  - type: textarea
+    id: attendu
+    attributes:
+      label: Comportement attendu
+    validations:
+      required: true
+
+  - type: textarea
+    id: constate
+    attributes:
+      label: Comportement constate
+      description: Message d'erreur exact, code HTTP, extrait de journal si disponible.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: gravite
+    attributes:
+      label: Gravite
+      description: >
+        Bloquante : la fonctionnalite est inutilisable et sans contournement.
+        Majeure : la fonctionnalite est degradee mais contournable.
+        Mineure : gene sans impact sur le service rendu.
+      options:
+        - Bloquante
+        - Majeure
+        - Mineure
+    validations:
+      required: true
+
+  - type: input
+    id: frequence
+    attributes:
+      label: Frequence
+      placeholder: "Systematique / intermittente (1 fois sur 3) / observee une seule fois"
+    validations:
+      required: true
+
+  - type: textarea
+    id: captures
+    attributes:
+      label: Captures d'ecran ou journaux
+      description: Glissez-deposez vos fichiers ici. Occultez toute donnee personnelle.
+    validations:
+      required: false

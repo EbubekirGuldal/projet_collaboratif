@@ -1,0 +1,98 @@
+# Jeu de labels du projet.
+#
+# Quatre dimensions independantes, chacune prefixee : un ticket porte au plus
+# un label de chaque dimension. Le prefixe rend le filtrage lisible dans la
+# barre de recherche GitHub (`label:"gravite:bloquante"`).
+#
+# Application :
+#   - a la main : Issues > Labels > New label, en reprenant nom, couleur et description ;
+#   - ou en lot : `gh label create "<name>" --color <color> --description "<desc>"`
+#     pour chaque entree (voir docs/gestion_des_tickets.md).
+#
+# Les labels type:* et statut:a-qualifier sont poses automatiquement par les
+# formulaires de .github/ISSUE_TEMPLATE.
+
+# ------------------------------------------------------------------- TYPE
+# Nature de la demande. Pose automatiquement par le formulaire d'ouverture.
+- name: "type:anomalie"
+  color: "d73a4a"
+  description: "Dysfonctionnement constate sur une fonctionnalite existante"
+
+- name: "type:evolution"
+  color: "0e8a16"
+  description: "Nouvelle fonctionnalite ou amelioration d'une fonctionnalite existante"
+
+- name: "type:securite"
+  color: "b60205"
+  description: "Faiblesse ou vulnerabilite de securite"
+
+- name: "type:dette-technique"
+  color: "fbca04"
+  description: "Refactorisation, mise a jour de dependance, outillage"
+
+- name: "type:documentation"
+  color: "0075ca"
+  description: "Redaction ou mise a jour de documentation"
+
+# -------------------------------------------------------------- PRIORITE
+# Ordre de traitement, decide par l'equipe lors de la priorisation.
+- name: "priorite:critique"
+  color: "b60205"
+  description: "A traiter immediatement, avant tout autre sujet"
+
+- name: "priorite:haute"
+  color: "d93f0b"
+  description: "A traiter dans l'iteration en cours"
+
+- name: "priorite:moyenne"
+  color: "fbca04"
+  description: "A planifier dans une prochaine iteration"
+
+- name: "priorite:basse"
+  color: "c2e0c6"
+  description: "Traite lorsque la charge le permet"
+
+# --------------------------------------------------------------- GRAVITE
+# Impact constate sur le service rendu. Ne concerne que les anomalies, et
+# se distingue de la priorite : une anomalie mineure peut etre prioritaire.
+- name: "gravite:bloquante"
+  color: "b60205"
+  description: "Fonctionnalite inutilisable, sans contournement"
+
+- name: "gravite:majeure"
+  color: "d93f0b"
+  description: "Fonctionnalite degradee mais contournable"
+
+- name: "gravite:mineure"
+  color: "fef2c0"
+  description: "Gene sans impact sur le service rendu"
+
+# ---------------------------------------------------------------- STATUT
+# Position dans le cycle de vie. Un seul statut a la fois.
+- name: "statut:a-qualifier"
+  color: "ededed"
+  description: "Ouvert, pas encore analyse par l'equipe"
+
+- name: "statut:qualifie"
+  color: "bfd4f2"
+  description: "Analyse et reproduit, en attente de priorisation"
+
+- name: "statut:en-cours"
+  color: "1d76db"
+  description: "Pris en charge, developpement engage"
+
+- name: "statut:en-revue"
+  color: "5319e7"
+  description: "Pull request ouverte, en attente de revue"
+
+- name: "statut:bloque"
+  color: "e99695"
+  description: "Traitement suspendu, en attente d'un element externe"
+
+- name: "statut:a-recetter"
+  color: "0e8a16"
+  description: "Corrige et fusionne, en attente de validation par le demandeur"
+
+- name: "statut:refuse"
+  color: "ffffff"
+  description: "Non retenu, ou non reproductible apres analyse"

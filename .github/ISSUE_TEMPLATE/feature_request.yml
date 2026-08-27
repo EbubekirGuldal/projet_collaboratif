@@ -1,0 +1,46 @@
+name: Demande d'evolution
+description: Proposer une nouvelle fonctionnalite ou une amelioration
+title: "[EVOL] "
+labels: ["type:evolution", "statut:a-qualifier"]
+body:
+  - type: textarea
+    id: besoin
+    attributes:
+      label: Besoin metier
+      description: Quel probleme cette evolution resout-elle ? Decrivez le besoin, pas la solution technique.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: utilisateur
+    attributes:
+      label: Utilisateur concerne
+      description: Profil principal vise par l'evolution.
+      options:
+        - Citoyen
+        - Moderateur
+        - Administrateur
+        - Super-administrateur
+        - Utilisateur non authentifie
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptation
+    attributes:
+      label: Criteres d'acceptation
+      description: Conditions verifiables permettant de declarer l'evolution terminee.
+      placeholder: |
+        - Etant donne un moderateur connecte
+        - Quand il ouvre la file de moderation
+        - Alors les ressources en attente sont triees par date de soumission
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Contournement actuel
+      description: Comment le besoin est-il couvert aujourd'hui, s'il l'est ?
+    validations:
+      required: false

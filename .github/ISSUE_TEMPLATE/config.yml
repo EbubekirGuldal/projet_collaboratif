@@ -1,0 +1,22 @@
+# Interdit l'ouverture d'un ticket hors formulaire : chaque demande arrive
+# ainsi avec les champs necessaires a sa qualification.
+blank_issues_enabled: false
+
+contact_links:
+  - name: Signalement d'une vulnerabilite exploitable
+    url: https://github.com/EbubekirGuldal/projet_collaboratif/security/advisories/new
+    about: >-
+      Une faille exploitable ne se declare pas dans un ticket public. Passez par
+      un avis de securite prive (procedure et delais dans SECURITY.md).
+
+  - name: Question sur la contribution au projet
+    url: https://github.com/EbubekirGuldal/projet_collaboratif/blob/master/CONTRIBUTING.md
+    about: >-
+      Conventions de branches, format des commits, cycle de vie d'un ticket et
+      regles de revue.
+
+  - name: Documentation du projet
+    url: https://github.com/EbubekirGuldal/projet_collaboratif/tree/master/docs
+    about: >-
+      Plan de deploiement, plan de securisation, conteneurisation, RGPD, gestion
+      des tickets.
