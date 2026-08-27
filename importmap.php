@@ -12,10 +12,11 @@
  * The "importmap:require" command can be used to add new entries to this file.
  */
 return [
-    'app' => [
-        'path' => './assets/app.js',
-        'entrypoint' => true,
-    ],
+    // 'app' n'est volontairement pas declare ici : assets/app.js est compile
+    // par Webpack Encore (webpack.config.js, .addEntry('app')) et servi par
+    // encore_entry_script_tags(). Le declarer en entrypoint AssetMapper le
+    // chargeait une seconde fois et imposait a AssetMapper de resoudre
+    // 'bootstrap', qui n'existe que dans node_modules.
     '@hotwired/stimulus' => [
         'version' => '3.2.2',
     ],

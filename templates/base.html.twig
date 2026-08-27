@@ -83,7 +83,10 @@
 
     {% block javascripts %}
         {{ encore_entry_script_tags('app') }}
-        {% block importmap %}{{ importmap('app') }}{% endblock %}
+        {# Pas d'appel a importmap() : les assets sont delivres par Webpack
+           Encore (ligne au-dessus). Les entrees d'importmap.php pointent vers
+           assets/vendor/, qui n'est pas versionne et n'existe donc ni en CI ni
+           dans l'image Docker : ce bloc produisait des balises mortes. #}
 
         <script>
         document.addEventListener('DOMContentLoaded', function () {
