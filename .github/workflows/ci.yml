@@ -116,21 +116,32 @@ jobs:
     name: Build & Push Docker image
     runs-on: ubuntu-latest
     needs: tests
-    if: github.ref == 'refs/heads/master'
     steps:
       - name: Checkout du code
         uses: actions/checkout@v4
 
+      # GHCR n'accepte que des noms d'image en minuscules, or le proprietaire
+      # du depot contient des majuscules (EbubekirGuldal).
+      - name: Nom de l image en minuscules
+        id: image
+        run: echo "name=ghcr.io/${GITHUB_REPOSITORY,,}" >> "$GITHUB_OUTPUT"
+
       - name: Connexion au GitHub Container Registry
+        if: github.ref == 'refs/heads/master'
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build et push de l image Docker
+      # L image est construite a chaque push et sur chaque PR : une PR qui
+      # casse le Dockerfile est detectee avant le merge. Le push vers le
+      # registre, lui, reste reserve a master.
+      - name: Build de l image Docker (push uniquement sur master)
         uses: docker/build-push-action@v6
         with:
           context: .
-          push: true
-          tags: ghcr.io/${{ github.repository }}:latest
+          push: ${{ github.ref == 'refs/heads/master' }}
+          tags: ${{ steps.image.outputs.name }}:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

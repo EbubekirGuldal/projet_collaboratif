@@ -1,37 +1,53 @@
+# Stack applicative. Les valeurs sensibles sont lues dans l'environnement
+# (fichier .env.local a la racine, ou secrets de la plateforme de deploiement) :
+# elles n'ont volontairement pas de valeur par defaut, compose refuse de
+# demarrer si elles manquent.
 
 services:
   app:
     image: ghcr.io/ebubekirguldal/projet_collaboratif:latest
     ports:
-      - "8080:80"
+      - "${APP_PORT:-8080}:80"
     environment:
       APP_ENV: prod
-      APP_SECRET: ${APP_SECRET}
-      DATABASE_URL: "postgresql://${POSTGRES_USER:-app}:${POSTGRES_PASSWORD:-!ChangeMe!}@database:5432/${POSTGRES_DB:-app}?serverVersion=16"
+      APP_SECRET: ${APP_SECRET:?APP_SECRET est requis}
+      DATABASE_URL: "mysql://${MYSQL_USER:-app}:${MYSQL_PASSWORD:?MYSQL_PASSWORD est requis}@database:3306/${MYSQL_DATABASE:-app}?serverVersion=8.0&charset=utf8mb4"
+      JWT_PASSPHRASE: ${JWT_PASSPHRASE:?JWT_PASSPHRASE est requis}
+      DEFAULT_URI: ${DEFAULT_URI:-http://localhost:8080}
+      MAILER_DSN: ${MAILER_DSN:-null://null}
+      MESSENGER_TRANSPORT_DSN: doctrine://default?auto_setup=0
+      CORS_ALLOW_ORIGIN: ${CORS_ALLOW_ORIGIN:-^https?://(localhost|127\.0\.0\.1)(:[0-9]+)?$$}
+    volumes:
+      # Les cles JWT sont generees au premier demarrage : sans ce volume, tous
+      # les tokens emis sont invalides a chaque redemarrage du conteneur.
+      - jwt_keys:/var/www/html/config/jwt
+      # Photos televersees par les utilisateurs (VichUploader)
+      - uploads:/var/www/html/public/uploads
     depends_on:
       database:
         condition: service_healthy
+    restart: unless-stopped
 
-###> doctrine/doctrine-bundle ###
   database:
-    image: postgres:${POSTGRES_VERSION:-16}-alpine
+    # MySQL et non PostgreSQL : les migrations du projet sont MySQL
+    # (ENGINE = InnoDB, AUTO_INCREMENT, utf8mb4).
+    image: mysql:${MYSQL_VERSION:-8.0}
     environment:
-      POSTGRES_DB: ${POSTGRES_DB:-app}
-      # You should definitely change the password in production
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-!ChangeMe!}
-      POSTGRES_USER: ${POSTGRES_USER:-app}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-app}
+      MYSQL_USER: ${MYSQL_USER:-app}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:?MYSQL_PASSWORD est requis}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?MYSQL_ROOT_PASSWORD est requis}
     healthcheck:
-      test: ["CMD", "pg_isready", "-d", "${POSTGRES_DB:-app}", "-U", "${POSTGRES_USER:-app}"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "--silent"]
+      interval: 10s
       timeout: 5s
-      retries: 5
-      start_period: 60s
+      retries: 10
+      start_period: 30s
     volumes:
-      - database_data:/var/lib/postgresql/data:rw
-      # You may use a bind-mounted host directory instead, so that it is harder to accidentally remove the volume and lose all your data!
-      # - ./docker/db/data:/var/lib/postgresql/data:rw
-###< doctrine/doctrine-bundle ###
+      - database_data:/var/lib/mysql:rw
+    restart: unless-stopped
 
 volumes:
-###> doctrine/doctrine-bundle ###
   database_data:
-###< doctrine/doctrine-bundle ###
+  jwt_keys:
+  uploads:
