@@ -74,6 +74,7 @@ class AuthApiRegisterTest extends WebTestCase
         $this->assertResponseIsSuccessful();
 
         $charge = json_decode($client->getResponse()->getContent(), true, 512, JSON_THROW_ON_ERROR);
-        $this->assertNull($charge['user']['firstName'] ?? 'non-null');
+        $this->assertArrayHasKey('firstName', $charge['user']);
+        $this->assertNull($charge['user']['firstName']);
     }
 }
