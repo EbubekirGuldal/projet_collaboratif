@@ -1,0 +1,193 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^Call to an undefined method App\\Entity\\Resource\:\:setVisibilityStatus\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Command/DemoDataCommand.php
+
+		-
+			message: '#^Call to an undefined method App\\Entity\\UserResourceState\:\:setCompletedAt\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Command/DemoDataCommand.php
+
+		-
+			message: '#^Call to an undefined method App\\Entity\\UserResourceState\:\:setIsFavorite\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Command/DemoDataCommand.php
+
+		-
+			message: '#^Call to an undefined method App\\Entity\\UserResourceState\:\:setIsSavedForLater\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Command/DemoDataCommand.php
+
+		-
+			message: '#^Call to an undefined method App\\Entity\\UserResourceState\:\:setLastInteractionAt\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Command/DemoDataCommand.php
+
+		-
+			message: '#^Call to an undefined method App\\Entity\\UserResourceState\:\:setStartedAt\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Command/DemoDataCommand.php
+
+		-
+			message: '#^Parameter \#1 \$resourceStatus of method App\\Entity\\Resource\:\:setResourceStatus\(\) expects App\\Enum\\ResourceStatus, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Command/DemoDataCommand.php
+
+		-
+			message: '#^Call to an undefined method App\\Entity\\UserResourceState\:\:setCompletedAt\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Command/PresentationDataResetCommand.php
+
+		-
+			message: '#^Call to an undefined method App\\Entity\\UserResourceState\:\:setIsFavorite\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Command/PresentationDataResetCommand.php
+
+		-
+			message: '#^Call to an undefined method App\\Entity\\UserResourceState\:\:setIsSavedForLater\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Command/PresentationDataResetCommand.php
+
+		-
+			message: '#^Call to an undefined method App\\Entity\\UserResourceState\:\:setLastInteractionAt\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Command/PresentationDataResetCommand.php
+
+		-
+			message: '#^Call to an undefined method App\\Entity\\UserResourceState\:\:setStartedAt\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Command/PresentationDataResetCommand.php
+
+		-
+			message: '#^Method App\\Command\\PresentationDataResetCommand\:\:createResources\(\) should return array\<string, App\\Entity\\Resource\> but returns array\<int\|string, App\\Entity\\Resource\>\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Command/PresentationDataResetCommand.php
+
+		-
+			message: '#^Offset ''3114'' does not exist on array\<string, App\\Entity\\Resource\>\.$#'
+			identifier: offsetAccess.notFound
+			count: 2
+			path: src/Command/PresentationDataResetCommand.php
+
+		-
+			message: '#^Call to an undefined method Symfony\\Component\\Security\\Core\\User\\UserInterface\:\:setLastConnexion\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Controller/Api/AuthApiController.php
+
+		-
+			message: '#^Parameter \#1 \$user of method App\\Entity\\UserLiked\:\:setUser\(\) expects App\\Entity\\User\|null, Symfony\\Component\\Security\\Core\\User\\UserInterface\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Controller/Api/ResourceApiController.php
+
+		-
+			message: '#^Call to an undefined method Symfony\\Component\\Security\\Core\\User\\UserInterface\:\:getPassword\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Controller/Api/UserApiController.php
+
+		-
+			message: '#^Call to an undefined method Symfony\\Component\\Security\\Core\\User\\UserInterface\:\:setPassword\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Controller/Api/UserApiController.php
+
+		-
+			message: '#^Parameter \#1 \$user of method Symfony\\Component\\PasswordHasher\\Hasher\\UserPasswordHasherInterface\:\:hashPassword\(\) expects Symfony\\Component\\Security\\Core\\User\\PasswordAuthenticatedUserInterface, Symfony\\Component\\Security\\Core\\User\\UserInterface given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Controller/Api/UserApiController.php
+
+		-
+			message: '#^Unreachable statement \- code above always terminates\.$#'
+			identifier: deadCode.unreachable
+			count: 1
+			path: src/Controller/ProfileController.php
+
+		-
+			message: '#^Property App\\Entity\\Category\:\:\$id \(int\|null\) is never assigned int so it can be removed from the property type\.$#'
+			identifier: property.unusedType
+			count: 1
+			path: src/Entity/Category.php
+
+		-
+			message: '#^Property App\\Entity\\Comment\:\:\$id \(int\|null\) is never assigned int so it can be removed from the property type\.$#'
+			identifier: property.unusedType
+			count: 1
+			path: src/Entity/Comment.php
+
+		-
+			message: '#^Property App\\Entity\\ModerationLog\:\:\$id \(int\|null\) is never assigned int so it can be removed from the property type\.$#'
+			identifier: property.unusedType
+			count: 1
+			path: src/Entity/ModerationLog.php
+
+		-
+			message: '#^Property App\\Entity\\RelationKind\:\:\$id \(int\|null\) is never assigned int so it can be removed from the property type\.$#'
+			identifier: property.unusedType
+			count: 1
+			path: src/Entity/RelationKind.php
+
+		-
+			message: '#^Property App\\Entity\\ResetPasswordRequest\:\:\$id \(int\|null\) is never assigned int so it can be removed from the property type\.$#'
+			identifier: property.unusedType
+			count: 1
+			path: src/Entity/ResetPasswordRequest.php
+
+		-
+			message: '#^Property App\\Entity\\Resource\:\:\$id \(int\|null\) is never assigned int so it can be removed from the property type\.$#'
+			identifier: property.unusedType
+			count: 1
+			path: src/Entity/Resource.php
+
+		-
+			message: '#^Property App\\Entity\\Resource\:\:\$sharesCount \(int\|null\) is never assigned null so it can be removed from the property type\.$#'
+			identifier: property.unusedType
+			count: 1
+			path: src/Entity/Resource.php
+
+		-
+			message: '#^Property App\\Entity\\ResourceLike\:\:\$id \(int\|null\) is never assigned int so it can be removed from the property type\.$#'
+			identifier: property.unusedType
+			count: 1
+			path: src/Entity/ResourceLike.php
+
+		-
+			message: '#^Property App\\Entity\\RessourceType\:\:\$id \(int\|null\) is never assigned int so it can be removed from the property type\.$#'
+			identifier: property.unusedType
+			count: 1
+			path: src/Entity/RessourceType.php
+
+		-
+			message: '#^Property App\\Entity\\Share\:\:\$id \(int\|null\) is never assigned int so it can be removed from the property type\.$#'
+			identifier: property.unusedType
+			count: 1
+			path: src/Entity/Share.php
+
+		-
+			message: '#^Property App\\Entity\\UserLiked\:\:\$id \(int\|null\) is never assigned int so it can be removed from the property type\.$#'
+			identifier: property.unusedType
+			count: 1
+			path: src/Entity/UserLiked.php
+
+		-
+			message: '#^Property App\\Entity\\UserResourceState\:\:\$id \(int\|null\) is never assigned int so it can be removed from the property type\.$#'
+			identifier: property.unusedType
+			count: 1
+			path: src/Entity/UserResourceState.php

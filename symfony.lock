@@ -85,6 +85,9 @@
             "./config/packages/nelmio_cors.yaml"
         ]
     },
+    "phpstan/phpstan": {
+        "version": "2.2.9"
+    },
     "phpunit/phpunit": {
         "version": "11.5",
         "recipe": {
@@ -99,6 +102,9 @@
             "./tests/bootstrap.php",
             "./bin/phpunit"
         ]
+    },
+    "squizlabs/php_codesniffer": {
+        "version": "3.13.6"
     },
     "symfony/asset-mapper": {
         "version": "7.3",

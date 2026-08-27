@@ -1,3 +1,6 @@
+# Genere par cache:warmup a partir de Symfony 7.4, ne doit pas etre versionne
+/config/reference.php
+
 # Fichiers generes par macOS
 .DS_Store
 
