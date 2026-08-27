@@ -1,0 +1,58 @@
+# Analyse statique de securite CodeQL.
+#
+# CodeQL cherche des motifs de vulnerabilite dans le code du projet lui-meme
+# (injection, XSS, chemins de donnees non assainis), la ou `composer audit` et
+# `npm audit` ne regardent que les dependances. Les deux sont complementaires :
+# l'un couvre le code ecrit par l'equipe, l'autre le code importe.
+#
+# Les resultats remontent dans l'onglet Security > Code scanning du depot.
+
+name: CodeQL
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+  schedule:
+    # Le lundi a 05h00 UTC. L'analyse periodique compte : la base de requetes
+    # CodeQL evolue, un code inchange peut devenir signale sans qu'aucun push
+    # ne declenche l'analyse.
+    - cron: "0 5 * * 1"
+
+permissions:
+  contents: read
+  # Requis pour publier les resultats dans Code scanning.
+  security-events: write
+
+jobs:
+  analyse:
+    name: Analyse CodeQL (${{ matrix.language }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # Les deux langages reellement presents dans le depot : PHP pour
+        # l'application Symfony (src/), JavaScript pour les assets front
+        # (assets/) et l'application mobile (mobile/).
+        language: [php, javascript-typescript]
+
+    steps:
+      - name: Checkout du code
+        uses: actions/checkout@v4
+
+      - name: Initialisation de CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: ${{ matrix.language }}
+          # security-and-quality ajoute aux requetes de securite celles de
+          # qualite : plus de bruit, mais utile sur un projet qui n'avait
+          # aucune analyse statique jusqu'ici.
+          queries: security-and-quality
+
+      # PHP et JavaScript sont des langages interpretes : CodeQL les analyse
+      # sans etape de compilation.
+      - name: Analyse
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: "/language:${{ matrix.language }}"
