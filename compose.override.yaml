@@ -1,10 +1,11 @@
+# Surcharges de developpement local uniquement (compose les fusionne
+# automatiquement avec compose.yaml).
 
 services:
-###> doctrine/doctrine-bundle ###
   database:
+    # Expose MySQL sur un port aleatoire de l'hote : `docker compose port database 3306`
     ports:
-      - "5432"
-###< doctrine/doctrine-bundle ###
+      - "3306"
 
 ###> symfony/mailer ###
   mailer:

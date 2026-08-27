@@ -1,0 +1,35 @@
+# Contexte de build : on n'envoie au daemon que ce qui sert a l'image.
+# Critique : vendor/ et public/build/ doivent venir des stages de build,
+# jamais de la machine qui lance le build.
+
+.git
+.gitignore
+.github
+.DS_Store
+.editorconfig
+
+# Reconstruits dans l'image
+node_modules
+vendor
+var
+public/build
+public/bundles
+
+# Secrets et config locale : ne doivent jamais entrer dans l'image
+.env
+.env.local
+.env.*.local
+.env.local.php
+config/jwt/*.pem
+
+# Outillage de dev, inutile en prod
+tests
+.phpunit.cache
+phpunit.dist.xml
+phpunit.xml
+docs
+mobile
+compose.yaml
+compose.override.yaml
+Dockerfile
+.dockerignore
