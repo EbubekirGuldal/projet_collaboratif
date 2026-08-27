@@ -21,8 +21,11 @@ services:
       # Les cles JWT sont generees au premier demarrage : sans ce volume, tous
       # les tokens emis sont invalides a chaque redemarrage du conteneur.
       - jwt_keys:/var/www/html/config/jwt
-      # Photos televersees par les utilisateurs (VichUploader)
-      - uploads:/var/www/html/public/uploads
+      # Photos televersees par les utilisateurs. Les chemins sont ceux
+      # declares dans config/packages/vich_uploader.yaml : les mappings
+      # "products" et "users" ecrivent dans public/images/resources et
+      # public/images/users.
+      - uploads:/var/www/html/public/images
     depends_on:
       database:
         condition: service_healthy
