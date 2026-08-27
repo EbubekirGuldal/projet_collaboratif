@@ -1,0 +1,72 @@
+# Mises a jour automatiques des dependances.
+#
+# Dependabot ouvre une pull request par mise a jour disponible ; le pipeline
+# s'y applique comme sur n'importe quelle autre PR, donc une montee de version
+# qui casse les tests ou le deploiement est visible avant le merge.
+#
+# Ce fichier couvre les trois ecosystemes reellement presents dans le depot.
+# Il complete, sans le remplacer, le job `security` du pipeline : Dependabot
+# propose les correctifs, le job verifie qu'aucune vulnerabilite connue ne
+# subsiste.
+
+version: 2
+updates:
+  # ------------------------------------------------------------- PHP
+  - package-ecosystem: composer
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+      timezone: Europe/Paris
+    open-pull-requests-limit: 5
+    labels:
+      - "type:dette-technique"
+      - "statut:a-qualifier"
+    commit-message:
+      prefix: "chore(deps)"
+      include: scope
+    groups:
+      # Les composants Symfony se mettent a jour ensemble : les separer
+      # produirait des PR qui echouent chacune sur une incompatibilite de
+      # version avec les autres composants.
+      symfony:
+        patterns:
+          - "symfony/*"
+      doctrine:
+        patterns:
+          - "doctrine/*"
+
+  # ------------------------------------------------------------ Node
+  - package-ecosystem: npm
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+      timezone: Europe/Paris
+    open-pull-requests-limit: 5
+    labels:
+      - "type:dette-technique"
+      - "statut:a-qualifier"
+    commit-message:
+      prefix: "chore(deps)"
+      include: scope
+
+  # -------------------------------------------- Actions GitHub du pipeline
+  # Les actions sont du code execute avec les droits du depot : les laisser
+  # figees est un risque a part entiere. Cela couvre aussi les depreciations
+  # d'environnement d'execution (Node 20 vers Node 24, par exemple).
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+      timezone: Europe/Paris
+    open-pull-requests-limit: 5
+    labels:
+      - "type:dette-technique"
+      - "statut:a-qualifier"
+    commit-message:
+      prefix: "ci(deps)"
