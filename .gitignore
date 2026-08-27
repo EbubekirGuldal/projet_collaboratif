@@ -1,4 +1,8 @@
 
+# Le .env local peut contenir des secrets : il ne doit jamais etre versionne.
+# Les valeurs par defaut partagees sont dans .env.dist (versionne).
+/.env
+
 ###> symfony/framework-bundle ###
 /.env.local
 /.env.local.php
