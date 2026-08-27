@@ -83,7 +83,7 @@
 
     {% block javascripts %}
         {{ encore_entry_script_tags('app') }}
-        {% block importmap %}{{ importmap('app') }}{% endblock %}
+        {% block importmap %}{{ importmap() }}{% endblock %}
 
         <script>
         document.addEventListener('DOMContentLoaded', function () {
