@@ -100,11 +100,16 @@ final class AuthApiController extends AbstractController
                 $data["password"]
             );
 
-            if ($data["firstName"] != null) {
-                $user->setFirstName($data["firstname"]);
+            // ANO-002 : la valeur etait lue dans $data["firstname"] alors que le
+            // test portait sur $data["firstName"]. La cle absente valait null,
+            // donc le prenom etait silencieusement perdu sans qu'aucune erreur
+            // ne remonte. L'operateur ?? evite en outre l'avertissement PHP sur
+            // une cle absente lorsque le client ne transmet pas le champ.
+            if (($data["firstName"] ?? null) !== null) {
+                $user->setFirstName($data["firstName"]);
             }
 
-            if ($data["lastName"] != null) {
+            if (($data["lastName"] ?? null) !== null) {
                 $user->setLastName($data["lastName"]);
             }
 
