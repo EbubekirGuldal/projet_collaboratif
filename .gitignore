@@ -1,3 +1,5 @@
+# Fichiers generes par macOS
+.DS_Store
 
 # Le .env local peut contenir des secrets : il ne doit jamais etre versionne.
 # Les valeurs par defaut partagees sont dans .env.dist (versionne).
