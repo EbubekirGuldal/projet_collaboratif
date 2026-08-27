@@ -162,6 +162,11 @@ jobs:
             jq -r '.advisories | to_entries[] | .key as $p | .value[] | select(.severity == "critical" or .severity == "high") | "  [\(.severity)] \($p) : \(.title) (\(.cve // "sans CVE"))"' audit-composer.json
             exit 1
           fi
+          # Indispensable : le shell tourne avec `bash -e` et le statut de sortie
+          # du script est celui de sa derniere commande. Sans cette ligne, le
+          # `if` precedent, faux quand il n'y a aucun avis bloquant, ferait
+          # sortir l'etape en erreur exactement dans le cas nominal.
+          echo "Aucun avis bloquant."
 
       # --- Dependances front -----------------------------------------------
       # npm audit sait filtrer par severite nativement : --audit-level=high ne
