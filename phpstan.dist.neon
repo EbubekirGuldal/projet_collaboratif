@@ -1,0 +1,15 @@
+parameters:
+    level: 5
+    paths:
+        - src
+    # Le conteneur compile permet a PHPStan de connaitre les services et les
+    # types de retour de l'injection de dependances Symfony.
+    symfony:
+        containerXmlPath: var/cache/dev/App_KernelDevDebugContainer.xml
+    # La dette existante est figee dans phpstan-baseline.neon (voir ce fichier).
+    # Sans baseline, introduire une analyse statique sur une base de code qui
+    # n'en avait jamais eu rendrait le pipeline rouge en permanence.
+includes:
+    - phpstan-baseline.neon
+    - vendor/phpstan/phpstan-symfony/extension.neon
+    - vendor/phpstan/phpstan-symfony/rules.neon
